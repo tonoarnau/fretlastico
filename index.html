@@ -2825,6 +2825,10 @@
         statusEl.textContent = ok ? '🔤 Tipografía musical: cargada ✓' : '🔤 Tipografía musical: no disponible (usando alternativa)';
         statusEl.className = 'piano-font-status ' + (ok ? 'ok' : 'fallback');
       }
+      // si el pentagrama ya se había dibujado (el usuario entró en Piano antes de confirmar la
+      // tipografía), se redibuja la clave para que pase de la letra de seguridad al símbolo real
+      const kb = document.getElementById('pianoKeyboard');
+      if (kb && kb.children.length) renderStaffBase();
     };
     if (!(window.document && document.fonts && document.fonts.load)) { setStatus(false); return; } // navegador sin Font Loading API: fallback de serie
     const timeout = new Promise(resolve => setTimeout(() => resolve(false), 2500));
@@ -2950,21 +2954,35 @@
       [2,4,6,8,10].forEach(rel => {
         svg.appendChild(mk('line', { x1: lineX1, x2: lineX2, y1: pianoY(rel,p), y2: pianoY(rel,p), stroke: '#2a2a2a', 'stroke-width': 0.9 }));
       });
-      // "G" en la propia línea de Sol (2a linea, rel=4): letra en tipografia estandar, garantizado
-      // que se ve en cualquier dispositivo (los símbolos Unicode de clave musical no siempre
-      // renderizan bien, lo que podía dejar la clave "invisible" hasta que aparecía una nota).
-      const clefG = mk('text', { x: 14, y: pianoY(4,p) + 9, 'font-size': 26, 'font-family': 'Georgia, serif', 'font-weight': 700, fill: '#1a1a1a' });
-      clefG.textContent = 'G';
-      svg.appendChild(clefG);
+      if (pianoMusicFontReady) {
+        // símbolo real de clave de Sol, con la tipografía musical ya confirmada como cargada
+        const clefG = mk('text', { x: 10, y: pianoY(6,p) + 11, 'font-family': '"Noto Music", serif', 'font-size': 38, fill: '#1a1a1a' });
+        clefG.textContent = '\u{1D11E}';
+        svg.appendChild(clefG);
+      } else {
+        // "G" en la propia línea de Sol (2a linea, rel=4): letra en tipografia estandar, garantizado
+        // que se ve en cualquier dispositivo (los símbolos Unicode de clave musical no siempre
+        // renderizan bien, lo que podía dejar la clave "invisible" hasta que aparecía una nota).
+        const clefG = mk('text', { x: 14, y: pianoY(4,p) + 9, 'font-size': 26, 'font-family': 'Georgia, serif', 'font-weight': 700, fill: '#1a1a1a' });
+        clefG.textContent = 'G';
+        svg.appendChild(clefG);
+      }
     }
     if (p.clefs.includes('bass')) {
       [-10,-8,-6,-4,-2].forEach(rel => {
         svg.appendChild(mk('line', { x1: lineX1, x2: lineX2, y1: pianoY(rel,p), y2: pianoY(rel,p), stroke: '#2a2a2a', 'stroke-width': 0.9 }));
       });
-      // "F" en su propia línea (2a linea empezando por arriba, rel=-4), mismo motivo que arriba
-      const clefF = mk('text', { x: 14, y: pianoY(-4,p) + 8, 'font-size': 24, 'font-family': 'Georgia, serif', 'font-weight': 700, fill: '#1a1a1a' });
-      clefF.textContent = 'F';
-      svg.appendChild(clefF);
+      if (pianoMusicFontReady) {
+        // símbolo real de clave de Fa
+        const clefF = mk('text', { x: 10, y: pianoY(-6,p) + 8, 'font-family': '"Noto Music", serif', 'font-size': 24, fill: '#1a1a1a' });
+        clefF.textContent = '\u{1D122}';
+        svg.appendChild(clefF);
+      } else {
+        // "F" en su propia línea (2a linea empezando por arriba, rel=-4), mismo motivo que arriba
+        const clefF = mk('text', { x: 14, y: pianoY(-4,p) + 8, 'font-size': 24, 'font-family': 'Georgia, serif', 'font-weight': 700, fill: '#1a1a1a' });
+        clefF.textContent = 'F';
+        svg.appendChild(clefF);
+      }
     }
     svg.appendChild(mk('g', { id: 'staffNoteLayer' }));
     void svg.offsetHeight; // fuerza un repintado inmediato (evita que el navegador deje el dibujo a medias)
