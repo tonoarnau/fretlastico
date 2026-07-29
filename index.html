@@ -122,6 +122,9 @@
   .piano-controls-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
   .piano-note-display{ font-family:'Oswald', sans-serif; font-weight:700;
     font-size: calc(16px * var(--fs-scale)); color: var(--accent-play); }
+  .piano-font-status{ font-family:'Inter', sans-serif; font-size: calc(11px * var(--fs-scale)); color: var(--ink-dim); }
+  .piano-font-status.ok{ color: #4caf50; }
+  .piano-font-status.fallback{ color: var(--ink-dim); }
   .piano-clef-toggle{ margin-left:auto; }
 
   .staff-row{ display:flex; align-items:stretch; gap:12px; flex: 0 0 280px; height:280px; }
@@ -567,6 +570,7 @@
     </div>
     <button class="play-btn" id="pianoRandomBtn">🎲 Nota aleatoria en el pentagrama</button>
     <div class="piano-note-display" id="pianoNoteDisplay">Toca una tecla, o pulsa el dado</div>
+    <span class="piano-font-status" id="pianoFontStatus">🔤 Comprobando tipografía musical…</span>
     <div class="pill-group piano-clef-toggle" id="pianoClefGroup">
       <button data-clef="both" class="active">Ambas claves</button>
       <button data-clef="treble">Solo clave de Sol</button>
@@ -2813,12 +2817,21 @@
   // "false" y pianoDrawNoteAt usa el fallback vectorial de siempre — nunca se rompe por esto.
   let pianoMusicFontReady = false;
   function pianoDetectMusicFont(){
-    if (!(window.document && document.fonts && document.fonts.load)) return; // navegador sin Font Loading API: fallback de serie
+    const statusEl = document.getElementById('pianoFontStatus');
+    const setStatus = (ok) => {
+      pianoMusicFontReady = ok;
+      console.log('[Fretlastico] Tipografía musical (Noto Music):', ok ? 'CARGADA ✓' : 'no disponible, usando alternativa vectorial');
+      if (statusEl) {
+        statusEl.textContent = ok ? '🔤 Tipografía musical: cargada ✓' : '🔤 Tipografía musical: no disponible (usando alternativa)';
+        statusEl.className = 'piano-font-status ' + (ok ? 'ok' : 'fallback');
+      }
+    };
+    if (!(window.document && document.fonts && document.fonts.load)) { setStatus(false); return; } // navegador sin Font Loading API: fallback de serie
     const timeout = new Promise(resolve => setTimeout(() => resolve(false), 2500));
     const loadCheck = document.fonts.load('24px "Noto Music"')
       .then(() => document.fonts.check('24px "Noto Music"'))
       .catch(() => false);
-    Promise.race([loadCheck, timeout]).then(ok => { pianoMusicFontReady = !!ok; });
+    Promise.race([loadCheck, timeout]).then(setStatus);
   }
   // letra y accidente de cada clase de tono, coherente con el DISPLAY que ya usa toda la app
   const PIANO_NOTE_INFO = [
