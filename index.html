@@ -528,16 +528,27 @@
         <button data-dstyle="metal">Metal</button>
         <button data-dstyle="punk">Punk</button>
         <button data-dstyle="blues">Blues Shuffle</button>
+        <button data-dstyle="bossa">Bossa Nova</button>
+        <button data-dstyle="ska">Ska</button>
+        <button data-dstyle="disco">Disco</button>
+        <button data-dstyle="hiphop">Hip-Hop</button>
+        <button data-dstyle="vals">Vals (3/4)</button>
       </div>
       <button class="play-btn" id="drumPlayBtn">▶ Reproducir</button>
       <button class="drum-mini-btn" id="drumFillToggle" title="Fill automático cada 4 compases">🔀 Fill</button>
       <button class="drum-mini-btn" id="drumResetBtn" title="Restablecer el patrón original del estilo">↺ Restablecer</button>
+      <button class="drum-mini-btn" id="drumHumanizeToggle" title="Pequeñas variaciones aleatorias de tiempo y volumen, para que no suene tan de máquina">🎭 Humanizar</button>
+      <div class="drum-volume-ctrl">
+        <span class="label">Tempo</span>
+        <input type="range" id="drumBpmSlider" min="50" max="250" step="5" value="100">
+        <span id="drumBpmLabel">100 BPM</span>
+      </div>
       <div class="drum-volume-ctrl">
         <span class="label">Volumen</span>
         <input type="range" id="drumVolumeSlider" min="0" max="100" step="5" value="75">
         <span id="drumVolumeLabel">75%</span>
       </div>
-      <span class="drum-note">Usa el mismo tempo global · toca cada casilla: apagada → normal → acento</span>
+      <span class="drum-note">El tempo es el mismo en toda la app · toca cada casilla: apagada → normal → acento</span>
     </div>
     <div class="drum-step-grid" id="drumStepGrid"></div>
   </div>
@@ -1432,37 +1443,44 @@
   // verificados uno por uno contra el patrón real de cada género antes de programar nada
   // (ver la comprobación en texto: negras 1&3/2&4, sincopa de funk, "one drop" de reggae...).
   const DRUM_STYLES = {
-    rock:   { label: 'Rock',    kick:[0,8],       snare:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:0 },
-    pop:    { label: 'Pop',     kick:[0,6,8],     snare:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:0 },
-    funk:   { label: 'Funk',    kick:[0,3,6,10],  snare:[4,12], hihatClosed:Array.from({length:16},(_,i)=>i), swing:0 },
-    reggae: { label: 'Reggae',  kick:[8],         snare:[8],    hihatClosed:[2,6,10,14], swing:0 },
-    metal:  { label: 'Metal',   kick:[0,2,4,6,8,10,12,14], snare:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:0 },
-    punk:   { label: 'Punk',    kick:[0,4,8,12],  snare:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:0 },
-    blues:  { label: 'Blues Shuffle', kick:[0,8], snare:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:65 }
+    rock:   { label: 'Rock',    steps:16, kick:[0,8],       snare:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:0 },
+    pop:    { label: 'Pop',     steps:16, kick:[0,6,8],     snare:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:0 },
+    funk:   { label: 'Funk',    steps:16, kick:[0,3,6,10],  snare:[4,12], hihatClosed:Array.from({length:16},(_,i)=>i), swing:0 },
+    reggae: { label: 'Reggae', steps:16, kick:[8],         snare:[8],    hihatClosed:[2,6,10,14], swing:0 },
+    metal:  { label: 'Metal',   steps:16, kick:[0,2,4,6,8,10,12,14], snare:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:0 },
+    punk:   { label: 'Punk',    steps:16, kick:[0,4,8,12],  snare:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:0 },
+    blues:  { label: 'Blues Shuffle', steps:16, kick:[0,8], snare:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:65 },
+    bossa:  { label: 'Bossa Nova', steps:16, kick:[0,6,8,14], clap:[4,12], hihatClosed:[0,2,4,6,8,10,12,14], swing:0 },
+    ska:    { label: 'Ska',     steps:16, kick:[0,8], snare:[4,12], hihatClosed:[0,4,8,12], hihatOpen:[2,6,10,14], swing:0 },
+    disco:  { label: 'Disco',   steps:16, kick:[0,4,8,12], snare:[4,12], hihatClosed:[0,4,8,12], hihatOpen:[2,6,10,14], swing:0 },
+    hiphop: { label: 'Hip-Hop', steps:16, kick:[0,3,7,10], snare:[4,12], hihatClosed:Array.from({length:16},(_,i)=>i), swing:0 },
+    vals:   { label: 'Vals (3/4)', steps:12, kick:[0], snare:[4,8], hihatClosed:[0,2,4,6,8,10], swing:0 }
   };
   const DRUM_VOICES = ['crash','hihatOpen','hihatClosed','clap','snare','kick'];
   const DRUM_VOICE_LABELS = { crash:'Platillo', hihatOpen:'Hi-hat abierto', hihatClosed:'Hi-hat', clap:'Palmada', snare:'Caja', kick:'Bombo' };
 
   // relleno genérico (redoble de caja + platillo) que sustituye los 4 últimos pasos del compás
-  // cuando el fill automático está activo — un giro clásico de "aviso" antes de repetir el patrón,
-  // funciona razonablemente bien encima de cualquiera de los 7 estilos sin tener que hacer uno
-  // distinto para cada uno.
-  const DRUM_FILL = {
-    kick:        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    snare:       [0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,0],
-    hihatClosed: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    hihatOpen:   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    clap:        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    crash:       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+  // cuando el fill automático está activo — un giro clásico de "aviso" antes de repetir el patrón.
+  // Definido de forma RELATIVA al final del compás (posiciones -4,-3,-2,-1), no en una posición
+  // fija como "paso 12", para que funcione igual de bien con un compás de 16 pasos (4/4) que con
+  // uno de 12 (el vals en 3/4) — cualquier estilo con al menos 4 pasos puede usarlo.
+  const DRUM_FILL_LAST4 = {
+    kick:        [0,0,0,1],
+    snare:       [1,1,2,0],
+    hihatClosed: [0,0,0,0],
+    hihatOpen:   [0,0,0,0],
+    clap:        [0,0,0,0],
+    crash:       [0,0,0,1]
   };
 
   // convierte el formato disperso de los presets (array de índices activos) al formato editable
-  // de la rejilla (array de 16 valores: 0=apagado, 1=normal, 2=acento)
+  // de la rejilla (array de N valores según los pasos del estilo: 0=apagado, 1=normal, 2=acento)
   function drumBuildPatternFromStyle(styleKey){
     const style = DRUM_STYLES[styleKey];
+    const steps = style.steps || 16;
     const pattern = {};
     DRUM_VOICES.forEach(v => {
-      const arr = new Array(16).fill(0);
+      const arr = new Array(steps).fill(0);
       (style[v] || []).forEach(i => { arr[i] = 1; });
       pattern[v] = arr;
     });
@@ -1999,7 +2017,7 @@
     pianoChordRoot: 0,
     pianoChordOctave: 3,
     pianoChordQuality: 'major',
-    drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null },
+    drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null, humanize: false },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
              tonality: 'major', progressionIdx: null, progShapes: [], zoneIdx: 0, singleStringIdx: 0,
              voiceLeading: false },
@@ -3927,13 +3945,42 @@
     }
 
     const sets = t.mode === 'vertical' ? TRIAD_STRING_SETS_VERTICAL : TRIAD_STRING_SETS_HORIZONTAL;
-    const stringSet = sets[t.stringSetIdx];
     const zone = TRIAD_ZONES[t.zoneIdx];
-    const shape = triadComputeShape(t.root, t.quality, t.inversion, stringSet.idxs, zone.min, zone.max, t.mode);
+    const isFullNeck = zone.min <= 0 && zone.max >= 17;
+
+    let stringSet, shape, autoPicked = false;
+    if (isFullNeck) {
+      stringSet = sets[t.stringSetIdx];
+      shape = triadComputeShape(t.root, t.quality, t.inversion, stringSet.idxs);
+    } else {
+      // zona concreta: para una combinación fija de 3 cuerdas, cada nota solo aparece cada 12
+      // trastes exactos — así que casi nunca cabe una digitación entera dentro de una zona de
+      // solo 4-5 trastes con esas cuerdas fijas. En su lugar, se elige automáticamente qué juego
+      // de cuerdas (de las disponibles en este modo) cae más cerca de esa zona — misma búsqueda
+      // ya verificada que usa el "Mapa del mástil".
+      const zoneCenter = (zone.min + zone.max) / 2;
+      let best = null;
+      sets.forEach((set, idx) => {
+        const s = triadComputeShape(t.root, t.quality, t.inversion, set.idxs);
+        if (!s) return;
+        const avgFret = s.frets.reduce((a, b) => a + b, 0) / s.frets.length;
+        const dist = Math.abs(avgFret - zoneCenter);
+        if (!best || dist < best.dist) best = { idx, set, shape: s, dist };
+      });
+      if (best) {
+        stringSet = best.set;
+        shape = best.shape;
+        autoPicked = true;
+        if (t.stringSetIdx !== best.idx) {
+          t.stringSetIdx = best.idx;
+          document.querySelectorAll('#triadStringSetGroup button').forEach((b, i) => b.classList.toggle('active', i === best.idx));
+        }
+      }
+    }
 
     if (!shape) {
       wrap.innerHTML = '';
-      wrap.textContent = 'No hay ninguna digitación de esta tríada que quepa entera en esta zona — prueba otra zona o cuerdas.';
+      wrap.textContent = 'No hay ninguna digitación de esta tríada disponible cerca de esta zona.';
       info.innerHTML = '';
       return;
     }
@@ -3942,12 +3989,16 @@
     // panel informativo: qué nota va en cada cuerda, y qué grado es
     const invLabel = ['Fundamental', '1ª inversión', '2ª inversión'][t.inversion];
     const bassRow = shape.rows[shape.rows.length - 1]; // última fila = cuerda más grave del conjunto
+    const autoNote = autoPicked
+      ? `<div class="theory-note-small">Cuerdas (${stringSet.label}) elegidas automáticamente por ser las que mejor caen en esta zona.</div>`
+      : '';
     info.innerHTML = `
       <div><b>${DISPLAY[t.root]} ${quality.label}</b> · ${invLabel}</div>
       <div>Notas: ${quality.degrees.map((d,i) => DISPLAY[shape.tones[i]] + ' (' + d + ')').join(' · ')}</div>
       <div>Nota más grave (bajo): <b>${DISPLAY[bassRow.pc]}</b>, en la cuerda ${STRING_ORDINALS[bassRow.stringIdx]}</div>
       <div>Disposición: ${t.mode === 'vertical' ? 'vertical (cuerdas adyacentes, forma compacta)' : 'horizontal (cuerdas salteadas, más abierta)'}</div>
       <div>Rango de la digitación: ${shape.minFret === shape.maxFret ? 'los 3 dedos en el mismo traste' : (shape.maxFret - shape.minFret) + ' trastes'}</div>
+      ${autoNote}
     `;
   }
 
@@ -4532,50 +4583,66 @@
     if (!state.drumMachine.pattern) state.drumMachine.pattern = drumBuildPatternFromStyle(state.drumMachine.style);
   }
 
+  function drumCurrentSteps(){
+    return (DRUM_STYLES[state.drumMachine.style].steps) || 16;
+  }
+
   // valor efectivo de un paso: normalmente el patrón editable, pero si el fill automático está
-  // activo y estamos en un compás de fill (cada 4), los 4 últimos pasos se sustituyen por el
-  // redoble genérico — así no hace falta un fill distinto para cada uno de los 7 estilos.
-  function drumEffectiveStep(voice, step, isFillBar){
-    if (isFillBar && step >= 12) return DRUM_FILL[voice][step];
+  // activo y estamos en un compás de fill (cada 4), los últimos 4 pasos se sustituyen por el
+  // redoble genérico — definido de forma relativa al final del compás, así funciona igual con
+  // un compás de 16 pasos que con uno de 12 (el vals en 3/4).
+  function drumEffectiveStep(voice, step, isFillBar, totalSteps){
+    if (isFillBar && step >= totalSteps - 4) return DRUM_FILL_LAST4[voice][step - (totalSteps - 4)];
     return state.drumMachine.pattern[voice][step];
   }
 
-  function drumScheduleStep(step, time, isFillBar){
-    const vol = state.drumMachine.volume;
-    const velFor = (v) => v === 2 ? vol * 1.35 : vol; // el acento suena más fuerte
+  // humanización: un pellizco aleatorio y sutil de tiempo (±8ms) y volumen (±8%) por golpe, para
+  // que no suene tan "de máquina" — desactivable, ya que a veces se prefiere la precisión robótica.
+  function drumHumanize(time, vol){
+    if (!state.drumMachine.humanize) return { time, vol };
+    const timeJitter = (Math.random() - 0.5) * 0.016;
+    const volJitter = 1 + (Math.random() - 0.5) * 0.16;
+    return { time: time + timeJitter, vol: Math.max(0.05, vol * volJitter) };
+  }
+
+  function drumScheduleStep(step, time, isFillBar, totalSteps){
+    const baseVol = state.drumMachine.volume;
     DRUM_VOICES.forEach(voice => {
-      const val = drumEffectiveStep(voice, step, isFillBar);
+      const val = drumEffectiveStep(voice, step, isFillBar, totalSteps);
       if (!val) return;
-      const v = velFor(val);
-      if (voice === 'kick') playDrumKick(time, v);
-      else if (voice === 'snare') playDrumSnare(time, v);
-      else if (voice === 'hihatClosed') playDrumHihat(time, false, v);
-      else if (voice === 'hihatOpen') playDrumHihat(time, true, v);
-      else if (voice === 'clap') playDrumClap(time, v);
-      else if (voice === 'crash') playDrumCrash(time, v);
+      const vol = val === 2 ? baseVol * 1.35 : baseVol; // el acento suena más fuerte
+      const h = drumHumanize(time, vol);
+      if (voice === 'kick') playDrumKick(h.time, h.vol);
+      else if (voice === 'snare') playDrumSnare(h.time, h.vol);
+      else if (voice === 'hihatClosed') playDrumHihat(h.time, false, h.vol);
+      else if (voice === 'hihatOpen') playDrumHihat(h.time, true, h.vol);
+      else if (voice === 'clap') playDrumClap(h.time, h.vol);
+      else if (voice === 'crash') playDrumCrash(h.time, h.vol);
     });
 
     const ctx = getAudioCtx();
     const delayMs = Math.max(0, (time - ctx.currentTime) * 1000);
-    setTimeout(() => flashDrumStep(step, isFillBar), delayMs);
+    setTimeout(() => flashDrumStep(step, isFillBar, totalSteps), delayMs);
   }
 
-  function flashDrumStep(step, isFillBar){
+  function flashDrumStep(step, isFillBar, totalSteps){
     document.querySelectorAll('.drum-step-cell').forEach(el => {
       const isCurrent = Number(el.dataset.step) === step;
       el.classList.toggle('current', isCurrent);
-      el.classList.toggle('fill-active', isCurrent && isFillBar && step >= 12);
+      el.classList.toggle('fill-active', isCurrent && isFillBar && step >= totalSteps - 4);
     });
   }
 
   function drumScheduler(){
     const ctx = getAudioCtx();
     while (drumNextStepTime < ctx.currentTime + DRUM_SCHEDULE_AHEAD) {
-      const isFillBar = state.drumMachine.fillEnabled && (drumBarCount % 4 === 3);
-      drumScheduleStep(drumStepIndex, drumNextStepTime, isFillBar);
-      const beatDur = 60 / state.bpm;      // duración de una negra
       const style = DRUM_STYLES[state.drumMachine.style];
-      let stepDur = beatDur / 4;           // cada paso = semicorchea
+      const totalSteps = style.steps || 16;
+      const isFillBar = state.drumMachine.fillEnabled && (drumBarCount % 4 === 3);
+      drumScheduleStep(drumStepIndex, drumNextStepTime, isFillBar, totalSteps);
+      const beatDur = 60 / state.bpm;      // duración de una negra
+      let stepDur = beatDur / 4;           // cada paso = semicorchea (esto no cambia con el compás,
+                                            // solo cambia cuántos pasos tiene el compás entero)
       if (style.swing > 0) {
         // swing: los pasos "pares" (los "y" de cada corchea) se retrasan, mismo principio
         // matemático ya verificado para el swing del metrónomo — al 100% da el "feel" de tresillo
@@ -4584,7 +4651,7 @@
         stepDur = (beatDur / 2) * (isOffbeat ? (1 - firstFrac) : firstFrac);
       }
       drumNextStepTime += stepDur;
-      drumStepIndex = (drumStepIndex + 1) % 16;
+      drumStepIndex = (drumStepIndex + 1) % totalSteps;
       if (drumStepIndex === 0) drumBarCount++;
     }
     drumTimerId = setTimeout(drumScheduler, DRUM_LOOKAHEAD_MS);
@@ -4623,6 +4690,7 @@
 
   function renderDrumGrid(){
     drumEnsurePattern();
+    const totalSteps = drumCurrentSteps();
     const wrap = $('#drumStepGrid');
     wrap.innerHTML = '';
     DRUM_VOICES.forEach(voice => {
@@ -4634,7 +4702,8 @@
       rowEl.appendChild(label);
       const cellsEl = document.createElement('div');
       cellsEl.className = 'drum-row-cells';
-      for (let i = 0; i < 16; i++) {
+      cellsEl.style.gridTemplateColumns = `repeat(${totalSteps}, 1fr)`;
+      for (let i = 0; i < totalSteps; i++) {
         const val = state.drumMachine.pattern[voice][i];
         const cell = document.createElement('div');
         cell.className = 'drum-step-cell' + (val === 1 ? ' on' : '') + (val === 2 ? ' accent' : '') + (i % 4 === 0 ? ' beat-start' : '');
@@ -4654,6 +4723,9 @@
     $('#drumVolumeSlider').value = Math.round(state.drumMachine.volume * 100);
     $('#drumVolumeLabel').textContent = Math.round(state.drumMachine.volume * 100) + '%';
     $('#drumFillToggle').classList.toggle('active', state.drumMachine.fillEnabled);
+    $('#drumHumanizeToggle').classList.toggle('active', state.drumMachine.humanize);
+    $('#drumBpmSlider').value = state.bpm;
+    $('#drumBpmLabel').textContent = state.bpm + ' BPM';
     renderDrumGrid();
   }
 
@@ -5022,6 +5094,8 @@
         state.bpm = Math.min(250, state.bpm + state.speedIncrement);
         $('#bpmSlider').value = state.bpm;
         $('#bpmLabel').textContent = state.bpm + ' BPM';
+        $('#drumBpmSlider').value = state.bpm;
+        $('#drumBpmLabel').textContent = state.bpm + ' BPM';
         rebuildCurrentRiff(); // por si el riff lleva duración fija (estilos), recalcula con el nuevo bpm
         await sleep(300);
       }
@@ -5146,9 +5220,18 @@
   $('#bpmSlider').addEventListener('input', e => {
     state.bpm = Number(e.target.value);
     $('#bpmLabel').textContent = state.bpm + ' BPM';
+    $('#drumBpmSlider').value = state.bpm;
+    $('#drumBpmLabel').textContent = state.bpm + ' BPM';
     // los riffs de estilo llevan la duración de cada nota ya calculada en bpm en el momento de
     // construirse (para poder tener ritmos como el galope o el swing) — sin volver a construir el
     // riff aquí, cambiar el tempo no tenía ningún efecto sobre ellos hasta el siguiente render().
+    render();
+  });
+  $('#drumBpmSlider').addEventListener('input', e => {
+    state.bpm = Number(e.target.value);
+    $('#drumBpmLabel').textContent = state.bpm + ' BPM';
+    $('#bpmSlider').value = state.bpm;
+    $('#bpmLabel').textContent = state.bpm + ' BPM';
     render();
   });
   $('#metroToggle').addEventListener('click', () => {
@@ -5180,6 +5263,8 @@
       state.bpm = pattern.defaultBpm;
       $('#bpmSlider').value = state.bpm;
       $('#bpmLabel').textContent = state.bpm + ' BPM';
+      $('#drumBpmSlider').value = state.bpm;
+      $('#drumBpmLabel').textContent = state.bpm + ' BPM';
       metroBeatCount = 0; metroSubCount = 0;
       renderCompasWheel();
     });
@@ -5344,6 +5429,10 @@
   $('#drumFillToggle').addEventListener('click', () => {
     state.drumMachine.fillEnabled = !state.drumMachine.fillEnabled;
     $('#drumFillToggle').classList.toggle('active', state.drumMachine.fillEnabled);
+  });
+  $('#drumHumanizeToggle').addEventListener('click', () => {
+    state.drumMachine.humanize = !state.drumMachine.humanize;
+    $('#drumHumanizeToggle').classList.toggle('active', state.drumMachine.humanize);
   });
   $('#drumResetBtn').addEventListener('click', () => {
     state.drumMachine.pattern = drumBuildPatternFromStyle(state.drumMachine.style);
