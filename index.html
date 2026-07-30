@@ -142,9 +142,10 @@
 
   .triad-progression-cards{ display:flex; flex-wrap:wrap; gap: 26px; justify-content:center;
     align-items:flex-start; width:100%; margin-top:10px; }
-  .chord-mini-card .triad-diagram{ background:none; border:none; padding:0; }
-  .triad-fret-num.compact{ flex-basis:26px; font-size: calc(8px * var(--fs-scale)); }
-  .triad-fret-cell.compact{ flex-basis:26px; height:26px; }
+  .chord-mini-card.triad-card{ flex: 0 1 auto; max-width: none; }
+  .chord-mini-card .triad-diagram{ background:none; border:none; padding:0; overflow-x:auto; max-width:100%; }
+  .triad-fret-num.compact{ flex: 0 0 26px; font-size: calc(8px * var(--fs-scale)); }
+  .triad-fret-cell.compact{ flex: 0 0 26px; height:26px; }
   .triad-note-dot.compact{ width:20px; height:20px; font-size: calc(8px * var(--fs-scale)); }
 
   .piano-controls-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
@@ -461,7 +462,7 @@
     .chord-panel{ gap: 14px; padding: 14px; height: 40vh; min-height: 220px; max-height: 420px; }
     .prog-chords-panel{ height:auto; min-height: 220px; max-height: 70vh; }
     .chord-info-name{ font-size: calc(18px * var(--fs-scale)); }
-    .chord-mini-card{ flex-basis: 150px; max-width: 170px; padding: 8px; gap: 4px; }
+    .chord-mini-card:not(.triad-card){ flex-basis: 150px; max-width: 170px; padding: 8px; gap: 4px; }
     .chord-mini-card .chord-mini-label{ font-size: calc(13px * var(--fs-scale)); }
     .chord-mini-card .chord-mini-roman{ font-size: calc(10px * var(--fs-scale)); }
     .drum-row-label{ flex: 0 0 58px; font-size: calc(8px * var(--fs-scale)); }
@@ -752,15 +753,46 @@
     <span class="label" id="triadStringSetLabel">Cuerdas</span>
     <div class="pill-group" id="triadStringSetGroup"></div>
     <div class="pill-group" id="triadSingleStringGroup" style="display:none;"></div>
+    <button class="drum-mini-btn" id="triadQuizToggle">🎯 Modo Quiz</button>
   </div>
   <div class="sub-row" id="triadZoneRow">
     <span class="label">Zona del mástil</span>
     <div class="pill-group" id="triadZoneGroup"></div>
   </div>
 
-  <div class="triad-diagram-wrap">
+  <div class="triad-diagram-wrap" id="triadNormalView">
     <div class="triad-diagram" id="triadDiagram"></div>
     <div class="triad-info" id="triadInfo"></div>
+  </div>
+
+  <div class="theory-section" id="triadQuizPanel" style="display:none;">
+    <div class="theory-body">
+      <div class="triad-diagram-wrap">
+        <div class="triad-diagram" id="triadQuizDiagram"></div>
+        <div class="triad-info" id="triadQuizStatus">Aciertos: 0/0</div>
+      </div>
+      <p class="theory-note theory-note-small">Sin nombres de nota ni fundamental marcada — adivina
+      la tónica, la calidad y la inversión de esta digitación (siempre en cuerdas adyacentes).</p>
+      <div class="sub-row" style="padding:0;">
+        <span class="label">Tónica</span>
+        <div class="pill-group" id="triadQuizRootGroup"></div>
+      </div>
+      <div class="sub-row" style="padding:0;">
+        <span class="label">Calidad</span>
+        <div class="pill-group" id="triadQuizQualityGroup"></div>
+        <span class="label">Inversión</span>
+        <div class="pill-group" id="triadQuizInversionGroup">
+          <button data-qinv="0">Fundamental</button>
+          <button data-qinv="1">1ª inversión</button>
+          <button data-qinv="2">2ª inversión</button>
+        </div>
+      </div>
+      <div class="sub-row" style="padding:0;">
+        <button class="play-btn" id="triadQuizCheckBtn">Comprobar</button>
+        <button class="drum-mini-btn" id="triadQuizNextBtn">Siguiente ▶</button>
+        <span id="triadQuizFeedback"></span>
+      </div>
+    </div>
   </div>
 
   <details class="theory-section" id="triadMapSection">
@@ -1971,6 +2003,7 @@
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
              tonality: 'major', progressionIdx: null, progShapes: [], zoneIdx: 0, singleStringIdx: 0,
              voiceLeading: false },
+    triadQuiz: { active: false, score: 0, attempts: 0, target: null, guessRoot: null, guessQuality: null, guessInversion: null },
     bpm: 100,
     metronome: { active: false, timeSignature: '4/4', subdivision: 1, swing: 0, compasActive: false, compasPalo: 'solea' },
     quiz: { active: false, target: null, locked: false, score: 0, attempts: 0 }
@@ -3802,7 +3835,7 @@
 
   // dibuja una forma de tríada (rows ya calculadas) dentro de un contenedor dado — reutilizado
   // por el diagrama principal y por las tarjetas de progresión de la armonía por grados
-  function triadDrawShapeInto(container, shape, rootPc, compact){
+  function triadDrawShapeInto(container, shape, rootPc, compact, blank){
     container.innerHTML = '';
     const startFret = Math.max(0, shape.minFret - 1);
     const endFret = shape.maxFret + 1;
@@ -3832,8 +3865,8 @@
         cell.className = 'triad-fret-cell' + (compact ? ' compact' : '');
         if (f === row.fret) {
           const dot = document.createElement('div');
-          dot.className = 'triad-note-dot' + (compact ? ' compact' : '') + (row.pc === rootPc ? ' root' : '');
-          dot.textContent = DISPLAY[row.pc];
+          dot.className = 'triad-note-dot' + (compact ? ' compact' : '') + (!blank && row.pc === rootPc ? ' root' : '');
+          dot.textContent = blank ? '' : DISPLAY[row.pc];
           cell.appendChild(dot);
         }
         rowEl.appendChild(cell);
@@ -3931,7 +3964,7 @@
 
     shapes.forEach((entry, i) => {
       const card = document.createElement('div');
-      card.className = 'chord-mini-card';
+      card.className = 'chord-mini-card triad-card';
       const diagram = document.createElement('div');
       diagram.className = 'triad-diagram';
       card.innerHTML = `<div class="chord-mini-roman">Posición ${i + 1} · cuerdas ${entry.label}</div>`;
@@ -4028,7 +4061,7 @@
       state.triad.progShapes.push(shape ? { shape, stringIdxs: stringSet.idxs } : null);
 
       const card = document.createElement('div');
-      card.className = 'chord-mini-card';
+      card.className = 'chord-mini-card triad-card';
       card.dataset.step = i;
       const diagram = document.createElement('div');
       diagram.className = 'triad-diagram';
@@ -4054,6 +4087,90 @@
     renderTriadDegreesTable();
     renderTriadProgressionButtons();
     renderTriadProgressionCards();
+  }
+
+  // ---------- TRÍADAS: quiz ----------
+  function populateTriadQuizControls(){
+    const rootWrap = $('#triadQuizRootGroup');
+    rootWrap.innerHTML = '';
+    DISPLAY.forEach((name, pc) => {
+      const b = document.createElement('button');
+      b.textContent = name;
+      b.addEventListener('click', () => {
+        state.triadQuiz.guessRoot = pc;
+        document.querySelectorAll('#triadQuizRootGroup button').forEach(x => x.classList.toggle('active', x === b));
+      });
+      rootWrap.appendChild(b);
+    });
+    const qualWrap = $('#triadQuizQualityGroup');
+    qualWrap.innerHTML = '';
+    Object.entries(TRIAD_QUALITIES).forEach(([key, q]) => {
+      const b = document.createElement('button');
+      b.textContent = q.label;
+      b.addEventListener('click', () => {
+        state.triadQuiz.guessQuality = key;
+        document.querySelectorAll('#triadQuizQualityGroup button').forEach(x => x.classList.toggle('active', x === b));
+      });
+      qualWrap.appendChild(b);
+    });
+    document.querySelectorAll('#triadQuizInversionGroup button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.triadQuiz.guessInversion = Number(b.dataset.qinv);
+        document.querySelectorAll('#triadQuizInversionGroup button').forEach(x => x.classList.toggle('active', x === b));
+      });
+    });
+  }
+
+  function nextTriadQuizRound(){
+    const root = Math.floor(Math.random() * 12);
+    const qualityKeys = Object.keys(TRIAD_QUALITIES);
+    const quality = qualityKeys[Math.floor(Math.random() * qualityKeys.length)];
+    const inversion = Math.floor(Math.random() * 3);
+    const stringSet = TRIAD_STRING_SETS_VERTICAL[Math.floor(Math.random() * TRIAD_STRING_SETS_VERTICAL.length)];
+    const shape = triadComputeShape(root, quality, inversion, stringSet.idxs);
+    state.triadQuiz.target = { root, quality, inversion, stringSet, shape };
+    state.triadQuiz.guessRoot = null;
+    state.triadQuiz.guessQuality = null;
+    state.triadQuiz.guessInversion = null;
+    document.querySelectorAll('#triadQuizRootGroup button, #triadQuizQualityGroup button, #triadQuizInversionGroup button')
+      .forEach(b => b.classList.remove('active'));
+    $('#triadQuizFeedback').textContent = '';
+    triadDrawShapeInto($('#triadQuizDiagram'), shape, root, false, true); // blank=true: sin nombres ni fundamental marcada
+  }
+
+  function checkTriadQuizAnswer(){
+    const q = state.triadQuiz;
+    if (!q.target) return;
+    if (q.guessRoot === null || q.guessQuality === null || q.guessInversion === null) {
+      $('#triadQuizFeedback').textContent = 'Elige tónica, calidad e inversión antes de comprobar.';
+      return;
+    }
+    q.attempts++;
+    const correct = q.guessRoot === q.target.root && q.guessQuality === q.target.quality && q.guessInversion === q.target.inversion;
+    if (correct) q.score++;
+    const invLabel = ['Fundamental', '1ª inversión', '2ª inversión'];
+    $('#triadQuizFeedback').textContent = correct
+      ? '✅ ¡Correcto!'
+      : `❌ Era ${DISPLAY[q.target.root]} ${TRIAD_QUALITIES[q.target.quality].label} · ${invLabel[q.target.inversion]}`;
+    $('#triadQuizStatus').textContent = `Aciertos: ${q.score}/${q.attempts}`;
+    if (correct) setTimeout(() => { if (state.triadQuiz.active) nextTriadQuizRound(); }, 900);
+  }
+
+  function startTriadQuiz(){
+    state.triadQuiz.active = true;
+    state.triadQuiz.score = 0;
+    state.triadQuiz.attempts = 0;
+    $('#triadNormalView').style.display = 'none';
+    $('#triadQuizPanel').style.display = 'block';
+    if (!$('#triadQuizRootGroup').children.length) populateTriadQuizControls();
+    $('#triadQuizStatus').textContent = 'Aciertos: 0/0';
+    nextTriadQuizRound();
+  }
+
+  function stopTriadQuiz(){
+    state.triadQuiz.active = false;
+    $('#triadQuizPanel').style.display = 'none';
+    $('#triadNormalView').style.display = 'flex';
   }
 
   function renderTriadSection(){
@@ -5186,6 +5303,13 @@
     $('#triadVoiceLeadingToggle').classList.toggle('active', state.triad.voiceLeading);
     renderTriadProgressionCards();
   });
+
+  $('#triadQuizToggle').addEventListener('click', () => {
+    if (state.triadQuiz.active) stopTriadQuiz(); else startTriadQuiz();
+    $('#triadQuizToggle').classList.toggle('active', state.triadQuiz.active);
+  });
+  $('#triadQuizCheckBtn').addEventListener('click', checkTriadQuizAnswer);
+  $('#triadQuizNextBtn').addEventListener('click', nextTriadQuizRound);
 
   populateScaleSelect();
   populateRootButtons();
