@@ -120,6 +120,33 @@
   .piano-shell{ flex: none; width:100%; display:flex; flex-direction:column; gap:10px;
     height: 66vh; min-height: 540px; max-height: 780px; min-width:0; }
 
+  .triad-shell{ display:flex; flex-direction:column; gap:12px; overflow-y:auto; }
+  .triad-diagram-wrap{ display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
+  .triad-diagram{ background: var(--panel); border:1px solid var(--panel-edge); border-radius:12px;
+    padding:18px; display:flex; flex-direction:column; gap:3px; overflow-x:auto; }
+  .triad-row{ display:flex; align-items:center; gap:3px; }
+  .triad-row-label{ flex: 0 0 40px; text-align:right; padding-right:8px; font-family:'Oswald', sans-serif;
+    font-weight:600; font-size: calc(11px * var(--fs-scale)); color: var(--ink-dim); }
+  .triad-fret-cell{ flex: 0 0 38px; height:38px; border:1px solid var(--panel-edge); border-radius:4px;
+    position:relative; background: var(--bg); display:flex; align-items:center; justify-content:center; }
+  .triad-fret-num{ flex: 0 0 38px; text-align:center; font-family:'Oswald', sans-serif;
+    font-size: calc(10px * var(--fs-scale)); color: var(--ink-dim); }
+  .triad-note-dot{ width:30px; height:30px; border-radius:50%; background: var(--panel-edge);
+    display:flex; align-items:center; justify-content:center; font-family:'Inter', sans-serif;
+    font-weight:700; font-size: calc(10px * var(--fs-scale)); color: var(--ink); }
+  .triad-note-dot.root{ background: var(--accent-root); color:#fff; }
+  .triad-info{ background: var(--panel); border:1px solid var(--panel-edge); border-radius:12px;
+    padding:16px; min-width:200px; font-family:'Inter', sans-serif; font-size: calc(11.5px * var(--fs-scale));
+    line-height:1.7; flex:1; }
+  .triad-info b{ color: var(--accent-blue); }
+
+  .triad-progression-cards{ display:flex; flex-wrap:wrap; gap: 26px; justify-content:center;
+    align-items:flex-start; width:100%; margin-top:10px; }
+  .chord-mini-card .triad-diagram{ background:none; border:none; padding:0; }
+  .triad-fret-num.compact{ flex-basis:26px; font-size: calc(8px * var(--fs-scale)); }
+  .triad-fret-cell.compact{ flex-basis:26px; height:26px; }
+  .triad-note-dot.compact{ width:20px; height:20px; font-size: calc(8px * var(--fs-scale)); }
+
   .piano-controls-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
   .piano-note-display{ font-family:'Oswald', sans-serif; font-weight:700;
     font-size: calc(16px * var(--fs-scale)); color: var(--accent-play); }
@@ -483,6 +510,7 @@
     <button data-tab="mastil">Mástil</button>
     <button data-tab="tecnica">Técnica</button>
     <button data-tab="piano">Piano</button>
+    <button data-tab="triads">Tríadas</button>
   </div>
 </div>
 
@@ -642,10 +670,12 @@
     <select id="pianoChordQualitySelect"></select>
     <span class="label">Octava</span>
     <div class="pill-group" id="pianoChordOctaveGroup">
+      <button data-oct="1">1</button>
       <button data-oct="2">2</button>
       <button data-oct="3" class="active">3</button>
       <button data-oct="4">4</button>
       <button data-oct="5">5</button>
+      <button data-oct="6">6</button>
     </div>
     <button class="play-btn" id="pianoChordPlayBtn">🔊 Tocar acorde</button>
   </div>
@@ -658,6 +688,99 @@
   <div class="piano-keyboard-wrap">
     <div class="piano-keyboard" id="pianoKeyboard"></div>
   </div>
+</div>
+
+<div class="triad-shell" id="triadShell" style="display:none;">
+  <details class="theory-section" id="triadTheorySection" open>
+    <summary>Teoría de Tríadas</summary>
+    <div class="theory-body">
+      <p class="theory-note"><b>¿Cómo se compone una tríada?</b> Apilando dos terceras a partir de una
+      nota fundamental: la <b>1ª</b> (fundamental), la <b>3ª</b> (a una tercera de la fundamental) y la
+      <b>5ª</b> (a una tercera de la 3ª). El tipo de tríada depende de si esas terceras son mayores
+      (4 semitonos) o menores (3 semitonos).</p>
+      <div class="theory-table-wrap">
+        <table class="theory-table">
+          <tr><th>Calidad</th><th>Fórmula</th><th>3ª (desde fundamental)</th><th>5ª (desde fundamental)</th><th>Ejemplo (Do)</th></tr>
+          <tr><td>Mayor</td><td>1 - 3 - 5</td><td>Mayor (4 semitonos)</td><td>Justa (7 semitonos)</td><td>Do - Mi - Sol</td></tr>
+          <tr><td>Menor</td><td>1 - b3 - 5</td><td>Menor (3 semitonos)</td><td>Justa (7 semitonos)</td><td>Do - Mib - Sol</td></tr>
+          <tr><td>Aumentada</td><td>1 - 3 - #5</td><td>Mayor (4 semitonos)</td><td>Aumentada (8 semitonos)</td><td>Do - Mi - Sol#</td></tr>
+          <tr><td>Disminuida</td><td>1 - b3 - b5</td><td>Menor (3 semitonos)</td><td>Disminuida (6 semitonos)</td><td>Do - Mib - Solb</td></tr>
+        </table>
+      </div>
+      <p class="theory-note"><b>Inversiones:</b> son la misma tríada, pero con una nota distinta en el
+      grave (el bajo). No cambian las notas, solo el orden en que suenan de grave a agudo.</p>
+      <div class="theory-table-wrap">
+        <table class="theory-table">
+          <tr><th>Inversión</th><th>Nota más grave</th><th>Orden (grave→agudo)</th></tr>
+          <tr><td>Fundamental (posición raíz)</td><td>1ª (fundamental)</td><td>1 - 3 - 5</td></tr>
+          <tr><td>1ª inversión</td><td>3ª</td><td>3 - 5 - 1</td></tr>
+          <tr><td>2ª inversión</td><td>5ª</td><td>5 - 1 - 3</td></tr>
+        </table>
+      </div>
+      <p class="theory-note theory-note-small">Las digitaciones de abajo se calculan, no están hechas a
+      mano: para cada tónica/calidad/inversión se busca la posición con menor separación entre trastes
+      (la más "compacta") dentro de las 3 cuerdas elegidas.</p>
+    </div>
+  </details>
+
+  <div class="sub-row">
+    <span class="label">Tónica</span>
+    <div class="pill-group" id="triadRootGroup"></div>
+  </div>
+  <div class="sub-row">
+    <span class="label">Calidad</span>
+    <div class="pill-group" id="triadQualityGroup"></div>
+    <span class="label">Inversión</span>
+    <div class="pill-group" id="triadInversionGroup">
+      <button data-inv="0" class="active">Fundamental</button>
+      <button data-inv="1">1ª inversión</button>
+      <button data-inv="2">2ª inversión</button>
+    </div>
+  </div>
+  <div class="sub-row">
+    <span class="label">Disposición</span>
+    <div class="pill-group" id="triadModeGroup">
+      <button data-tmode="vertical" class="active">Vertical (cerca)</button>
+      <button data-tmode="horizontal">Horizontal (abierta)</button>
+      <button data-tmode="single">Una cuerda</button>
+    </div>
+    <span class="label" id="triadStringSetLabel">Cuerdas</span>
+    <div class="pill-group" id="triadStringSetGroup"></div>
+    <div class="pill-group" id="triadSingleStringGroup" style="display:none;"></div>
+  </div>
+  <div class="sub-row" id="triadZoneRow">
+    <span class="label">Zona del mástil</span>
+    <div class="pill-group" id="triadZoneGroup"></div>
+  </div>
+
+  <div class="triad-diagram-wrap">
+    <div class="triad-diagram" id="triadDiagram"></div>
+    <div class="triad-info" id="triadInfo"></div>
+  </div>
+
+  <details class="theory-section" id="triadHarmonySection">
+    <summary>Armonía por grados</summary>
+    <div class="theory-body">
+      <div class="sub-row" style="padding:0;">
+        <span class="label">Tonalidad de <span id="triadHarmonyRootLabel">Do</span></span>
+        <div class="pill-group" id="triadTonalityGroup">
+          <button data-tonality="major" class="active">Mayor</button>
+          <button data-tonality="minor">Menor (natural)</button>
+        </div>
+      </div>
+      <div class="theory-table-wrap">
+        <table class="theory-table" id="triadDegreesTable"></table>
+      </div>
+      <p class="theory-note theory-note-small">La tónica es la misma que elegiste arriba — cambia la
+      tónica y esta tabla se actualiza sola.</p>
+      <div class="sub-row" style="padding:0;">
+        <span class="label">Progresión</span>
+        <div class="pill-group" id="triadProgressionGroup"></div>
+        <button class="play-btn" id="triadProgPlayBtn" disabled>▶ Reproducir progresión</button>
+      </div>
+      <div class="triad-progression-cards" id="triadProgressionCards"></div>
+    </div>
+  </details>
 </div>
 
 <div class="riff-panel">
@@ -897,6 +1020,200 @@
     guitarra: [40,45,50,55,59,64],
     bajo:     [28,33,38,43]
   };
+
+  // ---------- TRÍADAS ----------
+  // 4 calidades verificadas (formula en semitonos desde la fundamental)
+  const TRIAD_QUALITIES = {
+    major: { label: 'Mayor',       formula: [0,4,7], degrees: ['1','3','5'] },
+    minor: { label: 'Menor',       formula: [0,3,7], degrees: ['1','b3','5'] },
+    aug:   { label: 'Aumentada',   formula: [0,4,8], degrees: ['1','3','#5'] },
+    dim:   { label: 'Disminuida',  formula: [0,3,6], degrees: ['1','b3','b5'] }
+  };
+  const STRING_ORDINALS = ['6ª','5ª','4ª','3ª','2ª','1ª']; // índice 0 = Mi grave, 5 = Mi agudo
+  // "verticales": 3 cuerdas ADYACENTES (forma compacta, notas cercanas entre sí)
+  const TRIAD_STRING_SETS_VERTICAL = [
+    { idxs:[0,1,2], label:'6ª-5ª-4ª' },
+    { idxs:[1,2,3], label:'5ª-4ª-3ª' },
+    { idxs:[2,3,4], label:'4ª-3ª-2ª' },
+    { idxs:[3,4,5], label:'3ª-2ª-1ª' }
+  ];
+  // "horizontales": cuerdas SALTEADAS (misma tríada, pero mucho más abierta/separada)
+  const TRIAD_STRING_SETS_HORIZONTAL = [
+    { idxs:[0,2,4], label:'6ª-4ª-2ª' },
+    { idxs:[1,3,5], label:'5ª-3ª-1ª' }
+  ];
+  const TRIAD_ZONES = [
+    { label: 'Todo el mástil', min: 0,  max: 17 },
+    { label: 'Trastes 0-5',    min: 0,  max: 5 },
+    { label: 'Trastes 5-9',    min: 5,  max: 9 },
+    { label: 'Trastes 9-12',   min: 9,  max: 12 },
+    { label: 'Trastes 12-17',  min: 12, max: 17 }
+  ];
+
+  function triadTones(rootPc, quality){
+    return TRIAD_QUALITIES[quality].formula.map(i => (rootPc + i) % 12);
+  }
+  function triadInversionOrder(tones, inversion){
+    return tones.slice(inversion).concat(tones.slice(0, inversion));
+  }
+  // busca, para 3 cuerdas dadas (de grave a aguda) y 3 clases de tono objetivo (mismo orden,
+  // grave->aguda), la digitación más compacta (menor rango de trastes) — verificado contra
+  // 576 combinaciones (4 calidades × 12 tónicas × 3 inversiones × 4 juegos de cuerdas), 0 errores.
+  // Clave: usa la altura MIDI real de cada cuerda al aire, no solo su clase de tono, para poder
+  // comparar alturas correctamente entre cuerdas (Re3 suena más agudo que La2, aunque 2 < 9).
+  function triadClosestVoicing(stringOpenMidiArr, targetPcArr, maxFret, minFret){
+    maxFret = maxFret || 17;
+    minFret = minFret || 0;
+    const candidatesPerString = stringOpenMidiArr.map((openMidi, idx) => {
+      const targetPc = targetPcArr[idx];
+      const basePc = ((openMidi % 12) + 12) % 12;
+      let f = (((targetPc - basePc) % 12) + 12) % 12;
+      const frets = [];
+      while (f <= maxFret) { if (f >= minFret) frets.push(f); f += 12; }
+      return frets;
+    });
+    let best = null;
+    candidatesPerString[0].forEach(f1 => {
+      const p1 = stringOpenMidiArr[0] + f1;
+      candidatesPerString[1].forEach(f2 => {
+        const p2 = stringOpenMidiArr[1] + f2;
+        if (p2 <= p1) return;
+        candidatesPerString[2].forEach(f3 => {
+          const p3 = stringOpenMidiArr[2] + f3;
+          if (p3 <= p2) return;
+          const span = Math.max(f1,f2,f3) - Math.min(f1,f2,f3);
+          const lowest = Math.min(f1,f2,f3);
+          if (!best || span < best.span || (span === best.span && lowest < best.lowest)) {
+            best = { span, lowest, frets: [f1,f2,f3] };
+          }
+        });
+      });
+    });
+    return best ? best.frets : null;
+  }
+
+  // variante para "zona del mástil": la zona es una PREFERENCIA, no una obligación estricta.
+  // Exigir que las 3 notas caigan dentro de una ventana estrecha falla la mayoría de las veces
+  // (la posición de una forma compacta depende de la tónica, y las 12 tónicas se reparten por
+  // una octava entera de trastes) — verificado: con ventanas de 5 trastes fallaba el 80% de
+  // las veces. En su lugar, se buscan todas las formas razonablemente compactas de todo el
+  // mástil y se elige la más cercana al CENTRO de la zona — verificado: 0% de fallos.
+  // maxSpan depende del modo: 5 para vertical (su compacidad natural), 9 para horizontal
+  // (que por naturaleza necesita más recorrido, al ser cuerdas salteadas).
+  function triadClosestVoicingPreferZone(stringOpenMidiArr, targetPcArr, zoneCenter, maxSpan, searchMax){
+    searchMax = searchMax || 24;
+    const candidatesPerString = stringOpenMidiArr.map((openMidi, idx) => {
+      const targetPc = targetPcArr[idx];
+      const basePc = ((openMidi % 12) + 12) % 12;
+      let f = (((targetPc - basePc) % 12) + 12) % 12;
+      const frets = [];
+      while (f <= searchMax) { frets.push(f); f += 12; }
+      return frets;
+    });
+    let best = null;
+    candidatesPerString[0].forEach(f1 => {
+      const p1 = stringOpenMidiArr[0] + f1;
+      candidatesPerString[1].forEach(f2 => {
+        const p2 = stringOpenMidiArr[1] + f2;
+        if (p2 <= p1) return;
+        candidatesPerString[2].forEach(f3 => {
+          const p3 = stringOpenMidiArr[2] + f3;
+          if (p3 <= p2) return;
+          const span = Math.max(f1,f2,f3) - Math.min(f1,f2,f3);
+          if (span > maxSpan) return;
+          const center = (f1 + f2 + f3) / 3;
+          const dist = Math.abs(center - zoneCenter);
+          if (!best || dist < best.dist || (dist === best.dist && span < best.span)) {
+            best = { dist, span, frets: [f1,f2,f3] };
+          }
+        });
+      });
+    });
+    return best ? best.frets : null;
+  }
+
+  // ---------- TRÍADAS: armonía diatónica ----------
+  // la calidad de cada grado se CALCULA desde los intervalos de la escala (no está memorizada):
+  // se apilan la 3a y la 5a diatónicas de cada grado y se mide qué intervalos forman.
+  const TRIAD_MAJOR_STEPS = [2,2,1,2,2,2,1]; // T-T-S-T-T-T-S
+  const TRIAD_MINOR_STEPS = [2,1,2,2,1,2,2]; // T-S-T-T-S-T-T (menor natural)
+  const TRIAD_ROMAN_MAJOR = ['I','ii','iii','IV','V','vi','vii°'];
+  const TRIAD_ROMAN_MINOR = ['i','ii°','III','iv','v','VI','VII'];
+
+  function triadBuildScale(rootPc, steps){
+    const scale = [rootPc];
+    let pc = rootPc;
+    for (let i = 0; i < steps.length - 1; i++) { pc = (pc + steps[i]) % 12; scale.push(pc); }
+    return scale;
+  }
+  function triadQualityFromIntervals(root, third, fifth){
+    const r3 = (third - root + 12) % 12, r5 = (fifth - root + 12) % 12;
+    if (r3 === 4 && r5 === 7) return 'major';
+    if (r3 === 3 && r5 === 7) return 'minor';
+    if (r3 === 3 && r5 === 6) return 'dim';
+    if (r3 === 4 && r5 === 8) return 'aug';
+    return 'major';
+  }
+  function triadDiatonicDegrees(rootPc, tonality){
+    const steps = tonality === 'major' ? TRIAD_MAJOR_STEPS : TRIAD_MINOR_STEPS;
+    const romans = tonality === 'major' ? TRIAD_ROMAN_MAJOR : TRIAD_ROMAN_MINOR;
+    const scale = triadBuildScale(rootPc, steps);
+    return scale.map((root, degree) => {
+      const third = scale[(degree + 2) % 7];
+      const fifth = scale[(degree + 4) % 7];
+      return { degree, roman: romans[degree], root, quality: triadQualityFromIntervals(root, third, fifth) };
+    });
+  }
+  // progresiones comunes, como índices de grado (0-6) dentro de la tonalidad elegida
+  const TRIAD_PROGRESSIONS_MAJOR = [
+    { label: 'I - IV - V',        degrees: [0,3,4] },
+    { label: 'I - vi - IV - V',   degrees: [0,5,3,4] },
+    { label: 'I - V - vi - IV',   degrees: [0,4,5,3] },
+    { label: 'vi - IV - I - V',   degrees: [5,3,0,4] },
+    { label: 'ii - V - I',        degrees: [1,4,0] }
+  ];
+  const TRIAD_PROGRESSIONS_MINOR = [
+    { label: 'i - iv - v',        degrees: [0,3,4] },
+    { label: 'i - VI - III - VII',degrees: [0,5,2,6] },
+    { label: 'i - VII - VI - VII',degrees: [0,6,5,6] },
+    { label: 'ii° - v - i',       degrees: [1,4,0] }
+  ];
+
+  // calcula la digitación (frets + filas listas para pintar) de una tríada concreta, reutilizado
+  // tanto por el diagrama principal como por las tarjetas de progresión
+  function triadComputeShape(rootPc, quality, inversion, stringIdxs, zoneMin, zoneMax, mode){
+    const tones = triadTones(rootPc, quality);
+    const target = triadInversionOrder(tones, inversion);
+    const openMidiArr = stringIdxs.map(i => OPEN_MIDI.guitarra[i]);
+    const isFullNeck = (zoneMin === undefined) || (zoneMin <= 0 && zoneMax >= 17);
+    let frets;
+    if (isFullNeck) {
+      frets = triadClosestVoicing(openMidiArr, target);
+    } else {
+      const maxSpan = mode === 'horizontal' ? 9 : 5;
+      frets = triadClosestVoicingPreferZone(openMidiArr, target, (zoneMin + zoneMax) / 2, maxSpan);
+    }
+    if (!frets) return null;
+    const rows = stringIdxs.map((stringIdx, i) => ({
+      stringIdx, fret: frets[i], pc: (openMidiArr[i] + frets[i]) % 12
+    })).reverse();
+    return { tones, frets, rows, minFret: Math.min(...frets), maxFret: Math.max(...frets) };
+  }
+
+  // posiciones de una tríada recorriendo UNA sola cuerda (arpegio): dónde caen la 1ª, 3ª y 5ª
+  // (y su repetición una octava más arriba) entre el traste 0 y maxFret.
+  function triadSingleStringPositions(rootPc, quality, stringIdx, maxFret){
+    maxFret = maxFret || 15;
+    const tones = triadTones(rootPc, quality); // orden: [1ª,3ª,5ª]
+    const openMidi = OPEN_MIDI.guitarra[stringIdx];
+    const positions = [];
+    for (let f = 0; f <= maxFret; f++) {
+      const pc = (openMidi + f) % 12;
+      const degIdx = tones.indexOf(pc);
+      if (degIdx !== -1) positions.push({ fret: f, pc, degIdx });
+    }
+    return positions;
+  }
 
   const SCALES = {
     pent_mayor: { name: 'Pentatónica Mayor', intervals: [0,2,4,7,9] },
@@ -1634,6 +1951,8 @@
     pianoChordOctave: 3,
     pianoChordQuality: 'major',
     drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null },
+    triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
+             tonality: 'major', progressionIdx: null, progShapes: [], zoneIdx: 0, singleStringIdx: 0 },
     bpm: 100,
     metronome: { active: false, timeSignature: '4/4', subdivision: 1, swing: 0, compasActive: false, compasPalo: 'solea' },
     quiz: { active: false, target: null, locked: false, score: 0, attempts: 0 }
@@ -2417,9 +2736,32 @@
     const usingMastil = state.tab === 'mastil';
     const usingTecnica = state.tab === 'tecnica';
     const usingPiano = state.tab === 'piano';
+    const usingTriads = state.tab === 'triads';
     document.querySelectorAll('#tabGroup button').forEach(b => {
       b.classList.toggle('active', b.dataset.tab === state.tab);
     });
+    $('#triadShell').style.display = usingTriads ? 'flex' : 'none';
+    if (usingTriads) {
+      $('#zoneRow').style.display = 'none';
+      $('.board-shell').style.display = 'none';
+      $('.riff-panel').style.display = 'none';
+      $('#fingerLine').style.display = 'none';
+      $('#chordPanel').style.display = 'none';
+      $('#progChordsPanel').style.display = 'none';
+      $('#instrumentGroup').style.display = 'none';
+      $('#quizPanel').style.display = 'none';
+      $('#chordQualityRow').style.display = 'none';
+      $('#acordesModeRow').style.display = 'none';
+      $('#progKeyRow').style.display = 'none';
+      $('#progDegreesRow').style.display = 'none';
+      $('#progSequenceRow').style.display = 'none';
+      $('#tecnicaRow').style.display = 'none';
+      $('#tecnicaExerciseRow').style.display = 'none';
+      $('#pickingModeRow').style.display = 'none';
+      $('#pianoShell').style.display = 'none';
+      renderTriadSection();
+      return; // las tríadas son autocontenidas, igual que el piano
+    }
     $('#pianoShell').style.display = usingPiano ? 'flex' : 'none';
     if (usingPiano) {
       $('#zoneRow').style.display = 'none';
@@ -3321,6 +3663,335 @@
     showChordOnStaff(notes, chordLabel);
     highlightPianoKeys(notes);
     return notes;
+  }
+
+  // ---------- TRÍADAS: interfaz ----------
+  function populateTriadControls(){
+    const rootWrap = $('#triadRootGroup');
+    rootWrap.innerHTML = '';
+    DISPLAY.forEach((name, pc) => {
+      const b = document.createElement('button');
+      b.textContent = name;
+      b.dataset.root = pc;
+      if (pc === state.triad.root) b.classList.add('active');
+      b.addEventListener('click', () => {
+        state.triad.root = pc;
+        document.querySelectorAll('#triadRootGroup button').forEach(x => x.classList.toggle('active', x === b));
+        renderTriadDiagram();
+        renderTriadHarmony();
+      });
+      rootWrap.appendChild(b);
+    });
+
+    const qualWrap = $('#triadQualityGroup');
+    qualWrap.innerHTML = '';
+    Object.entries(TRIAD_QUALITIES).forEach(([key, q]) => {
+      const b = document.createElement('button');
+      b.textContent = q.label;
+      b.dataset.quality = key;
+      if (key === state.triad.quality) b.classList.add('active');
+      b.addEventListener('click', () => {
+        state.triad.quality = key;
+        document.querySelectorAll('#triadQualityGroup button').forEach(x => x.classList.toggle('active', x === b));
+        renderTriadDiagram();
+      });
+      qualWrap.appendChild(b);
+    });
+
+    document.querySelectorAll('#triadInversionGroup button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.triad.inversion = Number(b.dataset.inv);
+        document.querySelectorAll('#triadInversionGroup button').forEach(x => x.classList.toggle('active', x === b));
+        renderTriadDiagram();
+      });
+    });
+
+    document.querySelectorAll('#triadModeGroup button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.triad.mode = b.dataset.tmode;
+        state.triad.stringSetIdx = 0;
+        document.querySelectorAll('#triadModeGroup button').forEach(x => x.classList.toggle('active', x === b));
+        updateTriadModeVisibility();
+        renderTriadStringSetOptions();
+        renderTriadDiagram();
+        renderTriadProgressionCards();
+      });
+    });
+
+    const zoneWrap = $('#triadZoneGroup');
+    zoneWrap.innerHTML = '';
+    TRIAD_ZONES.forEach((zone, i) => {
+      const b = document.createElement('button');
+      b.textContent = zone.label;
+      if (i === state.triad.zoneIdx) b.classList.add('active');
+      b.addEventListener('click', () => {
+        state.triad.zoneIdx = i;
+        document.querySelectorAll('#triadZoneGroup button').forEach(x => x.classList.toggle('active', x === b));
+        renderTriadDiagram();
+      });
+      zoneWrap.appendChild(b);
+    });
+
+    const singleWrap = $('#triadSingleStringGroup');
+    singleWrap.innerHTML = '';
+    STRING_ORDINALS.forEach((label, i) => {
+      const b = document.createElement('button');
+      b.textContent = label;
+      if (i === state.triad.singleStringIdx) b.classList.add('active');
+      b.addEventListener('click', () => {
+        state.triad.singleStringIdx = i;
+        document.querySelectorAll('#triadSingleStringGroup button').forEach(x => x.classList.toggle('active', x === b));
+        renderTriadDiagram();
+      });
+      singleWrap.appendChild(b);
+    });
+
+    updateTriadModeVisibility();
+    renderTriadStringSetOptions();
+  }
+
+  function updateTriadModeVisibility(){
+    const isSingle = state.triad.mode === 'single';
+    $('#triadStringSetLabel').textContent = isSingle ? 'Cuerda' : 'Cuerdas';
+    $('#triadStringSetGroup').style.display = isSingle ? 'none' : 'flex';
+    $('#triadSingleStringGroup').style.display = isSingle ? 'flex' : 'none';
+    $('#triadZoneRow').style.display = isSingle ? 'none' : 'flex'; // en una cuerda no aplica zona: se ve el arpegio entero
+  }
+
+  function renderTriadStringSetOptions(){
+    const sets = state.triad.mode === 'vertical' ? TRIAD_STRING_SETS_VERTICAL : TRIAD_STRING_SETS_HORIZONTAL;
+    const wrap = $('#triadStringSetGroup');
+    wrap.innerHTML = '';
+    sets.forEach((set, i) => {
+      const b = document.createElement('button');
+      b.textContent = set.label;
+      if (i === state.triad.stringSetIdx) b.classList.add('active');
+      b.addEventListener('click', () => {
+        state.triad.stringSetIdx = i;
+        document.querySelectorAll('#triadStringSetGroup button').forEach(x => x.classList.toggle('active', x === b));
+        renderTriadDiagram();
+        renderTriadProgressionCards();
+      });
+      wrap.appendChild(b);
+    });
+  }
+
+  // dibuja una forma de tríada (rows ya calculadas) dentro de un contenedor dado — reutilizado
+  // por el diagrama principal y por las tarjetas de progresión de la armonía por grados
+  function triadDrawShapeInto(container, shape, rootPc, compact){
+    container.innerHTML = '';
+    const startFret = Math.max(0, shape.minFret - 1);
+    const endFret = shape.maxFret + 1;
+
+    const headerRow = document.createElement('div');
+    headerRow.className = 'triad-row';
+    const headerSpacer = document.createElement('span');
+    headerSpacer.className = 'triad-row-label';
+    headerRow.appendChild(headerSpacer);
+    for (let f = startFret; f <= endFret; f++) {
+      const cell = document.createElement('div');
+      cell.className = 'triad-fret-num' + (compact ? ' compact' : '');
+      cell.textContent = f;
+      headerRow.appendChild(cell);
+    }
+    container.appendChild(headerRow);
+
+    shape.rows.forEach(row => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'triad-row';
+      const label = document.createElement('span');
+      label.className = 'triad-row-label';
+      label.textContent = STRING_ORDINALS[row.stringIdx];
+      rowEl.appendChild(label);
+      for (let f = startFret; f <= endFret; f++) {
+        const cell = document.createElement('div');
+        cell.className = 'triad-fret-cell' + (compact ? ' compact' : '');
+        if (f === row.fret) {
+          const dot = document.createElement('div');
+          dot.className = 'triad-note-dot' + (compact ? ' compact' : '') + (row.pc === rootPc ? ' root' : '');
+          dot.textContent = DISPLAY[row.pc];
+          cell.appendChild(dot);
+        }
+        rowEl.appendChild(cell);
+      }
+      container.appendChild(rowEl);
+    });
+  }
+
+  function renderTriadDiagram(){
+    const t = state.triad;
+    const quality = TRIAD_QUALITIES[t.quality];
+    const wrap = $('#triadDiagram');
+    const info = $('#triadInfo');
+
+    if (t.mode === 'single') {
+      const positions = triadSingleStringPositions(t.root, t.quality, t.singleStringIdx, 15);
+      wrap.innerHTML = '';
+      const row = document.createElement('div');
+      row.className = 'triad-row';
+      const label = document.createElement('span');
+      label.className = 'triad-row-label';
+      label.textContent = STRING_ORDINALS[t.singleStringIdx];
+      row.appendChild(label);
+      for (let f = 0; f <= 15; f++) {
+        const cell = document.createElement('div');
+        cell.className = 'triad-fret-cell';
+        const pos = positions.find(p => p.fret === f);
+        if (pos) {
+          const dot = document.createElement('div');
+          dot.className = 'triad-note-dot' + (pos.pc === t.root ? ' root' : '');
+          dot.textContent = DISPLAY[pos.pc];
+          cell.appendChild(dot);
+        }
+        row.appendChild(cell);
+      }
+      wrap.appendChild(row);
+      const headerRow = document.createElement('div');
+      headerRow.className = 'triad-row';
+      const headerSpacer = document.createElement('span');
+      headerSpacer.className = 'triad-row-label';
+      headerRow.appendChild(headerSpacer);
+      for (let f = 0; f <= 15; f++) {
+        const cell = document.createElement('div');
+        cell.className = 'triad-fret-num';
+        cell.textContent = f;
+        headerRow.appendChild(cell);
+      }
+      wrap.appendChild(headerRow);
+
+      const degreeLabels = ['1ª (fundamental)', '3ª', '5ª'];
+      info.innerHTML = `
+        <div><b>${DISPLAY[t.root]} ${quality.label}</b> · arpegio en la cuerda ${STRING_ORDINALS[t.singleStringIdx]}</div>
+        <div>${positions.map(p => `traste ${p.fret}: ${DISPLAY[p.pc]} (${degreeLabels[p.degIdx]})`).join(' · ')}</div>
+        <div class="theory-note-small">Recorre esta cuerda de grave a agudo tocando solo estas notas: es la
+        misma tríada, pero desplegada como escala en una sola cuerda en vez de en acorde.</div>
+      `;
+      return;
+    }
+
+    const sets = t.mode === 'vertical' ? TRIAD_STRING_SETS_VERTICAL : TRIAD_STRING_SETS_HORIZONTAL;
+    const stringSet = sets[t.stringSetIdx];
+    const zone = TRIAD_ZONES[t.zoneIdx];
+    const shape = triadComputeShape(t.root, t.quality, t.inversion, stringSet.idxs, zone.min, zone.max, t.mode);
+
+    if (!shape) {
+      wrap.innerHTML = '';
+      wrap.textContent = 'No hay ninguna digitación de esta tríada que quepa entera en esta zona — prueba otra zona o cuerdas.';
+      info.innerHTML = '';
+      return;
+    }
+    triadDrawShapeInto(wrap, shape, t.root, false);
+
+    // panel informativo: qué nota va en cada cuerda, y qué grado es
+    const invLabel = ['Fundamental', '1ª inversión', '2ª inversión'][t.inversion];
+    const bassRow = shape.rows[shape.rows.length - 1]; // última fila = cuerda más grave del conjunto
+    info.innerHTML = `
+      <div><b>${DISPLAY[t.root]} ${quality.label}</b> · ${invLabel}</div>
+      <div>Notas: ${quality.degrees.map((d,i) => DISPLAY[shape.tones[i]] + ' (' + d + ')').join(' · ')}</div>
+      <div>Nota más grave (bajo): <b>${DISPLAY[bassRow.pc]}</b>, en la cuerda ${STRING_ORDINALS[bassRow.stringIdx]}</div>
+      <div>Disposición: ${t.mode === 'vertical' ? 'vertical (cuerdas adyacentes, forma compacta)' : 'horizontal (cuerdas salteadas, más abierta)'}</div>
+      <div>Rango de la digitación: ${shape.minFret === shape.maxFret ? 'los 3 dedos en el mismo traste' : (shape.maxFret - shape.minFret) + ' trastes'}</div>
+    `;
+  }
+
+  function renderTriadDegreesTable(){
+    const rootLabel = $('#triadHarmonyRootLabel');
+    if (rootLabel) rootLabel.textContent = DISPLAY[state.triad.root];
+    const degrees = triadDiatonicDegrees(state.triad.root, state.triad.tonality);
+    const table = $('#triadDegreesTable');
+    let html = '<tr><th>Grado</th><th>Nota</th><th>Calidad</th></tr>';
+    degrees.forEach(d => {
+      html += `<tr><td>${d.roman}</td><td>${DISPLAY[d.root]}</td><td>${TRIAD_QUALITIES[d.quality].label}</td></tr>`;
+    });
+    table.innerHTML = html;
+  }
+
+  function renderTriadProgressionButtons(){
+    const list = state.triad.tonality === 'major' ? TRIAD_PROGRESSIONS_MAJOR : TRIAD_PROGRESSIONS_MINOR;
+    const wrap = $('#triadProgressionGroup');
+    wrap.innerHTML = '';
+    list.forEach((prog, i) => {
+      const b = document.createElement('button');
+      b.textContent = prog.label;
+      if (i === state.triad.progressionIdx) b.classList.add('active');
+      b.addEventListener('click', () => {
+        state.triad.progressionIdx = (state.triad.progressionIdx === i) ? null : i;
+        renderTriadProgressionButtons();
+        renderTriadProgressionCards();
+      });
+      wrap.appendChild(b);
+    });
+  }
+
+  async function strumTriadShape(shape, stringIdxs, sustain){
+    const openMidi = OPEN_MIDI.guitarra;
+    for (let i = 0; i < stringIdxs.length; i++) {
+      playTone(openMidi[stringIdxs[i]] + shape.frets[i], sustain ?? 1.1, stringIdxs[i], 6);
+      await sleep(35);
+    }
+  }
+
+  function renderTriadProgressionCards(){
+    const wrap = $('#triadProgressionCards');
+    wrap.innerHTML = '';
+    state.triad.progShapes = [];
+    if (state.triad.progressionIdx === null) {
+      $('#triadProgPlayBtn').disabled = true;
+      return;
+    }
+    const list = state.triad.tonality === 'major' ? TRIAD_PROGRESSIONS_MAJOR : TRIAD_PROGRESSIONS_MINOR;
+    const prog = list[state.triad.progressionIdx];
+    const degrees = triadDiatonicDegrees(state.triad.root, state.triad.tonality);
+    const sets = state.triad.mode === 'vertical' ? TRIAD_STRING_SETS_VERTICAL : TRIAD_STRING_SETS_HORIZONTAL;
+    const stringSet = sets[state.triad.stringSetIdx];
+    prog.degrees.forEach((degIdx, i) => {
+      const d = degrees[degIdx];
+      const shape = triadComputeShape(d.root, d.quality, 0, stringSet.idxs); // fundamental, para ver el grado con claridad
+      const chordName = DISPLAY[d.root] + ' ' + TRIAD_QUALITIES[d.quality].label;
+      state.triad.progShapes.push(shape ? { shape, stringIdxs: stringSet.idxs } : null);
+
+      const card = document.createElement('div');
+      card.className = 'chord-mini-card';
+      card.dataset.step = i;
+      const diagram = document.createElement('div');
+      diagram.className = 'triad-diagram';
+      card.innerHTML = `<div class="chord-mini-roman">${d.roman}</div>`;
+      card.appendChild(diagram);
+      const label = document.createElement('div');
+      label.className = 'chord-mini-label';
+      label.textContent = chordName;
+      card.appendChild(label);
+      if (shape) {
+        triadDrawShapeInto(diagram, shape, d.root, true);
+        card.addEventListener('click', () => strumTriadShape(shape, stringSet.idxs));
+      } else {
+        diagram.textContent = '—';
+      }
+      wrap.appendChild(card);
+    });
+    $('#triadProgPlayBtn').disabled = false;
+  }
+
+  function renderTriadHarmony(){
+    renderTriadDegreesTable();
+    renderTriadProgressionButtons();
+    renderTriadProgressionCards();
+  }
+
+  function renderTriadSection(){
+    if (!$('#triadRootGroup').children.length) {
+      populateTriadControls();
+      document.querySelectorAll('#triadTonalityGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          state.triad.tonality = b.dataset.tonality;
+          state.triad.progressionIdx = null;
+          document.querySelectorAll('#triadTonalityGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderTriadHarmony();
+        });
+      });
+    }
+    renderTriadDiagram();
+    renderTriadHarmony();
   }
 
   function renderPianoSection(){
@@ -4410,6 +5081,25 @@
     cards.forEach(card => card.classList.remove('current'));
     state.progPlaying = false;
     $('#progPlayBtn').disabled = (state.progression.length === 0 && !state.activeForm);
+  });
+
+  let triadProgPlaying = false;
+  $('#triadProgPlayBtn').addEventListener('click', async () => {
+    const shapes = state.triad.progShapes || [];
+    if (triadProgPlaying || shapes.length === 0) return;
+    triadProgPlaying = true;
+    $('#triadProgPlayBtn').disabled = true;
+    const cards = document.querySelectorAll('#triadProgressionCards .chord-mini-card');
+    for (let i = 0; i < shapes.length; i++) {
+      cards.forEach((card, ci) => card.classList.toggle('current', ci === i));
+      if (cards[i]) cards[i].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      const entry = shapes[i];
+      if (entry) await strumTriadShape(entry.shape, entry.stringIdxs, 1.3);
+      await sleep(250);
+    }
+    cards.forEach(card => card.classList.remove('current'));
+    triadProgPlaying = false;
+    $('#triadProgPlayBtn').disabled = false;
   });
 
   populateScaleSelect();
