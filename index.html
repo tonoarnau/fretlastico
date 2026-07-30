@@ -22,6 +22,7 @@
     --accent-root: #ab1e16;
     --accent-root-dark: #7e1610;
     --accent-play: #e0b84a;
+    --accent-blue: #2fa1ff;
     --fs-scale: 1; /* control de tamaño de letra global, se ajusta con el mini-slider "Aa" */
   }
 
@@ -102,14 +103,14 @@
   .sub-row .label{ font-family:'Oswald', sans-serif; font-size: calc(10px * var(--fs-scale)); letter-spacing: 1.5px;
     text-transform: uppercase; color: var(--ink-dim); margin-right: 2px; white-space:nowrap; flex-shrink:0; }
 
-  .note-btn{ width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--panel-edge);
+  .note-btn{ width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--panel-edge);
     background: var(--panel); color: var(--ink); font-family:'Inter', sans-serif; font-weight: 700;
-    font-size: calc(11px * var(--fs-scale)); cursor: pointer; transition: transform .1s, box-shadow .15s; flex-shrink:0; }
+    font-size: calc(12px * var(--fs-scale)); cursor: pointer; transition: transform .1s, box-shadow .15s; flex-shrink:0; }
   .note-btn:hover{ transform: translateY(-1px); }
   .note-btn.selected{ background: var(--accent-root); border-color: var(--accent-root-dark);
     box-shadow: 0 0 0 3px rgba(171,30,22,0.25); color: white; }
 
-  #rootButtons{ display:flex; gap:5px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  #rootButtons{ display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
     max-width: 100%; min-width:0; }
   #rootButtons::-webkit-scrollbar{ display:none; }
 
@@ -296,10 +297,10 @@
 
   .theory-section{ background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 12px;
     padding: 10px 16px; font-size: calc(11px * var(--fs-scale)); }
-  .theory-section summary{ cursor:pointer; font-family:'Oswald', sans-serif; font-weight:600;
-    font-size: calc(11px * var(--fs-scale)); letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink-dim); list-style: none; }
+  .theory-section summary{ cursor:pointer; font-family:'Oswald', sans-serif; font-weight:700;
+    font-size: calc(12px * var(--fs-scale)); letter-spacing: 0.5px; text-transform: uppercase; color: var(--accent-blue); list-style: none; }
   .theory-section summary::-webkit-details-marker{ display:none; }
-  .theory-section[open] summary{ color: var(--ink); margin-bottom: 8px; }
+  .theory-section[open] summary{ color: var(--accent-blue); margin-bottom: 8px; }
   .theory-body{ display:flex; flex-direction:column; gap: 8px; }
   .theory-note{ margin:0; font-size: calc(10.5px * var(--fs-scale)); line-height:1.5; color: var(--ink-dim); }
   .theory-note b{ color: var(--ink); }
@@ -308,6 +309,11 @@
   .theory-table{ border-collapse: collapse; width: 100%; min-width: 480px; font-size: calc(10.5px * var(--fs-scale)); }
 
   .drum-controls-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .drum-mini-btn{ font-family:'Oswald', sans-serif; font-weight:600; font-size: calc(11px * var(--fs-scale));
+    background: var(--panel); color: var(--ink); border: 1px solid var(--panel-edge);
+    border-radius: 999px; padding: 8px 16px; cursor:pointer; white-space:nowrap; }
+  .drum-mini-btn:hover{ border-color: var(--accent-play); }
+  .drum-mini-btn.active{ background: var(--accent-play); color:#221a06; border-color: var(--accent-play); }
   .drum-volume-ctrl{ display:flex; align-items:center; gap:6px; }
   .drum-volume-ctrl input[type=range]{ width:80px; accent-color: var(--accent-play); }
   .drum-note{ font-size: calc(9.5px * var(--fs-scale)); color: var(--ink-dim); font-style:italic; }
@@ -323,7 +329,6 @@
   .drum-step-cell.current{ background: var(--accent-play); box-shadow: 0 0 6px 1px rgba(224,184,74,0.7); }
   .drum-step-cell.on.current{ background: var(--accent-root); box-shadow: 0 0 8px 2px rgba(171,30,22,0.7); }
   .drum-step-cell.fill-active{ box-shadow: 0 0 10px 3px rgba(224,184,74,0.9); }
-  #drumFillToggle.active, #drumFillToggle:active{ background: var(--accent-play); color:#221a06; }
 
   .theory-table th, .theory-table td{ text-align:left; padding: 5px 8px; border-bottom: 1px solid var(--panel-edge);
     white-space:nowrap; }
@@ -409,7 +414,7 @@
     .brand h1{ font-size: calc(16px * var(--fs-scale)); }
     .brand span{ font-size: calc(8px * var(--fs-scale)); }
     .icon-btn{ width: 30px; height: 30px; font-size: calc(12px * var(--fs-scale)); }
-    .note-btn{ width: 26px; height: 26px; font-size: calc(10px * var(--fs-scale)); }
+    .note-btn{ width: 34px; height: 34px; font-size: calc(10px * var(--fs-scale)); }
     select#scaleSelect{ max-width: 38vw; font-size: calc(10px * var(--fs-scale)); padding: 7px 10px; }
     .pill-group button{ padding: 6px 10px; font-size: calc(10px * var(--fs-scale)); }
     .board-shell{ height: 40vh; min-height: 220px; max-height: 420px; }
@@ -432,6 +437,12 @@
     .chord-mini-card{ flex-basis: 150px; max-width: 170px; padding: 8px; gap: 4px; }
     .chord-mini-card .chord-mini-label{ font-size: calc(13px * var(--fs-scale)); }
     .chord-mini-card .chord-mini-roman{ font-size: calc(10px * var(--fs-scale)); }
+    .drum-row-label{ flex: 0 0 58px; font-size: calc(8px * var(--fs-scale)); }
+    .drum-step-cell{ height: 14px; }
+    .drum-step-grid{ overflow-x: auto; }
+    .drum-row-cells{ min-width: 340px; }
+    .drum-controls-row{ gap: 8px; }
+    .drum-note{ display: none; }
   }
 </style>
 </head>
@@ -476,7 +487,7 @@
 </div>
 
 <details class="theory-section drum-section" id="drumSection">
-  <summary>🥁 Caja de Ritmos</summary>
+  <summary id="drumSummary">🥁 Caja de Ritmos</summary>
   <div class="theory-body">
     <div class="drum-controls-row">
       <span class="label">Estilo</span>
@@ -490,8 +501,8 @@
         <button data-dstyle="blues">Blues Shuffle</button>
       </div>
       <button class="play-btn" id="drumPlayBtn">▶ Reproducir</button>
-      <button class="icon-btn" id="drumFillToggle" title="Fill automático cada 4 compases">🔀 Fill</button>
-      <button class="icon-btn" id="drumResetBtn" title="Restablecer el patrón original del estilo">↺ Restablecer</button>
+      <button class="drum-mini-btn" id="drumFillToggle" title="Fill automático cada 4 compases">🔀 Fill</button>
+      <button class="drum-mini-btn" id="drumResetBtn" title="Restablecer el patrón original del estilo">↺ Restablecer</button>
       <div class="drum-volume-ctrl">
         <span class="label">Volumen</span>
         <input type="range" id="drumVolumeSlider" min="0" max="100" step="5" value="75">
@@ -3216,6 +3227,8 @@
       el.addEventListener('click', (e) => { e.stopPropagation(); pianoKeyPressed(k.pc, k.octave); });
       wrap.appendChild(el);
     });
+
+    wrap.parentElement.scrollLeft = 0; // arrancar viendo Do1 (el más grave), no una vista desplazada
   }
 
   function pianoKeyPressed(pc, octave){
@@ -3721,6 +3734,7 @@
     drumScheduler();
     $('#drumPlayBtn').textContent = '⏹ Detener';
     $('#drumPlayBtn').classList.add('active');
+    $('#drumSummary').textContent = '🥁 Caja de Ritmos · ▶ sonando';
   }
 
   function stopDrumMachine(){
@@ -3729,6 +3743,7 @@
     drumTimerId = null;
     $('#drumPlayBtn').textContent = '▶ Reproducir';
     $('#drumPlayBtn').classList.remove('active');
+    $('#drumSummary').textContent = '🥁 Caja de Ritmos';
     document.querySelectorAll('.drum-step-cell.current').forEach(el => el.classList.remove('current','fill-active'));
   }
 
@@ -4434,9 +4449,6 @@
   $('#drumResetBtn').addEventListener('click', () => {
     state.drumMachine.pattern = drumBuildPatternFromStyle(state.drumMachine.style);
     renderDrumGrid();
-  });
-  $('#drumSection').addEventListener('toggle', () => {
-    if (!$('#drumSection').open) stopDrumMachine();
   });
   renderDrumSection();
 
