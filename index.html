@@ -69,8 +69,11 @@
     border-radius: 999px; padding: 8px 16px; cursor: pointer; max-width: 42vw; text-overflow:ellipsis; }
 
   select#pianoChordQualitySelect{ font-family:'Oswald', sans-serif; font-weight: 600; font-size: calc(11px * var(--fs-scale));
-    background: var(--panel); color: var(--ink); border: 1px solid var(--panel-edge);
-    border-radius: 999px; padding: 8px 16px; cursor: pointer; max-width: 40vw; }
+    background: var(--panel) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'><path d='M0 0l5 6 5-6z' fill='%238792AC'/></svg>") no-repeat right 14px center;
+    background-size: 9px 6px;
+    color: var(--ink); border: 1px solid var(--panel-edge);
+    border-radius: 999px; padding: 8px 30px 8px 16px; cursor: pointer; max-width: 40vw;
+    appearance: none; -webkit-appearance: none; -moz-appearance: none; }
 
   .icon-btn{ width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--panel-edge);
     background: var(--panel); color: var(--ink-dim); display:flex; align-items:center; justify-content:center;
@@ -157,7 +160,7 @@
   .staff-row{ display:flex; align-items:stretch; gap:12px; flex: 0 0 280px; height:280px; }
   .staff-wrap{ flex: 0 0 80%; width:80%; min-width:0; background: #e2d5b0; border-radius: 12px; padding: 8px 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.35); box-sizing:border-box; }
-  .staff-wrap svg{ display:block; width:100%; height:100%; }
+  .staff-wrap svg{ display:block; width:100%; height:100%; overflow: visible; }
   .piano-big-note{ flex: 0 0 20%; width:20%; display:flex; align-items:center; justify-content:center;
     background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 12px;
     font-family:'Oswald', sans-serif; font-weight:700; color: var(--accent-play);
@@ -455,6 +458,12 @@
     .string-label .sletter{ font-size: calc(6px * var(--fs-scale)); }
     .note-circle{ max-width: 30px; }
     .finger-badge{ width: 11px; height: 11px; font-size: calc(7px * var(--fs-scale)); }
+    .staff-row{ flex-direction: column; flex: 0 0 auto; height: auto; gap: 8px; }
+    .staff-wrap{ width: 100%; flex: 0 0 auto; height: 46vh; min-height: 260px; max-height: 380px; }
+    .piano-big-note{ width: 100%; flex: 0 0 auto; height: auto; min-height: 46px;
+      font-size: calc(28px * var(--fs-scale)); padding: 8px; }
+    .piano-key-white{ flex: 0 0 22px; min-width: 22px; width: 22px; }
+    .piano-keyboard{ width: max-content; min-width: 100%; }
     .tempo-ctrl input[type=range]{ width: 60px; }
     .font-size-ctrl input[type=range]{ width: 46px; }
     .font-size-ctrl{ padding: 5px 8px; }
@@ -701,7 +710,7 @@
   </div>
   <div class="staff-row">
     <div class="staff-wrap">
-      <svg id="staffSVG" viewBox="0 0 700 330" preserveAspectRatio="xMidYMid meet"></svg>
+      <svg id="staffSVG" viewBox="0 0 700 362" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="piano-big-note" id="pianoBigNote">—</div>
   </div>
@@ -3016,6 +3025,10 @@
       $('#tecnicaRow').style.display = 'none';
       $('#tecnicaExerciseRow').style.display = 'none';
       $('#pickingModeRow').style.display = 'none';
+      $('#theorySection').style.display = 'none';
+      $('#modeTheorySection').style.display = 'none';
+      $('#circleTheorySection').style.display = 'none';
+      $('footer').style.display = 'none';
       $('#pianoShell').style.display = 'none';
       renderTriadSection();
       return; // las tríadas son autocontenidas, igual que el piano
@@ -3039,10 +3052,18 @@
       $('#tecnicaRow').style.display = 'none';
       $('#tecnicaExerciseRow').style.display = 'none';
       $('#pickingModeRow').style.display = 'none';
+      $('#theorySection').style.display = 'none';
+      $('#modeTheorySection').style.display = 'none';
+      $('#circleTheorySection').style.display = 'none';
+      $('footer').style.display = 'none';
       renderPianoSection();
       return; // el piano es autocontenido: no necesita nada del resto del render de guitarra/bajo
     }
     $('#rootRow').style.display = 'flex';
+    $('#theorySection').style.display = '';
+    $('#modeTheorySection').style.display = '';
+    $('#circleTheorySection').style.display = '';
+    $('footer').style.display = '';
     $('#zoneRow').style.display = (usingStyle || usingAcordes || usingMastil || usingTecnica) ? 'none' : 'flex';
     $('#styleZoneRow').style.display = (usingStyle && !usingAcordes) ? 'flex' : 'none';
     $('#tecnicaRow').style.display = usingTecnica ? 'flex' : 'none';
@@ -3548,8 +3569,8 @@
   ];
   const PIANO_MIN_OCTAVE = 1, PIANO_MAX_OCTAVE = 7; // Do1 a Do7 (6 octavas)
   const PIANO_STEP_PX = 6;        // píxeles por paso diatónico (igual en las 3 vistas, fijo)
-  const PIANO_MARGIN_TOP = 54;    // hueco fijo arriba (símbolo de clave)
-  const PIANO_MARGIN_BOTTOM = 24; // hueco fijo abajo
+  const PIANO_MARGIN_TOP = 70;    // hueco fijo arriba (símbolo de clave, con margen extra)
+  const PIANO_MARGIN_BOTTOM = 40; // hueco fijo abajo (margen extra)
   const PIANO_VIEWBOX_W = 700;
   // altura fija: cabe siempre el rango completo Do1-Do7 (42 pasos), sea cual sea la vista
   const PIANO_VIEWBOX_H = PIANO_MARGIN_TOP + PIANO_MARGIN_BOTTOM + 42 * PIANO_STEP_PX;
@@ -3833,10 +3854,23 @@
     wrap.parentElement.scrollLeft = 0; // arrancar viendo Do1 (el más grave), no una vista desplazada
   }
 
+  // centra el desplazamiento horizontal del teclado sobre las teclas indicadas — sobre todo útil
+  // en móvil, donde el teclado no cabe entero y hay que desplazarse para encontrar las teclas.
+  // En iPad/escritorio, donde suele caber entero, esto no tiene ningún efecto visible.
+  function pianoScrollToKeys(keyEls){
+    const wrap = document.querySelector('.piano-keyboard-wrap');
+    if (!wrap || keyEls.length === 0) return;
+    const lefts = keyEls.map(el => el.offsetLeft);
+    const rights = keyEls.map(el => el.offsetLeft + el.offsetWidth);
+    const center = (Math.min(...lefts) + Math.max(...rights)) / 2;
+    const target = center - wrap.clientWidth / 2;
+    wrap.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+  }
+
   function pianoKeyPressed(pc, octave){
     document.querySelectorAll('.piano-key-white.active, .piano-key-black.active').forEach(el => el.classList.remove('active'));
     const sel = document.querySelector(`.piano-keyboard [data-pc="${pc}"][data-octave="${octave}"]`);
-    if (sel) sel.classList.add('active');
+    if (sel) { sel.classList.add('active'); pianoScrollToKeys([sel]); }
     showNoteOnStaff(pc, octave);
     playPianoTone(pianoNoteData(pc, octave).midi);
   }
@@ -3906,10 +3940,12 @@
 
   function highlightPianoKeys(notes){
     document.querySelectorAll('.piano-key-white.active, .piano-key-black.active').forEach(el => el.classList.remove('active'));
+    const els = [];
     notes.forEach(n => {
       const sel = document.querySelector(`.piano-keyboard [data-pc="${n.pc}"][data-octave="${n.octave}"]`);
-      if (sel) sel.classList.add('active');
+      if (sel) { sel.classList.add('active'); els.push(sel); }
     });
+    pianoScrollToKeys(els);
   }
 
   function playChordTones(notes){
