@@ -8,27 +8,38 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Noto+Music&family=Anton&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #0c0e10;
+    --bg: #0A0E1A;
+    --bg-glow: radial-gradient(1200px 700px at 15% -10%, #182248 0%, #0A0E1A 55%);
     --wood-1: #2f333a;
     --wood-2: #383d45;
     --wood-3: #1c1f24;
     --fret-metal-a: #d8d3c8;
     --fret-metal-b: #8a8478;
     --bone: #ede4d3;
-    --ink: #f3ece0;
-    --ink-dim: #9aa0a8;
-    --panel: #16181c;
-    --panel-edge: #2c3138;
-    --accent-root: #ab1e16;
-    --accent-root-dark: #7e1610;
-    --accent-play: #e0b84a;
-    --accent-blue: #2fa1ff;
+    --ink: #EDF1F9;
+    --ink-secondary: #B7C0D8;
+    --ink-dim: #8792AC;
+    --ink-faint: #5B7099;
+    --panel: #141B2E;
+    --panel-2: #131A2B;
+    --panel-edge: #232C47;
+    --panel-edge-soft: #1F2844;
+    --panel-border: #2A3450;
+    --accent-root: #FF6B6B;
+    --accent-root-dark: #D94F4F;
+    --accent-play: #FFB020;
+    --accent-blue: #5B8CFF;
+    --accent-blue-dark: #4763E0;
+    --accent-green: #5FCB8F;
+    --accent-purple: #9B6BFF;
+    --accent-teal: #2FD4B8;
+    --accent-pink: #FF4FA3;
     --fs-scale: 1; /* control de tamaño de letra global, se ajusta con el mini-slider "Aa" */
   }
 
   *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  html, body{ margin:0; padding:0; height:100%; background: var(--bg); color: var(--ink);
+  html, body{ margin:0; padding:0; height:100%; background: var(--bg-glow); color: var(--ink);
     font-family: 'Inter', sans-serif; overflow-x: hidden; } /* red de seguridad: nada se sale de pantalla */
 
   body{ display:flex; flex-direction:column; height:100vh; padding: 10px 20px; gap: 8px; overflow-y:auto; }
@@ -50,8 +61,8 @@
   .pill-group button{ font-family:'Oswald', sans-serif; font-weight: 600; font-size: calc(11px * var(--fs-scale)); letter-spacing: 0.5px;
     text-transform: uppercase; padding: 7px 14px; border-radius: 999px; border: none; background: transparent;
     color: var(--ink-dim); cursor: pointer; transition: background .15s, color .15s; white-space:nowrap; flex-shrink:0; }
-  .pill-group button.active{ background: linear-gradient(180deg, #4a5561, #333a42); color: var(--ink);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12); }
+  .pill-group button.active{ background: linear-gradient(180deg, var(--accent-blue), var(--accent-blue-dark)); color: #fff;
+    box-shadow: 0 4px 12px -3px rgba(91,140,255,0.55), inset 0 1px 0 rgba(255,255,255,0.15); }
 
   select#scaleSelect{ font-family:'Oswald', sans-serif; font-weight: 600; font-size: calc(11px * var(--fs-scale)); letter-spacing: 0.5px;
     text-transform: uppercase; background: var(--panel); color: var(--ink); border: 1px solid var(--panel-edge);
@@ -92,7 +103,7 @@
   .jam-summary-alt{ font-size: calc(11px * var(--fs-scale)); color: var(--ink-dim); margin-top:2px; }
   .jam-summary-note{ font-size: calc(10px * var(--fs-scale)); color: var(--ink-dim); font-style:italic; margin-top:3px; }
   .jam-summary-btn{ font-family:'Oswald', sans-serif; font-weight:600; font-size: calc(12px * var(--fs-scale));
-    background: var(--accent-play); color:#221a06; border:none; border-radius:999px; padding: 9px 18px;
+    background: var(--accent-play); color:#241300; border:none; border-radius:999px; padding: 9px 18px;
     cursor:pointer; white-space:nowrap; }
 
   .fret-cell.behind-capo{ opacity: 0.22; filter: grayscale(0.6); }
@@ -152,7 +163,7 @@
   .piano-note-display{ font-family:'Oswald', sans-serif; font-weight:700;
     font-size: calc(16px * var(--fs-scale)); color: var(--accent-play); }
   .piano-font-status{ font-family:'Inter', sans-serif; font-size: calc(11px * var(--fs-scale)); color: var(--ink-dim); }
-  .piano-font-status.ok{ color: #4caf50; }
+  .piano-font-status.ok{ color: #5FCB8F; }
   .piano-font-status.fallback{ color: var(--ink-dim); }
   .piano-clef-toggle{ margin-left:auto; }
 
@@ -175,14 +186,14 @@
     border-radius: 0 0 5px 5px; cursor:pointer; display:flex; align-items:flex-end; justify-content:center;
     padding-bottom: 8px; font-family:'Oswald', sans-serif; font-size: 10px; color:#8a8578; }
   .piano-key-white:hover{ background: linear-gradient(180deg, #fff, #f0efe6); }
-  .piano-key-white.active{ background: linear-gradient(180deg, #e0b84a, #c99a2e); color:#221a06; }
+  .piano-key-white.active{ background: linear-gradient(180deg, #FFB020, #CC8A10); color:#241300; }
   .piano-key-white.middle-c{ background: linear-gradient(180deg, #fdfdfb, #e5c98a); }
-  .piano-key-white.middle-c.active{ background: linear-gradient(180deg, #e0b84a, #c99a2e); }
+  .piano-key-white.middle-c.active{ background: linear-gradient(180deg, #FFB020, #CC8A10); }
   .piano-key-black{ position:absolute; top:0; width: 1.4%; height:62%; z-index:2;
     background: linear-gradient(180deg, #2a2a2a, #060606); border: 1px solid #000;
     border-radius: 0 0 4px 4px; cursor:pointer; }
   .piano-key-black:hover{ background: linear-gradient(180deg, #3a3a3a, #161616); }
-  .piano-key-black.active{ background: linear-gradient(180deg, #e0b84a, #c99a2e); }
+  .piano-key-black.active{ background: linear-gradient(180deg, #FFB020, #CC8A10); }
   .piano-key-white.c-label::after{ content: attr(data-label); }
 
   .board-frame{ background: linear-gradient(180deg, #202327, #14161a); border-radius: 14px;
@@ -254,9 +265,11 @@
     font-family: 'JetBrains Mono', monospace;
     overflow-x:auto; white-space:pre; -webkit-overflow-scrolling:touch; }
   .play-btn{ font-family:'Oswald', sans-serif; font-weight: 700; font-size: calc(12px * var(--fs-scale)); letter-spacing: 0.5px;
-    text-transform:uppercase; background: linear-gradient(180deg, #f0c65a, #c99a2e); color:#221a06;
-    border:none; border-radius: 999px; padding: 9px 18px; cursor:pointer; white-space:nowrap; }
-  .play-btn:disabled{ opacity:1; background: var(--panel-edge); color: var(--ink-dim); cursor:default; }
+    text-transform:uppercase; background: linear-gradient(135deg, #FFC24B, #FF9640); color:#241300;
+    border:none; border-radius: 999px; padding: 9px 18px; cursor:pointer; white-space:nowrap;
+    box-shadow: 0 8px 20px -6px rgba(255,150,64,0.55); transition: transform .1s, box-shadow .15s; }
+  .play-btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 24px -6px rgba(255,150,64,0.7); }
+  .play-btn:disabled{ opacity:1; background: var(--panel-edge); color: var(--ink-dim); cursor:default; box-shadow:none; }
 
   .finger-line{ font-size: calc(10px * var(--fs-scale)); color: var(--ink-dim); letter-spacing: 0.5px; padding: 0 4px; }
   .finger-line b{ color: var(--ink); }
@@ -281,7 +294,7 @@
     background: var(--panel-edge); color: var(--ink); border: 1px solid transparent; border-radius: 999px;
     padding: 7px 14px; cursor:pointer; white-space:nowrap; transition: background .15s, color .15s; }
   .btn-compas:hover{ background: rgba(224,184,74,0.18); }
-  .btn-compas.active{ background: var(--accent-play); color:#221a06; }
+  .btn-compas.active{ background: var(--accent-play); color:#241300; }
 
   .timesig-ctrl{ display:flex; align-items:center; gap:8px; }
   .timesig-badge{ display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -298,7 +311,7 @@
     background: var(--panel-edge); color: var(--ink-dim); font-family:'JetBrains Mono', monospace;
     font-size: calc(10px * var(--fs-scale)); flex-shrink:0; transition: background .05s, transform .05s; }
   .compas-beat.strong{ font-weight:700; color: var(--ink); box-shadow: inset 0 0 0 2px var(--accent-root); }
-  .compas-beat.lit{ background: var(--accent-play); color:#221a06; transform: scale(1.25); }
+  .compas-beat.lit{ background: var(--accent-play); color:#241300; transform: scale(1.25); }
   .compas-beat.lit.strong{ background: var(--accent-root); color:#fff; }
   .compas-beat.sub-lit{ background: rgba(224,184,74,0.35); transform: scale(1.1); }
 
@@ -341,7 +354,7 @@
     background: var(--panel); color: var(--ink); border: 1px solid var(--panel-edge);
     border-radius: 999px; padding: 8px 16px; cursor:pointer; white-space:nowrap; }
   .drum-mini-btn:hover{ border-color: var(--accent-play); }
-  .drum-mini-btn.active{ background: var(--accent-play); color:#221a06; border-color: var(--accent-play); }
+  .drum-mini-btn.active{ background: var(--accent-play); color:#241300; border-color: var(--accent-play); }
   .drum-volume-ctrl{ display:flex; align-items:center; gap:6px; }
   .drum-volume-ctrl input[type=range]{ width:80px; accent-color: var(--accent-play); }
   .drum-note{ font-size: calc(9.5px * var(--fs-scale)); color: var(--ink-dim); font-style:italic; }
@@ -408,7 +421,7 @@
   .prog-chip{ display:flex; align-items:center; gap:4px; background: var(--panel-edge); border-radius: 999px;
     padding: 4px 10px; font-family:'Oswald', sans-serif; font-weight:600; font-size: calc(11px * var(--fs-scale));
     color: var(--ink); white-space:nowrap; }
-  .prog-chip.current{ background: var(--accent-play); color: #221a06; }
+  .prog-chip.current{ background: var(--accent-play); color: #241300; }
   .prog-chip .prog-chip-arrow{ color: var(--ink-dim); margin-left:2px; }
   .prog-empty-hint{ font-size: calc(11px * var(--fs-scale)); color: var(--ink-dim); }
 
@@ -431,7 +444,7 @@
     font-size: calc(10px * var(--fs-scale)); text-transform:uppercase; letter-spacing:0.5px;
     background: var(--panel-edge); color: var(--ink); border:none; border-radius:999px;
     padding: 5px 12px; cursor:pointer; }
-  .chord-mini-card .chord-mini-gobtn:hover{ background: var(--accent-play); color:#221a06; }
+  .chord-mini-card .chord-mini-gobtn:hover{ background: var(--accent-play); color:#241300; }
   .chord-mini-card.current{ border-color: var(--accent-play);
     background: rgba(224,184,74,0.12); box-shadow: 0 0 18px 2px rgba(224,184,74,0.35); }
 
@@ -538,6 +551,7 @@
       <button class="drum-mini-btn" id="drumFillToggle" title="Fill automático cada 4 compases">🔀 Fill</button>
       <button class="drum-mini-btn" id="drumResetBtn" title="Restablecer el patrón original del estilo">↺ Restablecer</button>
       <button class="drum-mini-btn" id="drumHumanizeToggle" title="Pequeñas variaciones aleatorias de tiempo y volumen, para que no suene tan de máquina">🎭 Humanizar</button>
+      <button class="drum-mini-btn" id="drumVariationBtn" title="Mueve 1-2 golpes del patrón actual, sin perder el estilo">🎲 Variación</button>
       <div class="drum-volume-ctrl">
         <span class="label">Tempo</span>
         <input type="range" id="drumBpmSlider" min="50" max="250" step="5" value="100">
@@ -1464,7 +1478,7 @@
   // Definido de forma RELATIVA al final del compás (posiciones -4,-3,-2,-1), no en una posición
   // fija como "paso 12", para que funcione igual de bien con un compás de 16 pasos (4/4) que con
   // uno de 12 (el vals en 3/4) — cualquier estilo con al menos 4 pasos puede usarlo.
-  const DRUM_FILL_LAST4 = {
+  const DRUM_FILL_GENERIC = {
     kick:        [0,0,0,1],
     snare:       [1,1,2,0],
     hihatClosed: [0,0,0,0],
@@ -1472,6 +1486,53 @@
     clap:        [0,0,0,0],
     crash:       [0,0,0,1]
   };
+  // fills propios por estilo: cada uno pensado para encajar con el carácter de ese género, en vez
+  // de usar siempre el mismo redoble genérico de caja+platillo
+  const DRUM_FILLS_BY_STYLE = {
+    funk: { // sincopado: combo bombo+caja en vez de redoble limpio, sin platillo (el funk no suele "explotar")
+      kick:        [1,0,0,1],
+      snare:       [0,1,1,0],
+      hihatClosed: [0,0,0,0],
+      hihatOpen:   [0,0,0,0],
+      clap:        [0,0,0,0],
+      crash:       [0,0,0,0]
+    },
+    metal: { // doble bombo rápido + redoble de caja con acento creciente, gran platillo final
+      kick:        [1,1,1,1],
+      snare:       [1,1,2,2],
+      hihatClosed: [0,0,0,0],
+      hihatOpen:   [0,0,0,0],
+      clap:        [0,0,0,0],
+      crash:       [0,0,0,1]
+    },
+    reggae: { // minimalista: casi silencio hasta el último golpe, deja "espacio" (muy propio del género)
+      kick:        [0,0,0,0],
+      snare:       [0,0,0,1],
+      hihatClosed: [0,0,0,0],
+      hihatOpen:   [0,0,0,0],
+      clap:        [0,0,0,0],
+      crash:       [0,0,0,0]
+    },
+    blues: { // con feel de swing, bombo y caja alternando, platillo al final
+      kick:        [0,1,0,1],
+      snare:       [1,0,1,0],
+      hihatClosed: [0,0,0,0],
+      hihatOpen:   [0,0,0,0],
+      clap:        [0,0,0,0],
+      crash:       [0,0,0,1]
+    },
+    vals: { // más simple, solo marca el final de la frase de 3 tiempos con la caja
+      kick:        [0,0,0,1],
+      snare:       [1,0,1,0],
+      hihatClosed: [0,0,0,0],
+      hihatOpen:   [0,0,0,0],
+      clap:        [0,0,0,0],
+      crash:       [0,0,0,0]
+    }
+  };
+  function drumFillForStyle(styleKey){
+    return DRUM_FILLS_BY_STYLE[styleKey] || DRUM_FILL_GENERIC;
+  }
 
   // convierte el formato disperso de los presets (array de índices activos) al formato editable
   // de la rejilla (array de N valores según los pasos del estilo: 0=apagado, 1=normal, 2=acento)
@@ -1792,7 +1853,7 @@
         const c1 = Math.min(...idxs), c2 = Math.max(...idxs);
         const rowIdx = isOpenPosition ? (targetFret - fretBase - 1) : (targetFret - fretBase);
         const y = marginTop + (rowIdx + 0.5) * stepY;
-        svg += `<line x1="${xAt(c1)}" y1="${y}" x2="${xAt(c2)}" y2="${y}" stroke="#e0b84a" stroke-width="10" stroke-linecap="round" opacity="0.85"/>`;
+        svg += `<line x1="${xAt(c1)}" y1="${y}" x2="${xAt(c2)}" y2="${y}" stroke="#FFB020" stroke-width="10" stroke-linecap="round" opacity="0.85"/>`;
         sameFret.forEach(o => barreCoveredIdx.add(o.i));
       }
     }
@@ -1812,8 +1873,8 @@
         // en cejilla la fila 0 es el propio traste de la cejilla (donde se dibuja la barra).
         const rowIdx = isOpenPosition ? (s.fret - fretBase - 1) : (s.fret - fretBase);
         const y = marginTop + (rowIdx + 0.5) * stepY;
-        svg += `<circle cx="${x}" cy="${y}" r="9" fill="#e0b84a"/>`;
-        svg += `<text x="${x}" y="${y+4}" font-size="10.5" font-weight="700" fill="#221a06" text-anchor="middle" font-family="'Inter', sans-serif">${s.finger}</text>`;
+        svg += `<circle cx="${x}" cy="${y}" r="9" fill="#FFB020"/>`;
+        svg += `<text x="${x}" y="${y+4}" font-size="10.5" font-weight="700" fill="#241300" text-anchor="middle" font-family="'Inter', sans-serif">${s.finger}</text>`;
       }
     });
 
@@ -1977,7 +2038,7 @@
   }
 
   const NOTE_COLORS = NOTES.map((_, i) => `hsl(${30 + i * 23}, 62%, 28%)`); // evita la banda roja, reservada a la raíz. L=28% asegura contraste >=4.5:1 con el texto blanco en las 12 notas (verificado)
-  const ROOT_COLOR = '#ab1e16'; // mismo tono que --accent-root, oscurecido para que el texto blanco cumpla contraste
+  const ROOT_COLOR = '#FF6B6B'; // mismo tono que --accent-root, oscurecido para que el texto blanco cumpla contraste
 
   const state = {
     tab: 'escalas', // 'escalas' | 'estilos'
@@ -3526,24 +3587,24 @@
     // (garantizado que se ve igual en cualquier dispositivo, sin depender de red).
     if (note.acc === '#' || note.acc === 'b') {
       if (pianoMusicFontReady) {
-        const sym = mk('text', { x: nx - 22, y: y + 7, 'font-family': '"Noto Music", serif', 'font-size': 22, fill: '#ab1e16' });
+        const sym = mk('text', { x: nx - 22, y: y + 7, 'font-family': '"Noto Music", serif', 'font-size': 22, fill: '#FF6B6B' });
         sym.textContent = note.acc === '#' ? '\u266F' : '\u266D';
         layer.appendChild(sym);
       } else if (note.acc === '#') {
         const ax = nx - 20;
-        layer.appendChild(mk('line', { x1: ax - 3, x2: ax - 3, y1: y - 8, y2: y + 7, stroke: '#ab1e16', 'stroke-width': 1.4 }));
-        layer.appendChild(mk('line', { x1: ax + 3, x2: ax + 3, y1: y - 9, y2: y + 6, stroke: '#ab1e16', 'stroke-width': 1.4 }));
-        layer.appendChild(mk('line', { x1: ax - 6, x2: ax + 6, y1: y - 2.5, y2: y - 4.5, stroke: '#ab1e16', 'stroke-width': 1.8 }));
-        layer.appendChild(mk('line', { x1: ax - 6, x2: ax + 6, y1: y + 4.5, y2: y + 2.5, stroke: '#ab1e16', 'stroke-width': 1.8 }));
+        layer.appendChild(mk('line', { x1: ax - 3, x2: ax - 3, y1: y - 8, y2: y + 7, stroke: '#FF6B6B', 'stroke-width': 1.4 }));
+        layer.appendChild(mk('line', { x1: ax + 3, x2: ax + 3, y1: y - 9, y2: y + 6, stroke: '#FF6B6B', 'stroke-width': 1.4 }));
+        layer.appendChild(mk('line', { x1: ax - 6, x2: ax + 6, y1: y - 2.5, y2: y - 4.5, stroke: '#FF6B6B', 'stroke-width': 1.8 }));
+        layer.appendChild(mk('line', { x1: ax - 6, x2: ax + 6, y1: y + 4.5, y2: y + 2.5, stroke: '#FF6B6B', 'stroke-width': 1.8 }));
       } else {
         const ax = nx - 18;
-        layer.appendChild(mk('line', { x1: ax, x2: ax, y1: y - 9, y2: y + 5, stroke: '#ab1e16', 'stroke-width': 1.5 }));
-        layer.appendChild(mk('ellipse', { cx: ax + 3, cy: y + 2, rx: 3.6, ry: 3, fill: '#ab1e16' }));
+        layer.appendChild(mk('line', { x1: ax, x2: ax, y1: y - 9, y2: y + 5, stroke: '#FF6B6B', 'stroke-width': 1.5 }));
+        layer.appendChild(mk('ellipse', { cx: ax + 3, cy: y + 2, rx: 3.6, ry: 3, fill: '#FF6B6B' }));
       }
     }
 
     // cabeza de nota (elipse rellena)
-    const head = mk('ellipse', { cx: nx, cy: y, rx: 8, ry: 6, fill: '#ab1e16', transform: `rotate(-18 ${nx} ${y})` });
+    const head = mk('ellipse', { cx: nx, cy: y, rx: 8, ry: 6, fill: '#FF6B6B', transform: `rotate(-18 ${nx} ${y})` });
     layer.appendChild(head);
     return { ledgerPositions, y };
   }
@@ -3559,7 +3620,7 @@
     const yBottom = Math.max(...allYs) + 4;
     layer.appendChild(mk('line', {
       x1: guideX, x2: guideX, y1: yTop, y2: yBottom,
-      stroke: '#b8341f', 'stroke-width': 1
+      stroke: '#FF6B6B', 'stroke-width': 1
     }));
   }
 
@@ -4592,7 +4653,7 @@
   // redoble genérico — definido de forma relativa al final del compás, así funciona igual con
   // un compás de 16 pasos que con uno de 12 (el vals en 3/4).
   function drumEffectiveStep(voice, step, isFillBar, totalSteps){
-    if (isFillBar && step >= totalSteps - 4) return DRUM_FILL_LAST4[voice][step - (totalSteps - 4)];
+    if (isFillBar && step >= totalSteps - 4) return drumFillForStyle(state.drumMachine.style)[voice][step - (totalSteps - 4)];
     return state.drumMachine.pattern[voice][step];
   }
 
@@ -4685,6 +4746,30 @@
     drumEnsurePattern();
     const cur = state.drumMachine.pattern[voice][step];
     state.drumMachine.pattern[voice][step] = (cur + 1) % 3; // apagado -> normal -> acento -> apagado
+    renderDrumGrid();
+  }
+
+  // variación aleatoria: mueve 1-2 golpes ya existentes (de bombo/caja/hi-hat) ±1 o ±2 pasos,
+  // sin tocar nunca el primer pulso del compás (el "esqueleto" que identifica al estilo) ni
+  // pisar un golpe que ya esté ahí — así el patrón sigue sonando reconocible, solo un poco distinto.
+  function drumApplyVariation(){
+    drumEnsurePattern();
+    const steps = drumCurrentSteps();
+    const candidateVoices = ['kick', 'snare', 'hihatClosed'];
+    const changes = 1 + Math.floor(Math.random() * 2); // 1 o 2 cambios
+    for (let c = 0; c < changes; c++) {
+      const voice = candidateVoices[Math.floor(Math.random() * candidateVoices.length)];
+      const arr = state.drumMachine.pattern[voice];
+      const activeIdxs = arr.map((v, i) => ({ v, i })).filter(o => o.v > 0 && o.i !== 0);
+      if (activeIdxs.length === 0) continue;
+      const pick = activeIdxs[Math.floor(Math.random() * activeIdxs.length)];
+      const shift = [-2, -1, 1, 2][Math.floor(Math.random() * 4)];
+      const dest = ((pick.i + shift) % steps + steps) % steps;
+      if (arr[dest] === 0 && dest !== 0) {
+        arr[dest] = arr[pick.i];
+        arr[pick.i] = 0;
+      }
+    }
     renderDrumGrid();
   }
 
@@ -5434,6 +5519,7 @@
     state.drumMachine.humanize = !state.drumMachine.humanize;
     $('#drumHumanizeToggle').classList.toggle('active', state.drumMachine.humanize);
   });
+  $('#drumVariationBtn').addEventListener('click', drumApplyVariation);
   $('#drumResetBtn').addEventListener('click', () => {
     state.drumMachine.pattern = drumBuildPatternFromStyle(state.drumMachine.style);
     renderDrumGrid();
