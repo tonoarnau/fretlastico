@@ -3596,24 +3596,24 @@
     // (garantizado que se ve igual en cualquier dispositivo, sin depender de red).
     if (note.acc === '#' || note.acc === 'b') {
       if (pianoMusicFontReady) {
-        const sym = mk('text', { x: nx - 22, y: y + 7, 'font-family': '"Noto Music", serif', 'font-size': 22, fill: '#FF6B6B' });
+        const sym = mk('text', { x: nx - 22, y: y + 7, 'font-family': '"Noto Music", serif', 'font-size': 22, fill: '#1a1a1a' });
         sym.textContent = note.acc === '#' ? '\u266F' : '\u266D';
         layer.appendChild(sym);
       } else if (note.acc === '#') {
         const ax = nx - 20;
-        layer.appendChild(mk('line', { x1: ax - 3, x2: ax - 3, y1: y - 8, y2: y + 7, stroke: '#FF6B6B', 'stroke-width': 1.4 }));
-        layer.appendChild(mk('line', { x1: ax + 3, x2: ax + 3, y1: y - 9, y2: y + 6, stroke: '#FF6B6B', 'stroke-width': 1.4 }));
-        layer.appendChild(mk('line', { x1: ax - 6, x2: ax + 6, y1: y - 2.5, y2: y - 4.5, stroke: '#FF6B6B', 'stroke-width': 1.8 }));
-        layer.appendChild(mk('line', { x1: ax - 6, x2: ax + 6, y1: y + 4.5, y2: y + 2.5, stroke: '#FF6B6B', 'stroke-width': 1.8 }));
+        layer.appendChild(mk('line', { x1: ax - 3, x2: ax - 3, y1: y - 8, y2: y + 7, stroke: '#1a1a1a', 'stroke-width': 1.4 }));
+        layer.appendChild(mk('line', { x1: ax + 3, x2: ax + 3, y1: y - 9, y2: y + 6, stroke: '#1a1a1a', 'stroke-width': 1.4 }));
+        layer.appendChild(mk('line', { x1: ax - 6, x2: ax + 6, y1: y - 2.5, y2: y - 4.5, stroke: '#1a1a1a', 'stroke-width': 1.8 }));
+        layer.appendChild(mk('line', { x1: ax - 6, x2: ax + 6, y1: y + 4.5, y2: y + 2.5, stroke: '#1a1a1a', 'stroke-width': 1.8 }));
       } else {
         const ax = nx - 18;
-        layer.appendChild(mk('line', { x1: ax, x2: ax, y1: y - 9, y2: y + 5, stroke: '#FF6B6B', 'stroke-width': 1.5 }));
-        layer.appendChild(mk('ellipse', { cx: ax + 3, cy: y + 2, rx: 3.6, ry: 3, fill: '#FF6B6B' }));
+        layer.appendChild(mk('line', { x1: ax, x2: ax, y1: y - 9, y2: y + 5, stroke: '#1a1a1a', 'stroke-width': 1.5 }));
+        layer.appendChild(mk('ellipse', { cx: ax + 3, cy: y + 2, rx: 3.6, ry: 3, fill: '#1a1a1a' }));
       }
     }
 
     // cabeza de nota (elipse rellena)
-    const head = mk('ellipse', { cx: nx, cy: y, rx: 8, ry: 6, fill: '#FF6B6B', transform: `rotate(-18 ${nx} ${y})` });
+    const head = mk('ellipse', { cx: nx, cy: y, rx: 8, ry: 6, fill: '#1a1a1a', transform: `rotate(-18 ${nx} ${y})` });
     layer.appendChild(head);
     return { ledgerPositions, y };
   }
@@ -3629,7 +3629,7 @@
     const yBottom = Math.max(...allYs) + 4;
     layer.appendChild(mk('line', {
       x1: guideX, x2: guideX, y1: yTop, y2: yBottom,
-      stroke: '#FF6B6B', 'stroke-width': 1
+      stroke: '#1a1a1a', 'stroke-width': 1
     }));
   }
 
