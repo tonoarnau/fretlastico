@@ -135,7 +135,8 @@
   .triad-diagram-wrap{ display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
   .triad-diagram{ background: var(--panel); border:1px solid var(--panel-edge); border-radius:12px;
     padding:18px; width: 220px; max-width: 100%; }
-  .triad-diagram svg{ display:block; width:100%; height:auto; aspect-ratio: 160/190; }
+  .triad-diagram.wide{ width: 100%; max-width: 640px; }
+  .triad-diagram svg{ display:block; width:100%; height:auto; }
   .triad-info{ background: var(--panel); border:1px solid var(--panel-edge); border-radius:12px;
     padding:16px; min-width:200px; font-family:'Inter', sans-serif; font-size: calc(11.5px * var(--fs-scale));
     line-height:1.7; flex:1; }
@@ -822,6 +823,7 @@
       arriba) en las 4 combinaciones de cuerdas adyacentes, ordenadas de más grave a más aguda por
       dónde empiezan en el mástil — igual que las 5 posiciones CAGED de un acorde completo, pero
       con solo 3 cuerdas.</p>
+      <button class="play-btn" id="triadMapPlayBtn" disabled>▶ Reproducir las 4 posiciones</button>
       <div class="triad-progression-cards" id="triadMapCards"></div>
     </div>
   </details>
@@ -1350,6 +1352,37 @@
       }
     });
 
+    svg += `</svg>`;
+    return svg;
+  }
+
+  // diagrama SVG de la tríada arpegiada en una sola cuerda: línea de cuerda horizontal con marcas
+  // de traste y las notas encima. Consciente de zurdos: el traste 0 (clavijero) va a la derecha
+  // en modo zurdo, igual que el resto del mástil de la app.
+  function renderTriadSingleStringSVG(positions, stringIdx, rootPc){
+    const maxFret = 15;
+    const W = 640, H = 84;
+    const marginL = 34, marginR = 18;
+    const gridW = W - marginL - marginR;
+    const stepX = gridW / maxFret;
+    const stringY = 34;
+    const fretX = f => state.lefty ? (marginL + (maxFret - f) * stepX) : (marginL + f * stepX);
+
+    let svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
+    svg += `<text x="4" y="${stringY+4}" font-size="12" font-weight="700" fill="#8792AC" font-family="Oswald, sans-serif">${STRING_ORDINALS[stringIdx]}</text>`;
+    svg += `<line x1="${marginL}" y1="${stringY}" x2="${marginL+gridW}" y2="${stringY}" stroke="#9aa0a8" stroke-width="2"/>`;
+    for (let f = 0; f <= maxFret; f++) {
+      const x = fretX(f);
+      svg += `<line x1="${x}" y1="${stringY-7}" x2="${x}" y2="${stringY+7}" stroke="#4a5561" stroke-width="1"/>`;
+      svg += `<text x="${x}" y="${stringY+24}" font-size="9" fill="#8792AC" text-anchor="middle" font-family="Oswald, sans-serif">${f}</text>`;
+    }
+    positions.forEach(pos => {
+      const x = fretX(pos.fret);
+      const isRoot = pos.pc === rootPc;
+      const color = isRoot ? 'var(--accent-root,#FF6B6B)' : NOTE_COLORS[pos.pc];
+      svg += `<circle cx="${x}" cy="${stringY}" r="11" fill="${color}"/>`;
+      svg += `<text x="${x}" y="${stringY+4}" font-size="10" font-weight="700" fill="#fff" text-anchor="middle" font-family="'Inter', sans-serif">${DISPLAY[pos.pc]}</text>`;
+    });
     svg += `</svg>`;
     return svg;
   }
@@ -2160,7 +2193,7 @@
     pianoChordQuality: 'major',
     drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null, humanize: false, speedFeel: 'normal' },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
-             tonality: 'major', progressionIdx: null, progShapes: [], zoneIdx: 0, singleStringIdx: 0,
+             tonality: 'major', progressionIdx: null, progShapes: [], mapShapes: [], zoneIdx: 0, singleStringIdx: 0,
              voiceLeading: false },
     triadQuiz: { active: false, score: 0, attempts: 0, target: null, guessRoot: null, guessQuality: null, guessInversion: null },
     bpm: 100,
@@ -3997,41 +4030,11 @@
     const quality = TRIAD_QUALITIES[t.quality];
     const wrap = $('#triadDiagram');
     const info = $('#triadInfo');
+    wrap.classList.toggle('wide', t.mode === 'single');
 
     if (t.mode === 'single') {
       const positions = triadSingleStringPositions(t.root, t.quality, t.singleStringIdx, 15);
-      wrap.innerHTML = '';
-      const row = document.createElement('div');
-      row.className = 'triad-row';
-      const label = document.createElement('span');
-      label.className = 'triad-row-label';
-      label.textContent = STRING_ORDINALS[t.singleStringIdx];
-      row.appendChild(label);
-      for (let f = 0; f <= 15; f++) {
-        const cell = document.createElement('div');
-        cell.className = 'triad-fret-cell';
-        const pos = positions.find(p => p.fret === f);
-        if (pos) {
-          const dot = document.createElement('div');
-          dot.className = 'triad-note-dot' + (pos.pc === t.root ? ' root' : '');
-          dot.textContent = DISPLAY[pos.pc];
-          cell.appendChild(dot);
-        }
-        row.appendChild(cell);
-      }
-      wrap.appendChild(row);
-      const headerRow = document.createElement('div');
-      headerRow.className = 'triad-row';
-      const headerSpacer = document.createElement('span');
-      headerSpacer.className = 'triad-row-label';
-      headerRow.appendChild(headerSpacer);
-      for (let f = 0; f <= 15; f++) {
-        const cell = document.createElement('div');
-        cell.className = 'triad-fret-num';
-        cell.textContent = f;
-        headerRow.appendChild(cell);
-      }
-      wrap.appendChild(headerRow);
+      wrap.innerHTML = renderTriadSingleStringSVG(positions, t.singleStringIdx, t.root);
 
       const degreeLabels = ['1ª (fundamental)', '3ª', '5ª'];
       info.innerHTML = `
@@ -4111,10 +4114,12 @@
       const shape = triadComputeShape(t.root, t.quality, t.inversion, set.idxs);
       return shape ? { shape, idxs: set.idxs, label: set.label } : null;
     }).filter(Boolean).sort((a, b) => a.shape.minFret - b.shape.minFret);
+    state.triad.mapShapes = shapes.map(e => ({ shape: e.shape, stringIdxs: e.idxs }));
 
     shapes.forEach((entry, i) => {
       const card = document.createElement('div');
       card.className = 'chord-mini-card triad-card';
+      card.dataset.step = i;
       const diagram = document.createElement('div');
       diagram.className = 'chord-mini-diagram';
       card.innerHTML = `<div class="chord-mini-roman">Posición ${i + 1} · cuerdas ${entry.label}</div>`;
@@ -4127,6 +4132,7 @@
       card.addEventListener('click', () => strumTriadShape(entry.shape, entry.idxs));
       wrap.appendChild(card);
     });
+    $('#triadMapPlayBtn').disabled = shapes.length === 0;
   }
 
   function renderTriadDegreesTable(){
@@ -5513,6 +5519,25 @@
     cards.forEach(card => card.classList.remove('current'));
     triadProgPlaying = false;
     $('#triadProgPlayBtn').disabled = false;
+  });
+
+  let triadMapPlaying = false;
+  $('#triadMapPlayBtn').addEventListener('click', async () => {
+    const shapes = state.triad.mapShapes || [];
+    if (triadMapPlaying || shapes.length === 0) return;
+    triadMapPlaying = true;
+    $('#triadMapPlayBtn').disabled = true;
+    const cards = document.querySelectorAll('#triadMapCards .chord-mini-card');
+    for (let i = 0; i < shapes.length; i++) {
+      cards.forEach((card, ci) => card.classList.toggle('current', ci === i));
+      if (cards[i]) cards[i].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      const entry = shapes[i];
+      if (entry) await strumTriadShape(entry.shape, entry.stringIdxs, 1.3);
+      await sleep(250);
+    }
+    cards.forEach(card => card.classList.remove('current'));
+    triadMapPlaying = false;
+    $('#triadMapPlayBtn').disabled = false;
   });
 
   $('#triadVoiceLeadingToggle').addEventListener('click', () => {
