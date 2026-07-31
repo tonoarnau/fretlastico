@@ -276,7 +276,7 @@
 
   .tempo-ctrl{ display:flex; align-items:center; gap: 8px; min-width:0; flex-shrink:0; }
   .tempo-ctrl input[type=range]{ width: 90px; accent-color: var(--accent-play); }
-  .tempo-ctrl span{ font-size: calc(10px * var(--fs-scale)); color: var(--ink-dim); white-space:nowrap; min-width: 56px; }
+  .tempo-ctrl span{ font-family:'JetBrains Mono', monospace; font-weight:700; font-size: calc(10px * var(--fs-scale)); color: var(--ink); white-space:nowrap; min-width: 56px; }
   .metro-dot{ width:14px; height:14px; min-width:14px; max-width:14px; min-height:14px; max-height:14px;
     border-radius:50%; background: var(--panel-edge);
     display:inline-block; box-sizing:border-box; margin: 0 6px;
@@ -357,6 +357,8 @@
   .drum-mini-btn.active{ background: var(--accent-play); color:#241300; border-color: var(--accent-play); }
   .drum-volume-ctrl{ display:flex; align-items:center; gap:6px; }
   .drum-volume-ctrl input[type=range]{ width:80px; accent-color: var(--accent-play); }
+  .drum-volume-ctrl span{ font-family:'JetBrains Mono', monospace; font-weight:700;
+    font-size: calc(10px * var(--fs-scale)); color: var(--ink); white-space:nowrap; min-width: 48px; }
   .drum-note{ font-size: calc(9.5px * var(--fs-scale)); color: var(--ink-dim); font-style:italic; }
   .drum-step-grid{ display:flex; flex-direction:column; gap:4px; margin-top:10px; }
   .drum-row{ display:flex; align-items:center; gap:8px; }
@@ -552,6 +554,11 @@
       <button class="drum-mini-btn" id="drumResetBtn" title="Restablecer el patrón original del estilo">↺ Restablecer</button>
       <button class="drum-mini-btn" id="drumHumanizeToggle" title="Pequeñas variaciones aleatorias de tiempo y volumen, para que no suene tan de máquina">🎭 Humanizar</button>
       <button class="drum-mini-btn" id="drumVariationBtn" title="Mueve 1-2 golpes del patrón actual, sin perder el estilo">🎲 Variación</button>
+      <div class="pill-group" id="drumSpeedFeelGroup" title="Reinterpreta el patrón a media o doble velocidad percibida, sin cambiar el BPM real">
+        <button data-feel="half">½×</button>
+        <button data-feel="normal" class="active">1×</button>
+        <button data-feel="double">2×</button>
+      </div>
       <div class="drum-volume-ctrl">
         <span class="label">Tempo</span>
         <input type="range" id="drumBpmSlider" min="50" max="250" step="5" value="100">
@@ -805,6 +812,8 @@
       <div class="sub-row" style="padding:0;">
         <span class="label">Calidad</span>
         <div class="pill-group" id="triadQuizQualityGroup"></div>
+      </div>
+      <div class="sub-row" style="padding:0;">
         <span class="label">Inversión</span>
         <div class="pill-group" id="triadQuizInversionGroup">
           <button data-qinv="0">Fundamental</button>
@@ -2078,7 +2087,7 @@
     pianoChordRoot: 0,
     pianoChordOctave: 3,
     pianoChordQuality: 'major',
-    drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null, humanize: false },
+    drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null, humanize: false, speedFeel: 'normal' },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
              tonality: 'major', progressionIdx: null, progShapes: [], zoneIdx: 0, singleStringIdx: 0,
              voiceLeading: false },
@@ -4253,8 +4262,12 @@
   function checkTriadQuizAnswer(){
     const q = state.triadQuiz;
     if (!q.target) return;
-    if (q.guessRoot === null || q.guessQuality === null || q.guessInversion === null) {
-      $('#triadQuizFeedback').textContent = 'Elige tónica, calidad e inversión antes de comprobar.';
+    const missing = [];
+    if (q.guessRoot === null) missing.push('la tónica');
+    if (q.guessQuality === null) missing.push('la calidad');
+    if (q.guessInversion === null) missing.push('la inversión');
+    if (missing.length) {
+      $('#triadQuizFeedback').textContent = 'Todavía falta elegir: ' + missing.join(', ') + '.';
       return;
     }
     q.attempts++;
@@ -4696,20 +4709,22 @@
 
   function drumScheduler(){
     const ctx = getAudioCtx();
+    const feelMultiplier = state.drumMachine.speedFeel === 'half' ? 2 : state.drumMachine.speedFeel === 'double' ? 0.5 : 1;
     while (drumNextStepTime < ctx.currentTime + DRUM_SCHEDULE_AHEAD) {
       const style = DRUM_STYLES[state.drumMachine.style];
       const totalSteps = style.steps || 16;
       const isFillBar = state.drumMachine.fillEnabled && (drumBarCount % 4 === 3);
       drumScheduleStep(drumStepIndex, drumNextStepTime, isFillBar, totalSteps);
       const beatDur = 60 / state.bpm;      // duración de una negra
-      let stepDur = beatDur / 4;           // cada paso = semicorchea (esto no cambia con el compás,
-                                            // solo cambia cuántos pasos tiene el compás entero)
+      let stepDur = (beatDur / 4) * feelMultiplier; // cada paso = semicorchea, estirada o encogida
+                                            // según el "feel" — el BPM real (state.bpm) no cambia,
+                                            // solo cuánto dura cada paso en la práctica.
       if (style.swing > 0) {
         // swing: los pasos "pares" (los "y" de cada corchea) se retrasan, mismo principio
         // matemático ya verificado para el swing del metrónomo — al 100% da el "feel" de tresillo
         const firstFrac = 0.5 + (style.swing / 100) * (1 / 6);
         const isOffbeat = drumStepIndex % 2 === 1;
-        stepDur = (beatDur / 2) * (isOffbeat ? (1 - firstFrac) : firstFrac);
+        stepDur = (beatDur / 2) * feelMultiplier * (isOffbeat ? (1 - firstFrac) : firstFrac);
       }
       drumNextStepTime += stepDur;
       drumStepIndex = (drumStepIndex + 1) % totalSteps;
@@ -4809,6 +4824,9 @@
     $('#drumVolumeLabel').textContent = Math.round(state.drumMachine.volume * 100) + '%';
     $('#drumFillToggle').classList.toggle('active', state.drumMachine.fillEnabled);
     $('#drumHumanizeToggle').classList.toggle('active', state.drumMachine.humanize);
+    document.querySelectorAll('#drumSpeedFeelGroup button').forEach(b => {
+      b.classList.toggle('active', b.dataset.feel === state.drumMachine.speedFeel);
+    });
     $('#drumBpmSlider').value = state.bpm;
     $('#drumBpmLabel').textContent = state.bpm + ' BPM';
     renderDrumGrid();
@@ -5520,6 +5538,12 @@
     $('#drumHumanizeToggle').classList.toggle('active', state.drumMachine.humanize);
   });
   $('#drumVariationBtn').addEventListener('click', drumApplyVariation);
+  document.querySelectorAll('#drumSpeedFeelGroup button').forEach(b => {
+    b.addEventListener('click', () => {
+      state.drumMachine.speedFeel = b.dataset.feel;
+      document.querySelectorAll('#drumSpeedFeelGroup button').forEach(x => x.classList.toggle('active', x === b));
+    });
+  });
   $('#drumResetBtn').addEventListener('click', () => {
     state.drumMachine.pattern = drumBuildPatternFromStyle(state.drumMachine.style);
     renderDrumGrid();
