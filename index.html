@@ -1810,9 +1810,23 @@
     return best;
   }
 
+  // obtiene la lista de acordes actual, sea de una progresión manual (grados) o de una forma
+  // estándar activa (blues12, rhythm changes, cadencia andaluza) — antes la línea de bajo walking
+  // solo funcionaba con progresión manual, y con una forma activa se quedaba vacía sin avisar.
+  function getWalkingBassChordList(){
+    if (state.activeForm) {
+      return FORM_TEMPLATES[state.activeForm].build(state.root)
+        .map(c => ({ chordRootPc: c.rootPc, qualityKey: c.qualityKey }));
+    }
+    if (state.progression.length > 0) {
+      return state.progression.map(d => degreeChordInfo(d, state.progKey, state.root));
+    }
+    return [];
+  }
+
   function buildWalkingBassLine(){
-    if (state.progression.length === 0) return [];
-    const chords = state.progression.map(d => degreeChordInfo(d, state.progKey, state.root));
+    const chords = getWalkingBassChordList();
+    if (chords.length === 0) return [];
     let refMidi = OPEN_MIDI.bajo[0] + 5; // arranque cómodo, ni muy grave ni muy agudo
     const line = [];
     chords.forEach((chord, i) => {
