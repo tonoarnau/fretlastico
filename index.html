@@ -68,7 +68,7 @@
     text-transform: uppercase; background: var(--panel); color: var(--ink); border: 1px solid var(--panel-edge);
     border-radius: 999px; padding: 8px 16px; cursor: pointer; max-width: 42vw; text-overflow:ellipsis; }
 
-  select#pianoChordQualitySelect{ font-family:'Oswald', sans-serif; font-weight: 600; font-size: calc(11px * var(--fs-scale));
+  select#pianoChordQualitySelect, select#pianoLooperQualitySelect{ font-family:'Oswald', sans-serif; font-weight: 600; font-size: calc(11px * var(--fs-scale));
     background: var(--panel) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'><path d='M0 0l5 6 5-6z' fill='%238792AC'/></svg>") no-repeat right 14px center;
     background-size: 9px 6px;
     color: var(--ink); border: 1px solid var(--panel-edge);
@@ -135,6 +135,15 @@
     height: 66vh; min-height: 540px; max-height: 780px; min-width:0; }
 
   .triad-shell{ flex: none; width:100%; display:flex; flex-direction:column; gap:12px; }
+  .oido-shell{ flex: none; width:100%; display:flex; flex-direction:column; gap:12px; }
+  .tecnica-extra-section{ background: var(--panel-2); border:1px solid var(--panel-edge); border-radius:12px;
+    padding:14px 16px; margin-top:12px; display:flex; flex-direction:column; gap:10px; }
+  .tecnica-extra-title{ font-family:'Oswald', sans-serif; font-weight:700; font-size: calc(13px * var(--fs-scale));
+    color: var(--accent-blue); text-transform:uppercase; letter-spacing:0.5px; }
+  #oidoAnswerGroup{ flex-wrap:wrap; }
+  #oidoAnswerGroup button.correct{ background: var(--accent-green); color:#0A0E1A; border-color: var(--accent-green); }
+  #oidoAnswerGroup button.wrong{ background: var(--accent-root); color:#fff; border-color: var(--accent-root-dark); }
+  #oidoFeedback{ font-weight:700; color: var(--ink); }
   .triad-diagram-wrap{ display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
   .triad-diagram{ background: var(--panel); border:1px solid var(--panel-edge); border-radius:12px;
     padding:18px; width: 220px; max-width: 100%; }
@@ -509,7 +518,42 @@
     .drum-row-cells{ min-width: 340px; }
     .drum-controls-row{ gap: 8px; }
     .drum-note{ display: none; }
+    .ft-panel{ width: 94vw; right: 3vw; left: 3vw; bottom: 8px; max-height: 78vh; }
   }
+
+  #fretTeacherFab{ position: fixed; bottom: 20px; right: 20px; z-index: 500; width: 54px; height: 54px;
+    border-radius: 50%; border: none; background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-dark));
+    color: #fff; font-size: 24px; cursor: pointer; box-shadow: 0 8px 20px -4px rgba(91,140,255,0.6);
+    display:flex; align-items:center; justify-content:center; }
+  #fretTeacherFab:hover{ transform: scale(1.06); }
+
+  .ft-panel{ position: fixed; right: 20px; bottom: 84px; width: 420px; max-width: 92vw; max-height: 72vh;
+    background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 16px; z-index: 500;
+    display:flex; flex-direction:column; box-shadow: 0 20px 50px -10px rgba(0,0,0,0.6); overflow:hidden; }
+  .ft-header{ display:flex; align-items:center; justify-content:space-between; padding: 12px 16px;
+    background: var(--panel-2); border-bottom: 1px solid var(--panel-edge); flex: 0 0 auto; }
+  .ft-title{ font-family:'Oswald', sans-serif; font-weight:700; font-size: calc(14px * var(--fs-scale));
+    color: var(--accent-blue); text-transform:uppercase; letter-spacing:0.5px; }
+  .ft-search-row{ display:flex; gap:8px; padding: 12px 16px 8px; flex: 0 0 auto; }
+  .ft-search-row input{ flex:1; min-width:0; background: var(--bg); border:1px solid var(--panel-edge);
+    border-radius:8px; padding:8px 12px; color: var(--ink); font-family:'Inter', sans-serif; font-size: calc(12px * var(--fs-scale)); }
+  .ft-quick-row{ display:flex; flex-wrap:wrap; gap:6px; padding: 4px 16px 10px; flex: 0 0 auto; }
+  .ft-quick-btn{ background: var(--panel-2); border:1px solid var(--panel-edge); border-radius:999px;
+    padding:6px 12px; font-family:'Oswald', sans-serif; font-size: calc(10px * var(--fs-scale));
+    color: var(--ink); cursor:pointer; text-align:left; }
+  .ft-quick-btn:hover{ border-color: var(--accent-blue); }
+  .ft-results{ flex:1; overflow-y:auto; padding: 8px 16px 16px; }
+  .ft-answer{ background: var(--panel-2); border:1px solid var(--panel-edge); border-radius:10px;
+    padding:12px 14px; margin-bottom:10px; }
+  .ft-answer h4{ margin:0 0 6px; color: var(--accent-play); font-family:'Oswald', sans-serif;
+    font-size: calc(12.5px * var(--fs-scale)); }
+  .ft-answer p{ margin: 0 0 8px; font-family:'Inter', sans-serif; font-size: calc(11.5px * var(--fs-scale));
+    color: var(--ink-secondary); line-height:1.65; white-space:pre-line; }
+  .ft-answer p:last-child{ margin-bottom:0; }
+  #ftContextTip{ margin: 0 16px 8px; border-color: var(--accent-blue); flex: 0 0 auto; }
+  .ft-action-btn{ background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-dark)); color:#fff;
+    border:none; border-radius:999px; padding:7px 14px; font-family:'Oswald', sans-serif; font-weight:700;
+    font-size: calc(10.5px * var(--fs-scale)); cursor:pointer; margin-top:4px; }
 </style>
 </head>
 <body>
@@ -550,6 +594,7 @@
     <button data-tab="tecnica">Técnica</button>
     <button data-tab="piano">Piano</button>
     <button data-tab="triads">Tríadas</button>
+    <button data-tab="oido">Oído</button>
   </div>
 </div>
 
@@ -697,6 +742,52 @@
   <div class="pill-group" id="tecnicaExerciseGroup"></div>
 </div>
 
+<div class="tecnica-extra-section" id="powerChordSection" style="display:none;">
+  <div class="tecnica-extra-title">🎸 Power chords (acordes de 5ª)</div>
+  <p class="theory-note theory-note-small">La base del rock, punk y metal: solo 2 notas (fundamental y 5ª), sin
+  tercera — por eso no son ni mayores ni menores, y suenan igual de bien con distorsión. Es una forma "movible":
+  la misma digitación sirve en cualquier traste, solo cambia dónde la colocas.</p>
+  <div class="sub-row" style="padding:0;">
+    <span class="label">Tónica</span>
+    <div class="pill-group" id="powerChordRootGroup"></div>
+  </div>
+  <div class="sub-row" style="padding:0;">
+    <span class="label">Cuerda</span>
+    <div class="pill-group" id="powerChordStringGroup">
+      <button data-pstring="0" class="active">6ª (Mi grave)</button>
+      <button data-pstring="1">5ª (La)</button>
+      <button data-pstring="2">4ª (Re)</button>
+    </div>
+    <button class="drum-mini-btn" id="powerChordOctaveToggle">+ Octava</button>
+    <button class="play-btn" id="powerChordPlayBtn">🔊 Tocar</button>
+  </div>
+  <div class="triad-diagram" id="powerChordDiagram" style="width:180px;"></div>
+</div>
+
+<div class="tecnica-extra-section" id="lickTechSection" style="display:none;">
+  <div class="tecnica-extra-title">🎯 Técnicas de mástil</div>
+  <div class="sub-row" style="padding:0;">
+    <div class="pill-group" id="lickTechGroup">
+      <button data-ltech="ligado" class="active">Ligados (hammer-on/pull-off)</button>
+      <button data-ltech="slide">Deslizamiento (slide)</button>
+      <button data-ltech="bend">Bending</button>
+    </div>
+  </div>
+  <p class="theory-note theory-note-small" id="lickTechExplainer"></p>
+  <div class="sub-row" style="padding:0;">
+    <span class="label">Cuerda</span>
+    <div class="pill-group" id="lickTechStringGroup"></div>
+    <span class="label">Traste inicio</span>
+    <div class="pill-group" id="lickTechFretGroup">
+      <button data-lfret="0" class="active">0</button>
+      <button data-lfret="3">3</button>
+      <button data-lfret="5">5</button>
+      <button data-lfret="7">7</button>
+    </div>
+    <button class="play-btn" id="lickTechPlayBtn">🔊 Escuchar</button>
+  </div>
+</div>
+
 <div class="sub-row" id="tecnicaRow" style="display:none;">
   <span class="label">Traste de inicio</span>
   <div class="pill-group" id="tecnicaStartGroup"></div>
@@ -765,6 +856,7 @@
     <div class="pill-group" id="pianoModeGroup">
       <button data-pmode="note" class="active">Nota individual</button>
       <button data-pmode="chord">Acorde</button>
+      <button data-pmode="scale">Escala</button>
     </div>
     <button class="play-btn" id="pianoRandomBtn">🎲 Nota aleatoria en el pentagrama</button>
     <div class="piano-note-display" id="pianoNoteDisplay">Toca una tecla, o pulsa el dado</div>
@@ -791,6 +883,26 @@
     </div>
     <button class="play-btn" id="pianoChordPlayBtn">🔊 Tocar acorde</button>
   </div>
+  <div class="piano-controls-row" id="pianoVoicingRow" style="display:none;">
+    <span class="label">Voicing (mano izquierda, jazz)</span>
+    <div class="pill-group" id="pianoVoicingGroup">
+      <button data-voicing="closed" class="active">Cerrado (normal)</button>
+      <button data-voicing="rootlessA">Rootless tipo A (3-5-7-9)</button>
+      <button data-voicing="rootlessB">Rootless tipo B (7-9-3-5)</button>
+    </div>
+  </div>
+  <div class="piano-controls-row" id="pianoScaleRow" style="display:none;">
+    <span class="label">Tónica</span>
+    <div class="pill-group" id="pianoScaleRootGroup"></div>
+    <span class="label">Octava</span>
+    <div class="pill-group" id="pianoScaleOctaveGroup">
+      <button data-soct="3">3</button>
+      <button data-soct="4" class="active">4</button>
+      <button data-soct="5">5</button>
+    </div>
+    <button class="play-btn" id="pianoScalePlayBtn">🔊 Reproducir escala</button>
+  </div>
+  <p class="theory-note theory-note-small" id="pianoScaleInfo" style="display:none;"></p>
   <div class="staff-row">
     <div class="staff-wrap">
       <svg id="staffSVG" viewBox="0 0 700 362" preserveAspectRatio="xMidYMid meet"></svg>
@@ -946,6 +1058,32 @@
   </details>
 </div>
 
+<div class="oido-shell" id="oidoShell" style="display:none;">
+  <div class="sub-row" style="padding:0;">
+    <span class="label">Modo</span>
+    <div class="pill-group" id="oidoModeGroup">
+      <button data-omode="intervalo" class="active">Intervalos</button>
+      <button data-omode="acorde">Calidad de acorde</button>
+    </div>
+  </div>
+  <div class="sub-row" id="oidoPlaybackRow" style="padding:0;">
+    <span class="label">Reproducción</span>
+    <div class="pill-group" id="oidoPlaybackGroup">
+      <button data-playback="melodic" class="active">Melódico</button>
+      <button data-playback="harmonic">Armónico (juntas)</button>
+    </div>
+  </div>
+  <p class="theory-note theory-note-small" id="oidoExplainer"></p>
+  <div class="sub-row" style="padding:0;">
+    <button class="play-btn" id="oidoPlayBtn">🔊 Reproducir</button>
+    <button class="drum-mini-btn" id="oidoRepeatBtn">🔁 Repetir</button>
+    <span id="oidoStatus" class="theory-note-small">Aciertos: 0/0</span>
+  </div>
+  <div class="pill-group" id="oidoAnswerGroup"></div>
+  <div id="oidoFeedback" class="theory-note-small"></div>
+  <button class="play-btn" id="oidoNextBtn">Siguiente ▶</button>
+</div>
+
 <div class="riff-panel">
   <div class="riff-controls-row">
     <span class="riff-label" id="riffPanelLabel">Riff de práctica</span>
@@ -1029,7 +1167,16 @@
   <span class="label">Ver</span>
   <div class="pill-group" id="progViewGroup">
     <button data-progview="acordes" class="active">Acordes</button>
-    <button data-progview="bajo">Línea de bajo (walking)</button>
+    <button data-progview="bajo">Línea de bajo</button>
+  </div>
+</div>
+
+<div class="sub-row" id="bassPatternRow" style="display:none;">
+  <span class="label">Patrón</span>
+  <div class="pill-group" id="bassPatternGroup">
+    <button data-bpattern="raiz5">Raíz-Quinta</button>
+    <button data-bpattern="octavas">Octavas</button>
+    <button data-bpattern="walking" class="active">Walking</button>
   </div>
 </div>
 
@@ -1166,6 +1313,24 @@
     </div>
   </div>
 </details>
+
+<button id="fretTeacherFab" title="FretTeacher: pregunta lo que quieras sobre la app o la teoría">🎓</button>
+
+<div id="fretTeacherPanel" class="ft-panel" style="display:none;">
+  <div class="ft-header">
+    <span class="ft-title">🎓 FretTeacher</span>
+    <button class="icon-btn" id="fretTeacherClose" title="Cerrar">✕</button>
+  </div>
+  <div class="ft-search-row">
+    <input type="text" id="ftSearchInput" placeholder="Escribe tu pregunta (ej. cómo practico escalas, qué es una tríada...)">
+    <button class="drum-mini-btn" id="ftSearchBtn">Buscar</button>
+  </div>
+  <div class="ft-answer" id="ftContextTip" style="display:none;"></div>
+  <div class="ft-quick-row" id="ftQuickRow"></div>
+  <div class="ft-results" id="ftResults">
+    <p class="theory-note-small">Elige una de las guías de arriba, o escribe tu pregunta — busco en toda la app: teoría, cómo usar cada sección, y consejos de práctica.</p>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -1366,6 +1531,26 @@
   // convierte la forma de tríada (3 cuerdas activas) al mismo formato de 6 cuerdas que usa el
   // diagrama de acordes — las 3 cuerdas no usadas quedan "mute" (se dibujan con ✕), y se asigna
   // dedo (1-4) reutilizando la misma función ya verificada que usa CAGED.
+  // power chord: forma movible de solo 2 (o 3 con octava) notas — fundamental + 5ª justa, en dos
+  // cuerdas consecutivas. El intervalo entre cuerdas consecutivas no es siempre el mismo (Sol-Si
+  // es una 3ª mayor, el resto son 4ª justa), así que se calcula el traste exacto en cada caso,
+  // no se asume un salto de 2 trastes fijo.
+  function computePowerChordShape(rootPc, stringIdx, withOctave){
+    const strings = [stringIdx, stringIdx + 1];
+    if (withOctave && stringIdx + 2 <= 5) strings.push(stringIdx + 2);
+    const openA = OPEN_MIDI.guitarra[stringIdx];
+    const rootFret = ((rootPc - openA % 12) % 12 + 12) % 12;
+    const frets = [rootFret];
+    for (let i = 1; i < strings.length; i++) {
+      const targetPc = i === 1 ? (rootPc + 7) % 12 : rootPc; // 5ª en la 2ª cuerda, octava (misma nota) en la 3ª
+      const openX = OPEN_MIDI.guitarra[strings[i]];
+      let f = ((targetPc - openX % 12) % 12 + 12) % 12;
+      while (f < rootFret - 1) f += 12; // la versión más cercana por encima del traste raíz
+      frets.push(f);
+    }
+    return { frets, minFret: Math.min(...frets), maxFret: Math.max(...frets), strings };
+  }
+
   function triadShapeToSvgFormat(shape, stringIdxs, rootPc){
     const offsets = new Array(6).fill(null);
     stringIdxs.forEach((si, i) => { offsets[si] = shape.frets[i]; });
@@ -1935,6 +2120,74 @@
     return line;
   }
 
+  // patrón raíz-quinta ("boom-chick"): el patrón de bajo más simple y común, previo al walking —
+  // alterna la fundamental y la 5ª del acorde, una por tiempo.
+  function buildRootFifthBassLine(){
+    const chords = getWalkingBassChordList();
+    if (chords.length === 0) return [];
+    let refMidi = OPEN_MIDI.bajo[0] + 5;
+    const line = [];
+    chords.forEach(chord => {
+      const rootPc = chord.chordRootPc;
+      const fifthPc = (rootPc + 7) % 12;
+      [rootPc, fifthPc, rootPc, fifthPc].forEach((targetPc, beat) => {
+        const note = findClosestBassNote(targetPc, refMidi);
+        if (!note) return;
+        line.push({ sIdx: note.sIdx, fret: note.fret, pc: note.pc, midi: note.midi, accent: beat === 0 });
+        refMidi = note.midi;
+      });
+    });
+    return line;
+  }
+
+  // búsqueda de nota de bajo con rango de traste ampliable — la usa el patrón de octavas, ya que
+  // la nota "aguda" (una octava por encima) a veces no cabe dentro de la ventana compacta habitual
+  // (9 trastes) en ciertas cuerdas, y sin ampliar el rango el patrón se quedaría repitiendo la
+  // misma nota en vez de saltar de verdad una octava.
+  function findBassNoteWideRange(targetPc, refMidi, maxFret){
+    const tuning = TUNINGS.bajo, openMidi = OPEN_MIDI.bajo;
+    let best = null;
+    for (let s = 0; s < tuning.length; s++) {
+      for (let f = 0; f <= maxFret; f++) {
+        const midi = openMidi[s] + f;
+        const pc = (pitchClassIndex(tuning[s]) + f) % 12;
+        if (pc !== targetPc) continue;
+        const dist = Math.abs(midi - refMidi);
+        if (!best || dist < best.dist) best = { sIdx: s, fret: f, midi, pc, dist };
+      }
+    }
+    return best;
+  }
+
+  // patrón de octavas: alterna la fundamental grave y la misma nota una octava más aguda —
+  // patrón muy usado en rock/pop, y un buen paso intermedio antes del walking bass.
+  function buildRootOctaveBassLine(){
+    const chords = getWalkingBassChordList();
+    if (chords.length === 0) return [];
+    let refMidi = OPEN_MIDI.bajo[0] + 5;
+    const line = [];
+    chords.forEach(chord => {
+      const rootPc = chord.chordRootPc;
+      const low = findBassNoteWideRange(rootPc, refMidi, WALKING_SEARCH_MAX_FRET);
+      if (!low) return;
+      const high = findBassNoteWideRange(rootPc, low.midi + 12, 15) || low;
+      [low, high, low, high].forEach((note, beat) => {
+        line.push({ sIdx: note.sIdx, fret: note.fret, pc: note.pc, midi: note.midi, accent: beat === 0 });
+      });
+      refMidi = low.midi;
+    });
+    return line;
+  }
+
+  // elige qué constructor de línea de bajo usar según el patrón seleccionado — se llama desde
+  // los mismos sitios que antes llamaban solo a buildWalkingBassLine, así no hace falta tocar
+  // cada punto de uso por separado.
+  function buildBassLine(){
+    if (state.bassPattern === 'raiz5') return buildRootFifthBassLine();
+    if (state.bassPattern === 'octavas') return buildRootOctaveBassLine();
+    return buildWalkingBassLine();
+  }
+
   function buildChordShape(rootPc, qualityKey){
     const q = CHORD_QUALITIES[qualityKey];
     const tuning = TUNINGS.guitarra;
@@ -2269,7 +2522,8 @@
     progKey: 'mayor', // 'mayor' | 'menor'
     progression: [], // secuencia de grados (0-6) construida por el usuario
     progShapes: [], // formas ya construidas de cada acorde de la progresión, en el mismo orden
-    progViewMode: 'acordes', // 'acordes' | 'bajo' (línea de bajo walking sobre la progresión)
+    progViewMode: 'acordes', // 'acordes' | 'bajo' (línea de bajo sobre la progresión)
+    bassPattern: 'walking', // 'walking' | 'raiz5' | 'octavas'
     cagedView: 'single', // 'single' | 'caged' (5 posiciones CAGED del acorde individual)
     progPlaying: false,
     currentChord: null,
@@ -2286,6 +2540,8 @@
     npsPattern: null,  // patrón elegido (id), null = el primero disponible
     chromaticStartFret: 1, // traste de inicio del ejercicio cromático 1-2-3-4
     tecnicaExercise: 'arana', // 'arana' | 'arana_inv' | 'zigzag' | 'barrido' | 'salto'
+    powerChord: { root: 4, stringIdx: 0, withOctave: true }, // Mi por defecto, cuerda grave
+    lickTech: { type: 'ligado', stringIdx: 0, startFret: 0 },
     speedTrainer: false,   // entrenador de velocidad: sube el bpm cada vuelta completa
     speedIncrement: 5,      // cuánto sube el bpm por vuelta
     pickingMode: 'off',     // 'off' | 'alternate' | 'economy' — patrón de púa sobre Escalas/Técnica
@@ -2297,10 +2553,13 @@
     pianoChordRoot: 0,
     pianoChordOctave: 3,
     pianoChordQuality: 'major',
+    pianoVoicing: 'closed', // 'closed' | 'rootlessA' | 'rootlessB'
+    pianoScale: { root: 0, octave: 4 },
     drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null, humanize: false, speedFeel: 'normal',
       muted: { crash:false, hihatOpen:false, hihatClosed:false, clap:false, snare:false, kick:false },
       fx: { reverb:0, chorus:0, delay:0 } },
     pianoLooper: { active:false, volume:0.5, chords:[], pattern:'pad', build:{ root:0, quality:'major', octave:3, bars:1 } },
+    oido: { mode:'intervalo', playback:'melodic', target:null, guess:null, score:0, attempts:0 },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
              tonality: 'major', progressionIdx: null, progShapes: [], mapShapes: [], zoneIdx: 0, singleStringIdx: 0,
              voiceLeading: false },
@@ -2312,6 +2571,160 @@
 
   const $ = sel => document.querySelector(sel);
   const pitchClassIndex = note => NOTES.indexOf(note);
+
+  // ---------- FRETTEACHER: base de conocimiento local (sin IA, sin clave de API) ----------
+  // cada entrada: keywords para la búsqueda por palabras clave, y opcionalmente una acción que
+  // configura la app por el usuario (cambia de pestaña, elige tónica/escala, etc.)
+  const FRETTEACHER_KB = [
+    {
+      id: 'guia-escalas-0', featured: true,
+      title: '🎯 Guíame con escalas hoy (nivel 0)',
+      keywords: ['escala','escalas','practicar escala','guia escala','nivel 0','empezar escala','como estudio escalas'],
+      answer: `Vamos paso a paso, sin prisa. El objetivo de hoy no es tocar rápido — es que tu mano aprenda DÓNDE está cada nota.
+
+1) Elige Do mayor. Es la escala más fácil para empezar: no tiene sostenidos ni bemoles, así que puedes centrarte solo en la digitación. Ve a la pestaña "Escalas", tónica "C", modo "Jónico" (así se llama la escala mayor dentro del sistema de modos).
+
+2) Baja el tempo a 60 BPM o menos. Ir despacio al principio es lo que hace que luego puedas ir rápido.
+
+3) Toca la escala completa subiendo y bajando, mirando el mástil, diciendo en voz alta el nombre de cada nota mientras la tocas (Do, Re, Mi, Fa...). Repite 5 veces.
+
+4) Ahora fíjate en los números de dedo que sugiere la app bajo cada nota. Tócala otra vez prestando atención solo a los dedos, sin mirar los nombres.
+
+5) Cuando lo sientas cómodo (puede que hoy, puede que en varias sesiones), prueba el modo Quiz de la pestaña Escalas: te pone una nota al azar y tienes que identificarla. Es la forma de comprobar si de verdad te la sabes, no solo si la memorizaste de un vistazo.
+
+Consejo: no hace falta dominar los 7 modos de golpe. Con la escala mayor (Jónico) y la menor natural (Eólico) tienes de sobra para empezar a tocar canciones reales.`,
+      action: { label: 'Llévame a Escalas (Do mayor)', apply: () => { state.tab = 'escalas'; state.root = 0; state.scaleKey = 'jonico'; render(); } }
+    },
+    {
+      id: 'guia-triadas-0', featured: true,
+      title: '🎯 Guíame con tríadas hoy (nivel 0)',
+      keywords: ['triada','triadas','tríada','tríadas','practicar triada','nivel 0','empezar triada'],
+      answer: `Una tríada es el acorde más pequeño que existe: solo 3 notas (fundamental, 3ª y 5ª). Aprenderlas bien es la base de todo lo demás — acordes con séptima, progresiones, improvisación.
+
+1) Ve a la pestaña "Tríadas", elige tónica "C" (Do), calidad "Mayor", inversión "Fundamental", disposición "Vertical".
+
+2) Verás un diagrama con 3 cuerdas activas (las otras 3 aparecen con ✕, no se tocan) y un número de dedo en cada una. Coloca los dedos exactamente como indica y rasguea solo esas 3 cuerdas.
+
+3) Toca esa forma 10 veces seguidas, sin prisa, asegurándote de que las 3 notas suenan limpias.
+
+4) Cambia la Inversión a "1ª inversión" y luego "2ª inversión" — es la MISMA tríada, pero empezando por una nota distinta. Tócalas las 3 seguidas y escucha cómo cambia el color del acorde aunque sean las mismas 3 notas.
+
+5) Abre "Mapa del mástil" — te enseña las 4 posiciones distintas donde se puede tocar esta misma tríada a lo largo del mástil. Tócalas de la más grave a la más aguda.
+
+Consejo: no hace falta aprenderte las 4 posiciones de golpe. Con la fundamental en posición vertical ya puedes acompañar canciones sencillas — las demás son para cuando quieras más recorrido por el mástil.`,
+      action: { label: 'Llévame a Tríadas (Do mayor)', apply: () => { state.tab = 'triadas'; state.triad.root = 0; state.triad.quality = 'major'; state.triad.inversion = 0; state.triad.mode = 'vertical'; render(); } }
+    },
+    {
+      id: 'guia-acordes-progresiones', featured: true,
+      title: '🎯 Qué acordes aprendo y sus progresiones',
+      keywords: ['acordes','progresion','progresiones','que acordes aprender','primeros acordes','cambios de acorde'],
+      answer: `Si vienes de cero, este es el orden que más rinde:
+
+Primeros 5 acordes (los "acordes abiertos" clásicos):
+  Do mayor, Sol mayor, Re mayor, Mi menor, La menor
+  → Con estos 5 puedes tocar cientos de canciones reales.
+
+Primera progresión para practicar cambios:
+  I - IV - V  (en Do mayor: Do - Fa - Sol)
+  → Es la base del blues, del rock clásico y de la música folk.
+
+Segunda progresión (muy usada en pop):
+  I - vi - IV - V  (en Do mayor: Do - La menor - Fa - Sol)
+  → Se la conoce como "la progresión de los 50" — está en cientos de canciones.
+
+Cómo practicarlas en la app:
+  Ve a "Acordes" → modo "Progresión" → elige la tonalidad → toca los grados en el orden que quieras (I, IV, V...) y pulsa reproducir para escuchar cómo suenan encadenados antes de tocarlos tú.
+
+Consejo: no memorices acordes sueltos, memoriza CAMBIOS entre dos acordes. Practica pasar de Do a Sol una y otra vez hasta que tu mano lo haga sin pensar, luego añade el siguiente cambio.`,
+      action: { label: 'Llévame a Acordes (progresión)', apply: () => { state.tab = 'acordes'; state.acordesMode = 'progresion'; render(); } }
+    },
+    { id: 'uso-pestanas', title: '¿Qué hace cada pestaña?',
+      keywords: ['pestañas','pestaña','secciones','que hace cada','navegar','tabs'],
+      answer: `Escalas: mástil con todas las escalas y modos, con quiz de notas.
+Estilos: riffs de ejemplo en distintos géneros (blues, flamenco, rock...).
+Acordes: acordes CAGED individuales o progresiones (por grados o formas como el blues de 12 compases), incluida la línea de bajo walking.
+Mástil: vista de referencia libre de todo el diapasón.
+Técnica: ejercicios de arpegios y picking alterno/económico.
+Piano: teclado de 6 octavas, notas o acordes, con pentagrama.
+Tríadas: teoría, digitaciones, armonía por grados, mapa del mástil y quiz.
+Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería y looper de piano.` },
+    { id: 'uso-zurdo', title: '¿Cómo cambio a zurdo?',
+      keywords: ['zurdo','zurda','mano izquierda','cambiar mano','diestro'],
+      answer: `Arriba a la derecha del mástil hay un botón con el icono ⇄ (junto al título) — lo tocas y toda la app (mástil, acordes, tríadas) se voltea a orientación zurda, con el clavijero a la derecha. Se aplica en toda la aplicación, no solo en una pestaña.` },
+    { id: 'uso-zona-mastil', title: '¿Qué es la "Zona del mástil" en Tríadas?',
+      keywords: ['zona del mastil','zona mastil','trastes 0-5','trastes 9-12'],
+      answer: `Te deja elegir en qué parte del mástil (graves, medios, agudos) quieres ver la tríada. Como una nota fija en una cuerda fija solo se repite cada 12 trastes, la app elige automáticamente qué juego de cuerdas encaja mejor en la zona que pediste — no hace falta que tú elijas las cuerdas a mano, se ajustan solas.` },
+    { id: 'uso-caja-ritmos', title: '¿Cómo uso la Caja de Ritmos & Looper?',
+      keywords: ['caja de ritmos','bateria','batería','looper','ritmo'],
+      answer: `Despliega la sección "🥁 Caja de Ritmos & Looper" (arriba de las pestañas). Elige un estilo (Rock, Funk, Blues Shuffle, Vals...), pulsa Reproducir, y toca las casillas para editar el patrón a tu gusto (apagada → normal → acento). El botón 🔇 de cada fila silencia esa voz sin borrar lo que tenías programado. El "Looper de piano" te deja añadir acordes que suenan en bucle sincronizados con el ritmo — y el "EQ" te deja añadir reverb, chorus y delay a todo el conjunto.` },
+    { id: 'uso-quiz', title: '¿Cómo activo el modo Quiz?',
+      keywords: ['quiz','examen','identificar notas','poner a prueba'],
+      answer: `Está disponible en varias pestañas: en Escalas (identificar notas del mástil), y en Tríadas (adivinar tónica, calidad e inversión de una digitación "ciega", sin nombres de nota). Busca el botón "Modo Quiz" dentro de cada sección.` },
+    { id: 'teoria-triada', title: '¿Qué es una tríada?',
+      keywords: ['que es una triada','definicion triada','tríada definicion'],
+      answer: `Una tríada es un acorde de 3 notas construido apilando terceras: la fundamental (1ª), la tercera (3ª) y la quinta (5ª). Según la distancia entre esas notas, es Mayor, Menor, Aumentada o Disminuida. Es el acorde más básico — todos los acordes más complejos (con séptima, novena...) se construyen añadiendo notas encima de una tríada.` },
+    { id: 'teoria-inversion', title: '¿Qué es una inversión?',
+      keywords: ['inversion','inversiones','que es una inversion'],
+      answer: `Es la misma tríada (las mismas 3 notas), pero tocada empezando por una nota distinta a la fundamental. Fundamental: empieza en la 1ª. 1ª inversión: empieza en la 3ª. 2ª inversión: empieza en la 5ª. Suenan distinto (más abierto o más cerrado) aunque sean exactamente las mismas notas.` },
+    { id: 'teoria-modo', title: '¿Qué es un modo (dórico, mixolidio...)?',
+      keywords: ['modo','modos','dorico','frigio','lidio','mixolidio','locrio','que es un modo'],
+      answer: `Los modos son las 7 escalas que salen de tocar las mismas 7 notas de una escala mayor, pero empezando desde cada uno de sus grados. Por ejemplo, las teclas blancas del piano empezando en Do dan el modo Jónico (escala mayor); las mismas teclas empezando en Re dan el modo Dórico. Cada uno tiene un color/carácter distinto aunque compartan las mismas notas.` },
+    { id: 'teoria-progresion', title: '¿Qué es una progresión de acordes?',
+      keywords: ['progresion de acordes','que es una progresion','grados romanos'],
+      answer: `Es una secuencia de acordes tocados en orden, normalmente descrita con números romanos (I, IV, V, vi...) que indican el grado de la escala sobre el que se construye cada acorde, no una nota fija — así la misma progresión "I-IV-V" funciona en cualquier tonalidad, cambiando solo qué notas concretas se tocan.` },
+    {
+      id: 'sugerencia-aleatoria', featured: true,
+      title: '🎲 No sé qué practicar hoy',
+      keywords: ['no se que practicar','sugerencia','que practico','aleatorio','sorprendeme','dame una idea'],
+      dynamic: () => FRETTEACHER_RANDOM_POOL[Math.floor(Math.random() * FRETTEACHER_RANDOM_POOL.length)]
+    },
+    {
+      id: 'plan-20-min', featured: true,
+      title: '📅 Plan de sesión de 20 minutos',
+      keywords: ['plan de sesion','20 minutos','plan de estudio','rutina','sesion completa'],
+      answer: `Una sesión corta pero completa — un poco de cada cosa, en vez de machacar solo una:
+
+<b>5 min — Calentamiento (Escalas)</b>: Do mayor, subiendo y bajando despacio, con metrónomo a 70 BPM.
+
+<b>5 min — Tríadas</b>: elige un acorde de la progresión de hoy (ej. Do mayor) y toca sus 3 inversiones seguidas, sin parar entre una y otra.
+
+<b>5 min — Cambios (Acordes)</b>: practica el cambio entre dos acordes de una progresión sencilla (ej. Do → Sol) hasta que no tengas que pensarlo.
+
+<b>5 min — Ritmo</b>: activa la Caja de Ritmos (estilo Rock o el que prefieras) a 80 BPM, y toca encima lo que acabas de practicar — es la parte que más se salta la gente, y la que más se nota.
+
+Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar poco pero todos los días rinde más que una sesión larga una vez por semana.`,
+      action: { label: 'Empezar (Escalas, Do mayor)', apply: () => { state.tab = 'escalas'; state.root = 0; state.scaleKey = 'jonico'; render(); } }
+    },
+  ];
+
+  // pool de sugerencias para el botón "No sé qué practicar hoy" — cada vez que se pulsa, elige
+  // una al azar. Variadas en tema y dificultad, todas con pasos concretos y tiempo estimado.
+  const FRETTEACHER_RANDOM_POOL = [
+    { title: '🎲 Pentatónica menor en La (10 min)',
+      answer: 'La pentatónica menor es la escala más usada en rock y blues — solo 5 notas, fácil de memorizar rápido. Tócala subiendo y bajando por 2 octavas, luego improvisa libremente sobre ella durante 5 minutos sin pensar en "hacerlo bien", solo explorando.',
+      action: { label: 'Ir a Escalas (La pentatónica menor)', apply: () => { state.tab = 'escalas'; state.root = 9; state.scaleKey = 'pent_menor'; render(); } } },
+    { title: '🎲 Tríada de Sol mayor, las 3 inversiones (10 min)',
+      answer: 'Toca la fundamental, luego la 1ª inversión, luego la 2ª — cada una 8 veces seguidas antes de pasar a la siguiente. Al final, intenta encadenar las 3 sin mirar el diagrama.',
+      action: { label: 'Ir a Tríadas (Sol mayor)', apply: () => { state.tab = 'triadas'; state.triad.root = 7; state.triad.quality = 'major'; state.triad.inversion = 0; render(); } } },
+    { title: '🎲 Modo Dórico en Re (10 min)',
+      answer: 'El Dórico tiene ese color "menor pero con un punto brillante" — muy usado en jazz y funk. Tócalo despacio prestando atención a cómo suena distinto de la escala menor natural, aunque solo cambie una nota.',
+      action: { label: 'Ir a Escalas (Re Dórico)', apply: () => { state.tab = 'escalas'; state.root = 2; state.scaleKey = 'dorico'; render(); } } },
+    { title: '🎲 Progresión I-vi-IV-V en Do mayor (15 min)',
+      answer: 'La "progresión de los 50" — Do, La menor, Fa, Sol. Practica primero cada cambio por separado (Do→Lam, Lam→Fa, Fa→Sol), luego encadénalos todos con la Caja de Ritmos sonando de fondo a tempo lento.',
+      action: { label: 'Ir a Acordes (progresión)', apply: () => { state.tab = 'acordes'; state.acordesMode = 'progresion'; render(); } } },
+    { title: '🎲 Walking bass sobre un blues de 12 compases (15 min)',
+      answer: 'Ve a Acordes → Progresión → elige la forma "12 compases de Blues" → cambia la vista a "Línea de bajo" → elige el patrón "Walking". Escúchala primero un par de veces reproduciéndola, luego intenta tocarla tú encima del ritmo.',
+      action: { label: 'Ir a Acordes (progresión)', apply: () => { state.tab = 'acordes'; state.acordesMode = 'progresion'; render(); } } },
+    { title: '🎲 Tríadas en horizontal, Mi menor (10 min)',
+      answer: 'Las disposiciones horizontales (cuerdas salteadas) suenan más abiertas que las verticales — un color distinto para la misma tríada. Compara cómo suena Mi menor en vertical y en horizontal, tocando una justo después de la otra.',
+      action: { label: 'Ir a Tríadas (Mi menor, horizontal)', apply: () => { state.tab = 'triadas'; state.triad.root = 4; state.triad.quality = 'minor'; state.triad.mode = 'horizontal'; render(); } } },
+    { title: '🎲 Picking alterno a 80 BPM (10 min)',
+      answer: 'Ve a la pestaña Técnica, elige un ejercicio de picking alterno, y ponlo a 80 BPM con el metrónomo. Si te cuesta mantenerlo limpio, baja a 60 BPM — la velocidad se gana con precisión, no al revés.',
+      action: { label: 'Ir a Técnica', apply: () => { state.tab = 'tecnica'; render(); } } },
+    { title: '🎲 Escala mayor + Caja de Ritmos juntas (10 min)',
+      answer: 'Activa la Caja de Ritmos (Rock o el estilo que prefieras) a 70 BPM, y toca la escala de Do mayor completa encima, en negras, marcando cada nota con el pulso. Tocar con ritmo de fondo cambia por completo cómo se siente estudiar una escala.',
+      action: { label: 'Ir a Escalas (Do mayor)', apply: () => { state.tab = 'escalas'; state.root = 0; state.scaleKey = 'jonico'; render(); } } },
+  ];
 
   function populateCapoSelect(){
     const sel = $('#capoSelect');
@@ -2619,6 +3032,7 @@
     $('#progDegreesRow').style.display = (isProg && !state.activeForm) ? 'flex' : 'none';
     $('#progSequenceRow').style.display = (isProg && !walking) ? 'flex' : 'none';
     $('#progViewRow').style.display = isProg ? 'flex' : 'none';
+    $('#bassPatternRow').style.display = walking ? 'flex' : 'none';
     $('#jamSummary').style.display = isProg ? 'flex' : 'none';
 
     $('#chordPanel').style.display = (isIndividual && !showCaged) ? 'flex' : 'none';
@@ -3017,7 +3431,7 @@
       return [s, Math.min(s + 3, MAX_FRET)];
     }
     if (usingWalkingBass()) {
-      const line = buildWalkingBassLine();
+      const line = buildBassLine();
       if (line.length > 0) return [Math.min(...line.map(n => n.fret)), Math.max(...line.map(n => n.fret))];
       return [0, WALKING_SEARCH_MAX_FRET];
     }
@@ -3089,9 +3503,38 @@
     const usingTecnica = state.tab === 'tecnica';
     const usingPiano = state.tab === 'piano';
     const usingTriads = state.tab === 'triads';
+    const usingOido = state.tab === 'oido';
     document.querySelectorAll('#tabGroup button').forEach(b => {
       b.classList.toggle('active', b.dataset.tab === state.tab);
     });
+    $('#oidoShell').style.display = usingOido ? 'flex' : 'none';
+    if (usingOido) {
+      $('#rootRow').style.display = 'none';
+      $('#zoneRow').style.display = 'none';
+      $('.board-shell').style.display = 'none';
+      $('.riff-panel').style.display = 'none';
+      $('#fingerLine').style.display = 'none';
+      $('#chordPanel').style.display = 'none';
+      $('#progChordsPanel').style.display = 'none';
+      $('#instrumentGroup').style.display = 'none';
+      $('#quizPanel').style.display = 'none';
+      $('#chordQualityRow').style.display = 'none';
+      $('#acordesModeRow').style.display = 'none';
+      $('#progKeyRow').style.display = 'none';
+      $('#progDegreesRow').style.display = 'none';
+      $('#progSequenceRow').style.display = 'none';
+      $('#tecnicaRow').style.display = 'none';
+      $('#tecnicaExerciseRow').style.display = 'none';
+      $('#pickingModeRow').style.display = 'none';
+      $('#theorySection').style.display = 'none';
+      $('#modeTheorySection').style.display = 'none';
+      $('#circleTheorySection').style.display = 'none';
+      $('footer').style.display = 'none';
+      $('#pianoShell').style.display = 'none';
+      $('#triadShell').style.display = 'none';
+      renderOidoSection();
+      return; // Oído es autocontenido, igual que Piano y Tríadas
+    }
     $('#triadShell').style.display = usingTriads ? 'flex' : 'none';
     if (usingTriads) {
       $('#rootRow').style.display = 'none';
@@ -3154,6 +3597,9 @@
     $('#styleZoneRow').style.display = (usingStyle && !usingAcordes) ? 'flex' : 'none';
     $('#tecnicaRow').style.display = usingTecnica ? 'flex' : 'none';
     $('#tecnicaExerciseRow').style.display = usingTecnica ? 'flex' : 'none';
+    $('#powerChordSection').style.display = usingTecnica ? 'flex' : 'none';
+    $('#lickTechSection').style.display = usingTecnica ? 'flex' : 'none';
+    if (usingTecnica) { renderPowerChordSection(); renderLickTechSection(); }
     $('#pickingModeRow').style.display = (state.tab === 'escalas' || usingTecnica) ? 'flex' : 'none';
     $('#chordQualityRow').style.display = usingAcordes ? 'flex' : 'none';
     $('#acordesModeRow').style.display = usingAcordes ? 'flex' : 'none';
@@ -3226,7 +3672,7 @@
     if (state.tab === 'tecnica') nps3Set = chromaticSet();
     // en la vista "línea de bajo" de Acordes > Progresión, solo las notas exactas de esa línea
     if (usingWalkingBass()) {
-      nps3Set = new Set(buildWalkingBassLine().map(n => n.sIdx + '-' + n.fret));
+      nps3Set = new Set(buildBassLine().map(n => n.sIdx + '-' + n.fret));
     }
 
     // numeración de trastes (espaciador a la DERECHA, alineado con la columna de etiquetas de cuerda)
@@ -4038,10 +4484,36 @@
     notes.forEach(n => playPianoTone(n.midi));
   }
 
+  // voicings "rootless" de jazz: se usan sobre todo en la mano izquierda para acompañar, cuando
+  // otro instrumento (normalmente el bajo) ya está tocando la fundamental — así se evita
+  // duplicarla y el voicing suena más "abierto" y propio del estilo. Simplificado con 3ª-5ª-7ª-9ª
+  // (en vez de sustituir la 5ª por la 13ª, que sería la versión más avanzada).
+  const ROOTLESS_BASE_TONES = { maj7: [4, 7, 11], min7: [3, 7, 10], dom7: [4, 7, 10] };
+  function pianoRootlessNotes(rootPc, rootOctave, qualityKey, voicingType){
+    const base = ROOTLESS_BASE_TONES[qualityKey];
+    if (!base) return null; // solo disponible para maj7 / min7 / dom7 por ahora
+    const [third, fifth, seventh] = base;
+    const ninth = 2;
+    const rootMidi = (rootOctave + 1) * 12 + rootPc;
+    const intervals = voicingType === 'rootlessA'
+      ? [third, fifth, seventh, ninth + 12]
+      : [seventh, ninth + 12, third + 12, fifth + 12];
+    return intervals.map(iv => {
+      const midi = rootMidi + iv;
+      const pc = ((midi % 12) + 12) % 12;
+      const octave = Math.floor(midi / 12) - 1;
+      return pianoNoteData(pc, octave);
+    });
+  }
+
   function pianoShowCurrentChord(){
-    const notes = pianoChordNotes(state.pianoChordRoot, state.pianoChordOctave, state.pianoChordQuality);
+    const rootlessNotes = state.pianoVoicing !== 'closed'
+      ? pianoRootlessNotes(state.pianoChordRoot, state.pianoChordOctave, state.pianoChordQuality, state.pianoVoicing)
+      : null;
+    const notes = rootlessNotes || pianoChordNotes(state.pianoChordRoot, state.pianoChordOctave, state.pianoChordQuality);
     const q = CHORD_QUALITIES[state.pianoChordQuality];
-    const chordLabel = DISPLAY[state.pianoChordRoot] + q.suffix;
+    const voicingTag = rootlessNotes ? (state.pianoVoicing === 'rootlessA' ? ' · rootless A' : ' · rootless B') : '';
+    const chordLabel = DISPLAY[state.pianoChordRoot] + q.suffix + voicingTag;
     showChordOnStaff(notes, chordLabel);
     highlightPianoKeys(notes);
     return notes;
@@ -4469,6 +4941,142 @@
     $('#triadNormalView').style.display = 'flex';
   }
 
+  // ---------- TÉCNICA: power chords ----------
+  function renderPowerChordSection(){
+    if (!$('#powerChordRootGroup').children.length) {
+      DISPLAY.forEach((name, pc) => {
+        const b = document.createElement('button');
+        b.textContent = name;
+        if (pc === state.powerChord.root) b.classList.add('active');
+        b.addEventListener('click', () => {
+          state.powerChord.root = pc;
+          document.querySelectorAll('#powerChordRootGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderPowerChordDiagram();
+        });
+        $('#powerChordRootGroup').appendChild(b);
+      });
+      document.querySelectorAll('#powerChordStringGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          state.powerChord.stringIdx = Number(b.dataset.pstring);
+          document.querySelectorAll('#powerChordStringGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderPowerChordDiagram();
+        });
+      });
+      $('#powerChordOctaveToggle').classList.add('active');
+      $('#powerChordOctaveToggle').addEventListener('click', () => {
+        state.powerChord.withOctave = !state.powerChord.withOctave;
+        $('#powerChordOctaveToggle').classList.toggle('active', state.powerChord.withOctave);
+        renderPowerChordDiagram();
+      });
+      $('#powerChordPlayBtn').addEventListener('click', playPowerChord);
+    }
+    renderPowerChordDiagram();
+  }
+
+  function renderPowerChordDiagram(){
+    const pc = state.powerChord;
+    const shape = computePowerChordShape(pc.root, pc.stringIdx, pc.withOctave);
+    $('#powerChordDiagram').innerHTML = renderTriadSVG(shape, shape.strings, pc.root);
+  }
+
+  function playPowerChord(){
+    const pc = state.powerChord;
+    const shape = computePowerChordShape(pc.root, pc.stringIdx, pc.withOctave);
+    shape.strings.forEach((sIdx, i) => {
+      const midi = OPEN_MIDI.guitarra[sIdx] + shape.frets[i];
+      playTone(midi, 1.2, sIdx, 6);
+    });
+  }
+
+  // ---------- TÉCNICA: ligados, deslizamiento, bending ----------
+  const LICK_TECH_EXPLAINERS = {
+    ligado: 'Pulsa la cuerda una sola vez y usa los dedos para "martillear" (hammer-on) o "tirar" (pull-off) sin volver a pulsar — así suenan varias notas seguidas con una sola pulsada de púa.',
+    slide:  'Pulsa la nota y desliza el dedo por la cuerda hasta el siguiente traste sin soltar la presión — la nota "resbala" de una altura a otra, sin silencio entre medias.',
+    bend:   'Empuja o tira de la cuerda hacia arriba con el dedo para subir la altura de la nota sin cambiar de traste — muy característico del blues y el rock. Aquí se simula un bend de un tono completo.'
+  };
+
+  function playSlideTone(midiStart, midiEnd, dur){
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const freqStart = 440 * Math.pow(2, (midiStart - 69) / 12);
+    const freqEnd = 440 * Math.pow(2, (midiEnd - 69) / 12);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freqStart, now);
+    osc.frequency.exponentialRampToValueAtTime(freqEnd, now + dur * 0.6);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.22, now + 0.02);
+    gain.gain.setValueAtTime(0.22, now + dur * 0.7);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now); osc.stop(now + dur + 0.05);
+  }
+
+  function playBendTone(midiStart, midiBend, dur){
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const freqStart = 440 * Math.pow(2, (midiStart - 69) / 12);
+    const freqBend = 440 * Math.pow(2, (midiBend - 69) / 12);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freqStart, now);
+    osc.frequency.exponentialRampToValueAtTime(freqBend, now + dur * 0.35);
+    osc.frequency.setValueAtTime(freqBend, now + dur * 0.65);
+    osc.frequency.exponentialRampToValueAtTime(freqStart, now + dur * 0.95);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.22, now + 0.02);
+    gain.gain.setValueAtTime(0.22, now + dur * 0.9);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now); osc.stop(now + dur + 0.05);
+  }
+
+  function renderLickTechSection(){
+    if (!$('#lickTechStringGroup').children.length) {
+      STRING_ORDINALS.forEach((label, sIdx) => {
+        const b = document.createElement('button');
+        b.textContent = label;
+        if (sIdx === state.lickTech.stringIdx) b.classList.add('active');
+        b.addEventListener('click', () => {
+          state.lickTech.stringIdx = sIdx;
+          document.querySelectorAll('#lickTechStringGroup button').forEach(x => x.classList.toggle('active', x === b));
+        });
+        $('#lickTechStringGroup').appendChild(b);
+      });
+      document.querySelectorAll('#lickTechGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          state.lickTech.type = b.dataset.ltech;
+          document.querySelectorAll('#lickTechGroup button').forEach(x => x.classList.toggle('active', x === b));
+          $('#lickTechExplainer').textContent = LICK_TECH_EXPLAINERS[state.lickTech.type];
+        });
+      });
+      document.querySelectorAll('#lickTechFretGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          state.lickTech.startFret = Number(b.dataset.lfret);
+          document.querySelectorAll('#lickTechFretGroup button').forEach(x => x.classList.toggle('active', x === b));
+        });
+      });
+      $('#lickTechPlayBtn').addEventListener('click', playLickTech);
+      $('#lickTechExplainer').textContent = LICK_TECH_EXPLAINERS[state.lickTech.type];
+    }
+  }
+
+  function playLickTech(){
+    const lt = state.lickTech;
+    const openMidi = OPEN_MIDI.guitarra[lt.stringIdx];
+    const f0 = lt.startFret;
+    if (lt.type === 'ligado') {
+      const sequence = [f0, f0 + 2, f0 + 3, f0 + 2]; // hammer-on subiendo, pull-off bajando
+      sequence.forEach((f, i) => setTimeout(() => playTone(openMidi + f, 0.5, lt.stringIdx, 6), i * 180));
+    } else if (lt.type === 'slide') {
+      playSlideTone(openMidi + f0, openMidi + f0 + 5, 0.8);
+    } else if (lt.type === 'bend') {
+      playBendTone(openMidi + f0, openMidi + f0 + 2, 1.0); // bend de un tono completo (2 semitonos)
+    }
+  }
+
   function renderTriadSection(){
     if (!$('#triadRootGroup').children.length) {
       populateTriadControls();
@@ -4484,6 +5092,108 @@
     renderTriadDiagram();
     renderTriadHarmony();
     renderTriadMapCards();
+  }
+
+  // ---------- OÍDO: entrenamiento auditivo (intervalos y calidad de acorde) ----------
+  const INTERVALS = [
+    { semitones: 1,  name: '2ª menor' },
+    { semitones: 2,  name: '2ª mayor' },
+    { semitones: 3,  name: '3ª menor' },
+    { semitones: 4,  name: '3ª mayor' },
+    { semitones: 5,  name: '4ª justa' },
+    { semitones: 6,  name: 'Tritono' },
+    { semitones: 7,  name: '5ª justa' },
+    { semitones: 8,  name: '6ª menor' },
+    { semitones: 9,  name: '6ª mayor' },
+    { semitones: 10, name: '7ª menor' },
+    { semitones: 11, name: '7ª mayor' },
+    { semitones: 12, name: 'Octava' },
+  ];
+  const OIDO_QUALITY_LABELS = { major: 'Mayor', minor: 'Menor', aug: 'Aumentada', dim: 'Disminuida' };
+
+  function renderOidoSection(){
+    if (!$('#oidoModeGroup').dataset.wired) {
+      $('#oidoModeGroup').dataset.wired = '1';
+      document.querySelectorAll('#oidoModeGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          state.oido.mode = b.dataset.omode;
+          document.querySelectorAll('#oidoModeGroup button').forEach(x => x.classList.toggle('active', x === b));
+          $('#oidoPlaybackRow').style.display = state.oido.mode === 'intervalo' ? 'flex' : 'none';
+          oidoNewRound();
+        });
+      });
+      document.querySelectorAll('#oidoPlaybackGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          state.oido.playback = b.dataset.playback;
+          document.querySelectorAll('#oidoPlaybackGroup button').forEach(x => x.classList.toggle('active', x === b));
+        });
+      });
+      $('#oidoPlayBtn').addEventListener('click', oidoPlayCurrent);
+      $('#oidoRepeatBtn').addEventListener('click', oidoPlayCurrent);
+      $('#oidoNextBtn').addEventListener('click', oidoNewRound);
+      oidoNewRound();
+    }
+    $('#oidoExplainer').textContent = state.oido.mode === 'intervalo'
+      ? 'Suenan 2 notas. Identifica la distancia entre ellas (el intervalo). Elige "Melódico" para oírlas una tras otra, o "Armónico" para oírlas juntas — el armónico es más difícil.'
+      : 'Suena una tríada (3 notas juntas). Identifica si es Mayor, Menor, Aumentada o Disminuida, solo de oído.';
+  }
+
+  function oidoNewRound(){
+    const q = state.oido;
+    q.guess = null;
+    $('#oidoFeedback').textContent = '';
+    const rootMidi = 55 + Math.floor(Math.random() * 13); // rango cómodo, ni muy grave ni muy agudo
+    if (q.mode === 'intervalo') {
+      const iv = INTERVALS[Math.floor(Math.random() * INTERVALS.length)];
+      q.target = { rootMidi, semitones: iv.semitones, label: iv.name };
+    } else {
+      const qualities = Object.keys(OIDO_QUALITY_LABELS);
+      const quality = qualities[Math.floor(Math.random() * qualities.length)];
+      q.target = { rootMidi, quality, label: OIDO_QUALITY_LABELS[quality] };
+    }
+    renderOidoAnswerButtons();
+    oidoPlayCurrent();
+  }
+
+  function oidoPlayCurrent(){
+    const q = state.oido;
+    if (!q.target) return;
+    if (q.mode === 'intervalo') {
+      const note2 = q.target.rootMidi + q.target.semitones;
+      playPianoTone(q.target.rootMidi);
+      if (q.playback === 'melodic') setTimeout(() => playPianoTone(note2), 550);
+      else playPianoTone(note2);
+    } else {
+      TRIAD_QUALITIES[q.target.quality].formula.forEach(iv => playPianoTone(q.target.rootMidi + iv));
+    }
+  }
+
+  function renderOidoAnswerButtons(){
+    const wrap = $('#oidoAnswerGroup');
+    wrap.innerHTML = '';
+    const q = state.oido;
+    const options = q.mode === 'intervalo' ? INTERVALS.map(iv => iv.name) : Object.values(OIDO_QUALITY_LABELS);
+    options.forEach(opt => {
+      const b = document.createElement('button');
+      b.textContent = opt;
+      b.addEventListener('click', () => oidoCheckAnswer(opt));
+      wrap.appendChild(b);
+    });
+  }
+
+  function oidoCheckAnswer(guessLabel){
+    const q = state.oido;
+    if (q.guess !== null || !q.target) return; // ya contestada esta ronda
+    q.guess = guessLabel;
+    q.attempts++;
+    const correct = guessLabel === q.target.label;
+    if (correct) q.score++;
+    $('#oidoFeedback').textContent = correct ? '✅ ¡Correcto!' : `❌ Era: ${q.target.label}`;
+    $('#oidoStatus').textContent = `Aciertos: ${q.score}/${q.attempts}`;
+    document.querySelectorAll('#oidoAnswerGroup button').forEach(b => {
+      if (b.textContent === q.target.label) b.classList.add('correct');
+      else if (b.textContent === guessLabel) b.classList.add('wrong');
+    });
   }
 
   function renderPianoSection(){
@@ -4526,6 +5236,7 @@
     sel.value = state.pianoChordQuality;
     sel.addEventListener('change', (e) => {
       state.pianoChordQuality = e.target.value;
+      pianoUpdateVoicingRowVisibility();
       pianoShowCurrentChord();
     });
 
@@ -4541,6 +5252,15 @@
       const notes = pianoShowCurrentChord();
       playChordTones(notes);
     });
+
+    document.querySelectorAll('#pianoVoicingGroup button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.pianoVoicing = b.dataset.voicing;
+        document.querySelectorAll('#pianoVoicingGroup button').forEach(x => x.classList.toggle('active', x === b));
+        pianoShowCurrentChord();
+      });
+    });
+    pianoUpdateVoicingRowVisibility();
   }
 
   function pianoSetMode(mode){
@@ -4549,9 +5269,94 @@
     $('#pianoRandomBtn').style.display = mode === 'note' ? '' : 'none';
     $('#pianoNoteDisplay').style.display = mode === 'note' ? '' : 'none';
     $('#pianoChordRow').style.display = mode === 'chord' ? 'flex' : 'none';
+    $('#pianoScaleRow').style.display = mode === 'scale' ? 'flex' : 'none';
+    $('#pianoScaleInfo').style.display = mode === 'scale' ? '' : 'none';
     document.querySelectorAll('.piano-key-white.active, .piano-key-black.active').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.piano-key-white .finger-badge, .piano-key-black .finger-badge').forEach(el => el.remove());
     clearStaffNote();
+    pianoUpdateVoicingRowVisibility();
     if (mode === 'chord') pianoShowCurrentChord();
+    if (mode === 'scale') { if (!$('#pianoScaleRootGroup').children.length) populatePianoScaleControls(); renderPianoScale(); }
+  }
+
+  function pianoUpdateVoicingRowVisibility(){
+    const eligible = ROOTLESS_BASE_TONES[state.pianoChordQuality] !== undefined;
+    $('#pianoVoicingRow').style.display = (state.pianoMode === 'chord' && eligible) ? 'flex' : 'none';
+  }
+
+  // ---------- PIANO: modo Escala (digitación de mano derecha) ----------
+  const MAJOR_SCALE_INTERVALS = [0, 2, 4, 5, 7, 9, 11, 12];
+  // digitación estándar de mano derecha, escala mayor ascendente — verificada solo para estas 6
+  // tonalidades (las que no cruzan el pulgar de forma atípica). Do/Sol/Re/La/Mi: 1-2-3,1-2-3-4-5.
+  // Fa es la excepción: el 4º dedo toca el Sib en vez de cruzar el pulgar.
+  const PIANO_SCALE_FINGERING_RH = {
+    0: [1,2,3,1,2,3,4,5], 7: [1,2,3,1,2,3,4,5], 2: [1,2,3,1,2,3,4,5],
+    9: [1,2,3,1,2,3,4,5], 4: [1,2,3,1,2,3,4,5], 5: [1,2,3,4,1,2,3,4],
+  };
+
+  function populatePianoScaleControls(){
+    const rootWrap = $('#pianoScaleRootGroup');
+    DISPLAY.forEach((name, pc) => {
+      const b = document.createElement('button');
+      b.textContent = name;
+      if (pc === state.pianoScale.root) b.classList.add('active');
+      b.addEventListener('click', () => {
+        state.pianoScale.root = pc;
+        document.querySelectorAll('#pianoScaleRootGroup button').forEach(x => x.classList.toggle('active', x === b));
+        renderPianoScale();
+      });
+      rootWrap.appendChild(b);
+    });
+    document.querySelectorAll('#pianoScaleOctaveGroup button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.pianoScale.octave = Number(b.dataset.soct);
+        document.querySelectorAll('#pianoScaleOctaveGroup button').forEach(x => x.classList.toggle('active', x === b));
+        renderPianoScale();
+      });
+    });
+    $('#pianoScalePlayBtn').addEventListener('click', playPianoScale);
+  }
+
+  function pianoScaleNotes(){
+    const { root, octave } = state.pianoScale;
+    return MAJOR_SCALE_INTERVALS.map(iv => {
+      const totalPc = root + iv;
+      const pc = ((totalPc % 12) + 12) % 12;
+      const oct = octave + Math.floor(totalPc / 12);
+      return pianoNoteData(pc, oct);
+    });
+  }
+
+  function renderPianoScale(){
+    document.querySelectorAll('.piano-key-white .finger-badge, .piano-key-black .finger-badge').forEach(el => el.remove());
+    const notes = pianoScaleNotes();
+    const fingering = PIANO_SCALE_FINGERING_RH[state.pianoScale.root];
+    const info = $('#pianoScaleInfo');
+    if (!fingering) {
+      info.textContent = `Escala de ${DISPLAY[state.pianoScale.root]} mayor: ${notes.map(n => DISPLAY[n.pc]).join('-')}. La digitación todavía no está verificada para esta tonalidad — de momento solo está confirmada para Do, Sol, Re, La, Mi y Fa mayor.`;
+    } else {
+      info.innerHTML = `Escala de ${DISPLAY[state.pianoScale.root]} mayor (mano derecha, ascendente): ` +
+        notes.map((n, i) => `${DISPLAY[n.pc]} (${fingering[i]})`).join(' - ');
+      notes.forEach((n, i) => {
+        const keyEl = document.querySelector(`.piano-keyboard [data-pc="${n.pc}"][data-octave="${n.octave}"]`);
+        if (keyEl) {
+          const badge = document.createElement('span');
+          badge.className = 'finger-badge';
+          badge.textContent = fingering[i];
+          keyEl.appendChild(badge);
+        }
+      });
+    }
+  }
+
+  function playPianoScale(){
+    const notes = pianoScaleNotes();
+    notes.forEach((n, i) => setTimeout(() => {
+      document.querySelectorAll('.piano-key-white.active, .piano-key-black.active').forEach(el => el.classList.remove('active'));
+      const keyEl = document.querySelector(`.piano-keyboard [data-pc="${n.pc}"][data-octave="${n.octave}"]`);
+      if (keyEl) { keyEl.classList.add('active'); pianoScrollToKeys([keyEl]); }
+      playPianoTone(n.midi);
+    }, i * 400));
   }
 
   let circleSelected = 0;
@@ -4653,7 +5458,7 @@
   function rebuildCurrentRiff(){
     currentRiff = state.tab === 'estilos' ? buildStyleRiff()
       : state.tab === 'tecnica' ? buildChromaticExercise()
-      : usingWalkingBass() ? buildWalkingBassLine()
+      : usingWalkingBass() ? buildBassLine()
       : buildRiff();
     $('#tabDisplay').textContent = renderTab(currentRiff);
     $('#playRiffBtn').disabled = currentRiff.length === 0 || state.playing;
@@ -5868,6 +6673,13 @@
   document.querySelectorAll('#progViewGroup button').forEach(b => {
     b.addEventListener('click', () => { state.progViewMode = b.dataset.progview; render(); });
   });
+  document.querySelectorAll('#bassPatternGroup button').forEach(b => {
+    b.addEventListener('click', () => {
+      state.bassPattern = b.dataset.bpattern;
+      document.querySelectorAll('#bassPatternGroup button').forEach(x => x.classList.toggle('active', x === b));
+      render();
+    });
+  });
   document.querySelectorAll('#cagedViewGroup button').forEach(b => {
     b.addEventListener('click', () => { state.cagedView = b.dataset.cagedview; render(); });
   });
@@ -6035,6 +6847,113 @@
     $('#drumFxDelayLabel').textContent = e.target.value + '%';
   });
   renderDrumSection();
+
+  // ---------- FRETTEACHER: interfaz ----------
+  function ftRenderQuickButtons(){
+    const wrap = $('#ftQuickRow');
+    wrap.innerHTML = '';
+    FRETTEACHER_KB.filter(e => e.featured).forEach(entry => {
+      const b = document.createElement('button');
+      b.className = 'ft-quick-btn';
+      b.textContent = entry.title;
+      b.addEventListener('click', () => ftShowEntries([entry]));
+      wrap.appendChild(b);
+    });
+  }
+
+  // búsqueda simple por coincidencia de palabras clave: puntúa cada entrada según cuántas
+  // palabras de la pregunta aparecen en sus keywords o en su título, y devuelve las mejores
+  function ftSearch(query){
+    const q = query.toLowerCase().trim();
+    if (!q) return [];
+    const words = q.split(/\s+/).filter(w => w.length > 2);
+    const scored = FRETTEACHER_KB.map(entry => {
+      let score = 0;
+      const haystack = (entry.title + ' ' + entry.keywords.join(' ')).toLowerCase();
+      if (haystack.includes(q)) score += 10; // coincidencia de la frase completa
+      words.forEach(w => { if (haystack.includes(w)) score += 1; });
+      return { entry, score };
+    }).filter(s => s.score >= 2).sort((a, b) => b.score - a.score);
+    return scored.slice(0, 5).map(s => s.entry);
+  }
+
+  function ftShowEntries(entries){
+    const wrap = $('#ftResults');
+    wrap.innerHTML = '';
+    if (entries.length === 0) {
+      wrap.innerHTML = '<p class="theory-note-small">No he encontrado nada parecido — prueba con otras palabras, o elige una de las guías de arriba.</p>';
+      return;
+    }
+    entries.forEach(rawEntry => {
+      const entry = rawEntry.dynamic ? rawEntry.dynamic() : rawEntry;
+      const box = document.createElement('div');
+      box.className = 'ft-answer';
+      box.innerHTML = `<h4>${entry.title}</h4><p>${entry.answer}</p>`;
+      if (entry.action) {
+        const btn = document.createElement('button');
+        btn.className = 'ft-action-btn';
+        btn.textContent = entry.action.label;
+        btn.addEventListener('click', () => { entry.action.apply(); $('#fretTeacherPanel').style.display = 'none'; });
+        box.appendChild(btn);
+      }
+      wrap.appendChild(box);
+    });
+  }
+
+  // consejo contextual: mira en qué pestaña y con qué está el usuario ahora mismo, y da un
+  // consejo concreto adaptado a eso — no genérico, distinto según lo que tenga seleccionado
+  function ftContextualTip(){
+    const t = state.tab;
+    if (t === 'escalas') {
+      const scaleName = SCALES[state.scaleKey] ? SCALES[state.scaleKey].name : state.scaleKey;
+      return { title: '📍 Ahora mismo: Escalas', text: `Tienes seleccionada ${DISPLAY[state.root]} ${scaleName}. Consejo: tócala subiendo y bajando 3 veces seguidas sin parar antes de probar el Quiz — el error más común es pasar al quiz demasiado pronto, sin haber automatizado el patrón todavía.` };
+    }
+    if (t === 'triadas') {
+      const q = TRIAD_QUALITIES[state.triad.quality];
+      const invLabel = ['fundamental', '1ª inversión', '2ª inversión'][state.triad.inversion];
+      return { title: '📍 Ahora mismo: Tríadas', text: `Tienes ${DISPLAY[state.triad.root]} ${q.label}, en ${invLabel}, disposición ${state.triad.mode}. Consejo: cuando la domines, cambia SOLO la inversión (no la tónica) y practica ese cambio — así entrenas el oído para reconocer inversiones, que es lo que más cuesta al principio.` };
+    }
+    if (t === 'acordes') {
+      if (state.acordesMode === 'progresion') {
+        return { title: '📍 Ahora mismo: Acordes (progresión)', text: 'Estás en modo Progresión. Consejo: no intentes memorizar la progresión entera de golpe — practica el cambio ENTRE LOS DOS PRIMEROS acordes hasta que sea automático, luego añade el tercero, y así sucesivamente.' };
+      }
+      return { title: '📍 Ahora mismo: Acordes', text: 'Estás en modo acorde individual. Consejo: prueba a activar la vista CAGED — verás las 5 posiciones de este mismo acorde por todo el mástil, muy útil para dejar de depender de una sola forma.' };
+    }
+    if (t === 'piano') {
+      return { title: '📍 Ahora mismo: Piano', text: 'Consejo: si estás memorizando cómo se ve un acorde en el pentagrama, prueba primero en "Solo clave de Sol" o "Solo clave de Fa" (según el registro del acorde) — con las dos claves a la vez al principio cuesta más saber dónde mirar.' };
+    }
+    if (t === 'mastil') {
+      return { title: '📍 Ahora mismo: Mástil', text: 'Esta vista es de referencia libre — buena para explorar el diapasón sin un objetivo concreto. Si estás empezando, mejor vuelve a Escalas o Tríadas, que te guían paso a paso.' };
+    }
+    if (t === 'tecnica') {
+      return { title: '📍 Ahora mismo: Técnica', text: 'Consejo: practica siempre con metrónomo, aunque vayas despacio — la técnica que se entrena sin pulso estable no se transfiere bien a tocar canciones reales.' };
+    }
+    if (t === 'estilos') {
+      return { title: '📍 Ahora mismo: Estilos', text: `Estás explorando riffs de estilo (${state.style}). Consejo: no te limites a escuchar — activa la reproducción lenta y tócalo tú encima, aunque sea a trozos.` };
+    }
+    return null;
+  }
+
+  function ftRenderContextTip(){
+    const box = $('#ftContextTip');
+    const tip = ftContextualTip();
+    if (!tip) { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    box.innerHTML = `<h4>${tip.title}</h4><p>${tip.text}</p>`;
+  }
+
+  ftRenderQuickButtons();
+  $('#fretTeacherFab').addEventListener('click', () => {
+    const panel = $('#fretTeacherPanel');
+    const opening = panel.style.display === 'none';
+    panel.style.display = opening ? 'flex' : 'none';
+    if (opening) ftRenderContextTip();
+  });
+  $('#fretTeacherClose').addEventListener('click', () => { $('#fretTeacherPanel').style.display = 'none'; });
+  $('#ftSearchBtn').addEventListener('click', () => ftShowEntries(ftSearch($('#ftSearchInput').value)));
+  $('#ftSearchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') ftShowEntries(ftSearch($('#ftSearchInput').value));
+  });
 
   render();
 })();
