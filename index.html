@@ -352,6 +352,9 @@
   .drum-note{ font-size: calc(9.5px * var(--fs-scale)); color: var(--ink-dim); font-style:italic; }
   .drum-step-grid{ display:flex; flex-direction:column; gap:4px; margin-top:10px; }
   .drum-row{ display:flex; align-items:center; gap:8px; }
+  .drum-mute-btn{ flex: 0 0 22px; width:22px; height:22px; border-radius:50%; border:1px solid var(--panel-edge);
+    background: var(--panel); font-size: 11px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+  .drum-mute-btn.active{ background: var(--accent-root); border-color: var(--accent-root-dark); }
   .drum-row-label{ flex: 0 0 90px; font-family:'Oswald', sans-serif; font-size: calc(10px * var(--fs-scale));
     color: var(--ink-dim); text-align:right; }
   .drum-row-cells{ flex:1; display:grid; grid-template-columns: repeat(16, 1fr); gap: 3px; min-width:0; }
@@ -360,6 +363,28 @@
   .drum-step-cell.on{ background: var(--panel-edge); }
   .drum-step-cell.on.accent{ background: var(--accent-root); }
   .drum-step-cell.current{ background: var(--accent-play); box-shadow: 0 0 6px 1px rgba(224,184,74,0.7); }
+
+  .drum-looper-row{ background: var(--panel-2); border:1px solid var(--panel-edge); border-radius:12px;
+    padding:12px 16px; margin-top:12px; display:flex; flex-direction:column; gap:10px; }
+  .drum-looper-header{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .drum-looper-title{ font-family:'Oswald', sans-serif; font-weight:700; font-size: calc(12px * var(--fs-scale));
+    color: var(--accent-blue); text-transform:uppercase; letter-spacing:0.5px; }
+  .drum-looper-build{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .drum-looper-list{ display:flex; flex-wrap:wrap; gap:8px; }
+  .drum-looper-chip{ background: var(--panel); border:1px solid var(--panel-edge); border-radius:999px;
+    padding:6px 12px; font-family:'Oswald', sans-serif; font-size: calc(10.5px * var(--fs-scale));
+    color: var(--ink); display:flex; align-items:center; gap:6px; }
+  .drum-looper-chip button{ background:none; border:none; color: var(--ink-dim); cursor:pointer; font-size:13px; padding:0; }
+  .drum-looper-chip.current-chord{ border-color: var(--accent-play); box-shadow: 0 0 6px 1px rgba(255,176,32,0.4); }
+
+  .drum-eq-section{ margin-top: 14px; background: var(--panel-2); border:1px solid var(--panel-edge); border-radius:12px; padding: 10px 16px; }
+  .drum-eq-section summary{ cursor:pointer; font-family:'Oswald', sans-serif; font-weight:700;
+    font-size: calc(11px * var(--fs-scale)); color: var(--accent-blue); list-style:none; text-transform:uppercase; letter-spacing:0.5px; }
+  .drum-eq-section summary::-webkit-details-marker{ display:none; }
+  .drum-eq-row{ display:flex; gap:22px; flex-wrap:wrap; margin-top:10px; }
+  .drum-eq-ctrl{ display:flex; align-items:center; gap:8px; }
+  .drum-eq-ctrl input[type=range]{ width:90px; accent-color: var(--accent-blue); }
+  .drum-eq-ctrl span{ font-family:'JetBrains Mono', monospace; font-weight:700; font-size: calc(10px * var(--fs-scale)); color: var(--ink); min-width:32px; }
   .drum-step-cell.on.current{ background: var(--accent-root); box-shadow: 0 0 8px 2px rgba(171,30,22,0.7); }
   .drum-step-cell.fill-active{ box-shadow: 0 0 10px 3px rgba(224,184,74,0.9); }
 
@@ -527,7 +552,7 @@
 </div>
 
 <details class="theory-section drum-section" id="drumSection">
-  <summary id="drumSummary">🥁 Caja de Ritmos</summary>
+  <summary id="drumSummary">🥁 Caja de Ritmos & Looper</summary>
   <div class="theory-body">
     <div class="drum-controls-row">
       <span class="label">Estilo</span>
@@ -568,6 +593,57 @@
       <span class="drum-note">El tempo es el mismo en toda la app · toca cada casilla: apagada → normal → acento</span>
     </div>
     <div class="drum-step-grid" id="drumStepGrid"></div>
+
+    <div class="drum-looper-row">
+      <div class="drum-looper-header">
+        <span class="drum-looper-title">🎹 Looper de piano</span>
+        <button class="drum-mini-btn" id="pianoLooperToggle">▶ Activar</button>
+        <div class="drum-volume-ctrl">
+          <span class="label">Volumen</span>
+          <input type="range" id="pianoLooperVolSlider" min="0" max="100" step="5" value="50">
+          <span id="pianoLooperVolLabel">50%</span>
+        </div>
+      </div>
+      <div class="drum-looper-build">
+        <div class="pill-group" id="pianoLooperRootGroup"></div>
+        <select id="pianoLooperQualitySelect"></select>
+        <div class="pill-group" id="pianoLooperOctaveGroup">
+          <button data-oct="2">2</button>
+          <button data-oct="3" class="active">3</button>
+          <button data-oct="4">4</button>
+          <button data-oct="5">5</button>
+        </div>
+        <div class="pill-group" id="pianoLooperBarsGroup">
+          <button data-bars="1" class="active">1 compás</button>
+          <button data-bars="2">2 compases</button>
+          <button data-bars="4">4 compases</button>
+        </div>
+        <button class="drum-mini-btn" id="pianoLooperAddBtn">+ Añadir</button>
+      </div>
+      <div class="drum-looper-list" id="pianoLooperList"></div>
+    </div>
+
+    <details class="drum-eq-section" id="drumEqSection">
+      <summary>🎛️ EQ · efectos del conjunto</summary>
+      <div class="drum-eq-row">
+        <div class="drum-eq-ctrl">
+          <span class="label">Reverb</span>
+          <input type="range" id="drumFxReverbSlider" min="0" max="100" step="5" value="0">
+          <span id="drumFxReverbLabel">0%</span>
+        </div>
+        <div class="drum-eq-ctrl">
+          <span class="label">Chorus</span>
+          <input type="range" id="drumFxChorusSlider" min="0" max="100" step="5" value="0">
+          <span id="drumFxChorusLabel">0%</span>
+        </div>
+        <div class="drum-eq-ctrl">
+          <span class="label">Delay</span>
+          <input type="range" id="drumFxDelaySlider" min="0" max="100" step="5" value="0">
+          <span id="drumFxDelayLabel">0%</span>
+        </div>
+      </div>
+      <p class="theory-note-small">Afecta a todo lo que suena en esta sección: batería y looper de piano juntos.</p>
+    </details>
   </div>
 </details>
 
@@ -2214,7 +2290,10 @@
     pianoChordRoot: 0,
     pianoChordOctave: 3,
     pianoChordQuality: 'major',
-    drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null, humanize: false, speedFeel: 'normal' },
+    drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null, humanize: false, speedFeel: 'normal',
+      muted: { crash:false, hihatOpen:false, hihatClosed:false, clap:false, snare:false, kick:false },
+      fx: { reverb:0, chorus:0, delay:0 } },
+    pianoLooper: { active:false, volume:0.5, chords:[], build:{ root:0, quality:'major', octave:3, bars:1 } },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
              tonality: 'major', progressionIdx: null, progShapes: [], mapShapes: [], zoneIdx: 0, singleStringIdx: 0,
              voiceLeading: false },
@@ -4625,6 +4704,128 @@
     return buffer;
   }
 
+  // ---------- CAJA DE RITMOS & LOOPER: bus maestro y efectos ----------
+  // arquitectura "send/return": la señal seca (drumMasterBus -> destino) siempre suena entera;
+  // cada efecto tiene su propio "envío" (0% por defecto) que mezcla más señal procesada encima,
+  // sin restar nunca de la seca — así subir un efecto nunca "apaga" el sonido limpio.
+  let drumMasterBus = null;
+  const drumFxSends = { delay: null, reverb: null, chorus: null };
+
+  function buildSyntheticImpulseResponse(ctx, duration, decay){
+    const rate = ctx.sampleRate;
+    const length = Math.max(1, Math.floor(rate * duration));
+    const impulse = ctx.createBuffer(2, length, rate);
+    for (let ch = 0; ch < 2; ch++) {
+      const data = impulse.getChannelData(ch);
+      for (let i = 0; i < length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+      }
+    }
+    return impulse;
+  }
+
+  function getDrumMasterBus(){
+    const ctx = getAudioCtx();
+    if (drumMasterBus) return drumMasterBus;
+    drumMasterBus = ctx.createGain();
+    drumMasterBus.gain.value = 1;
+    drumMasterBus.connect(ctx.destination); // señal seca, siempre activa
+
+    // DELAY: eco con realimentación
+    const delaySend = ctx.createGain(); delaySend.gain.value = 0;
+    const delayNode = ctx.createDelay(1.5); delayNode.delayTime.value = 0.32;
+    const delayFeedback = ctx.createGain(); delayFeedback.gain.value = 0.35;
+    drumMasterBus.connect(delaySend);
+    delaySend.connect(delayNode);
+    delayNode.connect(delayFeedback);
+    delayFeedback.connect(delayNode);
+    delayNode.connect(ctx.destination);
+    drumFxSends.delay = delaySend;
+
+    // REVERB: respuesta de impulso sintética (ruido con caída exponencial, verificado)
+    const reverbSend = ctx.createGain(); reverbSend.gain.value = 0;
+    const convolver = ctx.createConvolver();
+    convolver.buffer = buildSyntheticImpulseResponse(ctx, 2.2, 2.2);
+    drumMasterBus.connect(reverbSend);
+    reverbSend.connect(convolver);
+    convolver.connect(ctx.destination);
+    drumFxSends.reverb = reverbSend;
+
+    // CHORUS: línea de retardo corta modulada por un LFO lento
+    const chorusSend = ctx.createGain(); chorusSend.gain.value = 0;
+    const chorusDelay = ctx.createDelay(0.05);
+    chorusDelay.delayTime.value = 0.015;
+    const chorusLFO = ctx.createOscillator();
+    chorusLFO.type = 'sine'; chorusLFO.frequency.value = 0.8;
+    const chorusLFOGain = ctx.createGain(); chorusLFOGain.gain.value = 0.006;
+    chorusLFO.connect(chorusLFOGain);
+    chorusLFOGain.connect(chorusDelay.delayTime);
+    chorusLFO.start();
+    drumMasterBus.connect(chorusSend);
+    chorusSend.connect(chorusDelay);
+    chorusDelay.connect(ctx.destination);
+    drumFxSends.chorus = chorusSend;
+
+    return drumMasterBus;
+  }
+
+  function setDrumFxSend(name, amount01){
+    getDrumMasterBus(); // asegura que está inicializado
+    if (drumFxSends[name]) drumFxSends[name].gain.value = amount01;
+  }
+
+  // ---------- LOOPER DE PIANO ----------
+  // reutiliza pianoChordNotes (ya construido y verificado para el modo Acorde del Piano) para
+  // saber qué notas tocar; el sonido va por el MISMO bus maestro que la batería, así que los
+  // efectos (reverb/chorus/delay) se aplican por igual a los dos.
+  function playLooperChordTone(time, midi, vol, dur){
+    const ctx = getAudioCtx();
+    const bus = getDrumMasterBus();
+    const freq = 440 * Math.pow(2, (midi - 69) / 12);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(vol, time + 0.05);
+    gain.gain.setValueAtTime(vol, time + dur * 0.7);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    osc.connect(gain).connect(bus);
+    osc.start(time);
+    osc.stop(time + dur + 0.05);
+  }
+
+  function pianoLooperTotalBars(){
+    return state.pianoLooper.chords.reduce((sum, c) => sum + c.bars, 0);
+  }
+
+  // encuentra qué acorde de la lista corresponde a un número de compás dentro del bucle completo,
+  // y si ese compás es el PRIMERO del acorde (para no repetirlo en cada compás que dura, solo al
+  // empezar su turno)
+  function pianoLooperChordAtBar(barIndexInLoop){
+    let acc = 0;
+    for (const chord of state.pianoLooper.chords) {
+      if (barIndexInLoop < acc + chord.bars) return { chord, isFirstBarOfChord: barIndexInLoop === acc };
+      acc += chord.bars;
+    }
+    return null;
+  }
+
+  function pianoLooperMaybeTrigger(barIndex, time, totalStepsInBar){
+    if (!state.pianoLooper.active) return;
+    const totalBars = pianoLooperTotalBars();
+    if (totalBars === 0) return;
+    const posInLoop = barIndex % totalBars;
+    const info = pianoLooperChordAtBar(posInLoop);
+    if (!info || !info.isFirstBarOfChord) return; // solo al EMPEZAR el turno del acorde, no cada compás
+    const beatDur = 60 / state.bpm;
+    const barDur = beatDur * (totalStepsInBar / 4);
+    const holdDur = barDur * info.chord.bars * 0.92; // sostener casi todo el rango de compases asignado
+    const notes = pianoChordNotes(info.chord.root, info.chord.octave, info.chord.quality);
+    notes.forEach(n => playLooperChordTone(time, n.midi, state.pianoLooper.volume, holdDur));
+  }
+
+
   function playDrumKick(time, vol){
     const ctx = getAudioCtx();
     const osc = ctx.createOscillator();
@@ -4634,7 +4835,7 @@
     osc.frequency.exponentialRampToValueAtTime(45, time + 0.15);
     gain.gain.setValueAtTime(vol, time);
     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.38);
-    osc.connect(gain).connect(ctx.destination);
+    osc.connect(gain).connect(getDrumMasterBus());
     osc.start(time); osc.stop(time + 0.4);
   }
 
@@ -4647,7 +4848,7 @@
     osc.frequency.setValueAtTime(190, time);
     oscGain.gain.setValueAtTime(vol * 0.6, time);
     oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
-    osc.connect(oscGain).connect(ctx.destination);
+    osc.connect(oscGain).connect(getDrumMasterBus());
     osc.start(time); osc.stop(time + 0.12);
     // ruido filtrado (el "chasquido" del bordón)
     const noise = ctx.createBufferSource();
@@ -4657,7 +4858,7 @@
     const noiseGain = ctx.createGain();
     noiseGain.gain.setValueAtTime(vol * 0.8, time);
     noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
-    noise.connect(filt).connect(noiseGain).connect(ctx.destination);
+    noise.connect(filt).connect(noiseGain).connect(getDrumMasterBus());
     noise.start(time);
   }
 
@@ -4678,14 +4879,14 @@
       osc.connect(bandpass);
       osc.start(time); osc.stop(time + dur + 0.02);
     });
-    bandpass.connect(highpass).connect(gain).connect(ctx.destination);
+    bandpass.connect(highpass).connect(gain).connect(getDrumMasterBus());
   }
 
   function playDrumClap(time, vol){
     const ctx = getAudioCtx();
     const bandpass = ctx.createBiquadFilter();
     bandpass.type = 'bandpass'; bandpass.frequency.value = 1200; bandpass.Q.value = 1.2;
-    bandpass.connect(ctx.destination);
+    bandpass.connect(getDrumMasterBus());
     [0, 0.012, 0.024, 0.036].forEach((offset, i) => {
       const isLast = i === 3;
       const noise = ctx.createBufferSource();
@@ -4725,7 +4926,7 @@
       osc.connect(highpass);
       osc.start(time); osc.stop(time + 1.35);
     });
-    highpass.connect(gain).connect(ctx.destination);
+    highpass.connect(gain).connect(getDrumMasterBus());
   }
 
   // ---------- CAJA DE RITMOS: secuenciador ----------
@@ -4767,6 +4968,7 @@
   function drumScheduleStep(step, time, isFillBar, totalSteps){
     const baseVol = state.drumMachine.volume;
     DRUM_VOICES.forEach(voice => {
+      if (state.drumMachine.muted[voice]) return;
       const val = drumEffectiveStep(voice, step, isFillBar, totalSteps);
       if (!val) return;
       const vol = val === 2 ? baseVol * 1.35 : baseVol; // el acento suena más fuerte
@@ -4799,6 +5001,7 @@
       const style = DRUM_STYLES[state.drumMachine.style];
       const totalSteps = style.steps || 16;
       const isFillBar = state.drumMachine.fillEnabled && (drumBarCount % 4 === 3);
+      if (drumStepIndex === 0) pianoLooperMaybeTrigger(drumBarCount, drumNextStepTime, totalSteps);
       drumScheduleStep(drumStepIndex, drumNextStepTime, isFillBar, totalSteps);
       const beatDur = 60 / state.bpm;      // duración de una negra
       let stepDur = (beatDur / 4) * feelMultiplier; // cada paso = semicorchea, estirada o encogida
@@ -4829,7 +5032,7 @@
     drumScheduler();
     $('#drumPlayBtn').textContent = '⏹ Detener';
     $('#drumPlayBtn').classList.add('active');
-    $('#drumSummary').textContent = '🥁 Caja de Ritmos · ▶ sonando';
+    $('#drumSummary').textContent = '🥁 Caja de Ritmos & Looper · ▶ sonando';
   }
 
   function stopDrumMachine(){
@@ -4838,7 +5041,7 @@
     drumTimerId = null;
     $('#drumPlayBtn').textContent = '▶ Reproducir';
     $('#drumPlayBtn').classList.remove('active');
-    $('#drumSummary').textContent = '🥁 Caja de Ritmos';
+    $('#drumSummary').textContent = '🥁 Caja de Ritmos & Looper';
     document.querySelectorAll('.drum-step-cell.current').forEach(el => el.classList.remove('current','fill-active'));
   }
 
@@ -4881,6 +5084,15 @@
     DRUM_VOICES.forEach(voice => {
       const rowEl = document.createElement('div');
       rowEl.className = 'drum-row';
+      const muteBtn = document.createElement('button');
+      muteBtn.className = 'drum-mute-btn' + (state.drumMachine.muted[voice] ? ' active' : '');
+      muteBtn.textContent = state.drumMachine.muted[voice] ? '🔇' : '🔊';
+      muteBtn.title = 'Silenciar ' + DRUM_VOICE_LABELS[voice];
+      muteBtn.addEventListener('click', () => {
+        state.drumMachine.muted[voice] = !state.drumMachine.muted[voice];
+        renderDrumGrid();
+      });
+      rowEl.appendChild(muteBtn);
       const label = document.createElement('span');
       label.className = 'drum-row-label';
       label.textContent = DRUM_VOICE_LABELS[voice];
@@ -4914,7 +5126,76 @@
     });
     $('#drumBpmSlider').value = state.bpm;
     $('#drumBpmLabel').textContent = state.bpm + ' BPM';
+    if (!$('#pianoLooperRootGroup').children.length) populatePianoLooperControls();
+    renderPianoLooperList();
     renderDrumGrid();
+  }
+
+  function populatePianoLooperControls(){
+    const rootWrap = $('#pianoLooperRootGroup');
+    rootWrap.innerHTML = '';
+    DISPLAY.forEach((name, pc) => {
+      const b = document.createElement('button');
+      b.textContent = name;
+      if (pc === state.pianoLooper.build.root) b.classList.add('active');
+      b.addEventListener('click', () => {
+        state.pianoLooper.build.root = pc;
+        document.querySelectorAll('#pianoLooperRootGroup button').forEach(x => x.classList.toggle('active', x === b));
+      });
+      rootWrap.appendChild(b);
+    });
+
+    const sel = $('#pianoLooperQualitySelect');
+    sel.innerHTML = '';
+    Object.entries(CHORD_QUALITIES).forEach(([key, q]) => {
+      const opt = document.createElement('option');
+      opt.value = key; opt.textContent = q.label;
+      sel.appendChild(opt);
+    });
+    sel.value = state.pianoLooper.build.quality;
+    sel.addEventListener('change', e => { state.pianoLooper.build.quality = e.target.value; });
+
+    document.querySelectorAll('#pianoLooperOctaveGroup button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.pianoLooper.build.octave = Number(b.dataset.oct);
+        document.querySelectorAll('#pianoLooperOctaveGroup button').forEach(x => x.classList.toggle('active', x === b));
+      });
+    });
+    document.querySelectorAll('#pianoLooperBarsGroup button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.pianoLooper.build.bars = Number(b.dataset.bars);
+        document.querySelectorAll('#pianoLooperBarsGroup button').forEach(x => x.classList.toggle('active', x === b));
+      });
+    });
+    $('#pianoLooperAddBtn').addEventListener('click', () => {
+      const b = state.pianoLooper.build;
+      state.pianoLooper.chords.push({ root: b.root, quality: b.quality, octave: b.octave, bars: b.bars });
+      renderPianoLooperList();
+    });
+  }
+
+  function renderPianoLooperList(){
+    const wrap = $('#pianoLooperList');
+    wrap.innerHTML = '';
+    if (state.pianoLooper.chords.length === 0) {
+      wrap.innerHTML = '<span class="theory-note-small">Añade acordes arriba para formar el bucle — sonarán en este orden, sincronizados con el ritmo.</span>';
+      return;
+    }
+    state.pianoLooper.chords.forEach((c, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'drum-looper-chip';
+      chip.dataset.idx = i;
+      const q = CHORD_QUALITIES[c.quality];
+      chip.innerHTML = `<span>${DISPLAY[c.root]}${q.suffix} (oct.${c.octave}) · ${c.bars}c</span>`;
+      const rm = document.createElement('button');
+      rm.textContent = '✕';
+      rm.addEventListener('click', () => {
+        state.pianoLooper.chords.splice(i, 1);
+        renderPianoLooperList();
+      });
+      chip.appendChild(rm);
+      wrap.appendChild(chip);
+    });
   }
 
   // Karplus-Strong: modelo físico clásico de cuerda pulsada. Se llena una línea de retardo con
@@ -5651,6 +5932,28 @@
   $('#drumResetBtn').addEventListener('click', () => {
     state.drumMachine.pattern = drumBuildPatternFromStyle(state.drumMachine.style);
     renderDrumGrid();
+  });
+
+  $('#pianoLooperToggle').addEventListener('click', () => {
+    state.pianoLooper.active = !state.pianoLooper.active;
+    $('#pianoLooperToggle').textContent = state.pianoLooper.active ? '⏹ Desactivar' : '▶ Activar';
+    $('#pianoLooperToggle').classList.toggle('active', state.pianoLooper.active);
+  });
+  $('#pianoLooperVolSlider').addEventListener('input', e => {
+    state.pianoLooper.volume = Number(e.target.value) / 100;
+    $('#pianoLooperVolLabel').textContent = e.target.value + '%';
+  });
+  $('#drumFxReverbSlider').addEventListener('input', e => {
+    setDrumFxSend('reverb', Number(e.target.value) / 100);
+    $('#drumFxReverbLabel').textContent = e.target.value + '%';
+  });
+  $('#drumFxChorusSlider').addEventListener('input', e => {
+    setDrumFxSend('chorus', Number(e.target.value) / 100);
+    $('#drumFxChorusLabel').textContent = e.target.value + '%';
+  });
+  $('#drumFxDelaySlider').addEventListener('input', e => {
+    setDrumFxSend('delay', Number(e.target.value) / 100);
+    $('#drumFxDelayLabel').textContent = e.target.value + '%';
   });
   renderDrumSection();
 
