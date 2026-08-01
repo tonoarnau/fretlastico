@@ -375,6 +375,8 @@
     padding:6px 12px; font-family:'Oswald', sans-serif; font-size: calc(10.5px * var(--fs-scale));
     color: var(--ink); display:flex; align-items:center; gap:6px; }
   .drum-looper-chip button{ background:none; border:none; color: var(--ink-dim); cursor:pointer; font-size:13px; padding:0; }
+  .drum-looper-bars-btn{ background: var(--panel-2); border:1px solid var(--panel-edge); border-radius:999px;
+    padding:2px 8px; font-family:'JetBrains Mono', monospace; font-weight:700; color: var(--accent-blue); font-size:11px; }
   .drum-looper-chip.current-chord{ border-color: var(--accent-play); box-shadow: 0 0 6px 1px rgba(255,176,32,0.4); }
 
   .drum-eq-section{ margin-top: 14px; background: var(--panel-2); border:1px solid var(--panel-edge); border-radius:12px; padding: 10px 16px; }
@@ -598,6 +600,11 @@
       <div class="drum-looper-header">
         <span class="drum-looper-title">🎹 Looper de piano</span>
         <button class="drum-mini-btn" id="pianoLooperToggle">▶ Activar</button>
+        <div class="pill-group" id="pianoLooperPatternGroup">
+          <button data-pattern="pad" class="active">Pad (sostenido)</button>
+          <button data-pattern="quarters">Negras</button>
+          <button data-pattern="downbeat">Primer tiempo</button>
+        </div>
         <div class="drum-volume-ctrl">
           <span class="label">Volumen</span>
           <input type="range" id="pianoLooperVolSlider" min="0" max="100" step="5" value="50">
@@ -2293,7 +2300,7 @@
     drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null, humanize: false, speedFeel: 'normal',
       muted: { crash:false, hihatOpen:false, hihatClosed:false, clap:false, snare:false, kick:false },
       fx: { reverb:0, chorus:0, delay:0 } },
-    pianoLooper: { active:false, volume:0.5, chords:[], build:{ root:0, quality:'major', octave:3, bars:1 } },
+    pianoLooper: { active:false, volume:0.5, chords:[], pattern:'pad', build:{ root:0, quality:'major', octave:3, bars:1 } },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
              tonality: 'major', progressionIdx: null, progShapes: [], mapShapes: [], zoneIdx: 0, singleStringIdx: 0,
              voiceLeading: false },
@@ -4778,7 +4785,7 @@
   // reutiliza pianoChordNotes (ya construido y verificado para el modo Acorde del Piano) para
   // saber qué notas tocar; el sonido va por el MISMO bus maestro que la batería, así que los
   // efectos (reverb/chorus/delay) se aplican por igual a los dos.
-  function playLooperChordTone(time, midi, vol, dur){
+  function playLooperChordTone(time, midi, vol, dur, staccato){
     const ctx = getAudioCtx();
     const bus = getDrumMasterBus();
     const freq = 440 * Math.pow(2, (midi - 69) / 12);
@@ -4786,9 +4793,12 @@
     const gain = ctx.createGain();
     osc.type = 'triangle';
     osc.frequency.value = freq;
+    const safeVol = Math.max(vol, 0.0001); // exponentialRampToValueAtTime no admite 0 exacto como destino
+    const attack = staccato ? 0.006 : 0.05; // ataque mucho más rápido y percusivo en modo staccato
+    const sustainUntil = time + (staccato ? dur * 0.3 : dur * 0.7);
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(vol, time + 0.05);
-    gain.gain.setValueAtTime(vol, time + dur * 0.7);
+    gain.gain.exponentialRampToValueAtTime(safeVol, time + attack);
+    gain.gain.setValueAtTime(safeVol, sustainUntil);
     gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
     osc.connect(gain).connect(bus);
     osc.start(time);
@@ -4804,25 +4814,61 @@
   // empezar su turno)
   function pianoLooperChordAtBar(barIndexInLoop){
     let acc = 0;
-    for (const chord of state.pianoLooper.chords) {
-      if (barIndexInLoop < acc + chord.bars) return { chord, isFirstBarOfChord: barIndexInLoop === acc };
+    for (let idx = 0; idx < state.pianoLooper.chords.length; idx++) {
+      const chord = state.pianoLooper.chords[idx];
+      if (barIndexInLoop < acc + chord.bars) return { chord, idx, isFirstBarOfChord: barIndexInLoop === acc };
       acc += chord.bars;
     }
     return null;
   }
 
-  function pianoLooperMaybeTrigger(barIndex, time, totalStepsInBar){
+  function pianoLooperPlayChord(time, chordSpec, dur, staccato){
+    const notes = pianoChordNotes(chordSpec.root, chordSpec.octave, chordSpec.quality);
+    notes.forEach(n => playLooperChordTone(time, n.midi, state.pianoLooper.volume, dur, staccato));
+  }
+
+  // resalta en la lista de acordes cuál está sonando AHORA — se programa con setTimeout para que
+  // el resaltado visual aparezca en el mismo instante exacto que el sonido, no cuando se programa
+  // (que va por delante, igual que ya hace flashDrumStep con los pasos de la rejilla).
+  function flashPianoLooperChord(idx, time){
+    const ctx = getAudioCtx();
+    const delayMs = Math.max(0, (time - ctx.currentTime) * 1000);
+    setTimeout(() => {
+      document.querySelectorAll('.drum-looper-chip').forEach(chip => {
+        chip.classList.toggle('current-chord', Number(chip.dataset.idx) === idx);
+      });
+    }, delayMs);
+  }
+
+  // se llama en CADA paso del secuenciador (no solo al empezar compás), para poder soportar
+  // patrones que tocan varias veces por compás (ej. "Negras") además del "Pad" sostenido.
+  function pianoLooperMaybeTrigger(barIndex, stepIndex, time, totalStepsInBar){
     if (!state.pianoLooper.active) return;
     const totalBars = pianoLooperTotalBars();
     if (totalBars === 0) return;
     const posInLoop = barIndex % totalBars;
     const info = pianoLooperChordAtBar(posInLoop);
-    if (!info || !info.isFirstBarOfChord) return; // solo al EMPEZAR el turno del acorde, no cada compás
+    if (!info) return;
+    if (stepIndex === 0) flashPianoLooperChord(info.idx, time); // resaltar al empezar cada compás, pase lo que pase con el patrón
     const beatDur = 60 / state.bpm;
-    const barDur = beatDur * (totalStepsInBar / 4);
-    const holdDur = barDur * info.chord.bars * 0.92; // sostener casi todo el rango de compases asignado
-    const notes = pianoChordNotes(info.chord.root, info.chord.octave, info.chord.quality);
-    notes.forEach(n => playLooperChordTone(time, n.midi, state.pianoLooper.volume, holdDur));
+    const pattern = state.pianoLooper.pattern;
+
+    if (pattern === 'pad') {
+      // sostenido: suena una vez al EMPEZAR el turno del acorde, y se mantiene todo su rango
+      if (stepIndex !== 0 || !info.isFirstBarOfChord) return;
+      const barDur = beatDur * (totalStepsInBar / 4);
+      const holdDur = barDur * info.chord.bars * 0.92;
+      pianoLooperPlayChord(time, info.chord, holdDur, false);
+    } else if (pattern === 'quarters') {
+      // negras: un toque corto y percusivo en cada tiempo (cada 4 pasos = una negra), con hueco
+      // de silencio claro entre golpe y golpe para que se note el pulso, no un pad continuo
+      if (stepIndex % 4 !== 0) return;
+      pianoLooperPlayChord(time, info.chord, beatDur * 0.4, true);
+    } else if (pattern === 'downbeat') {
+      // primer tiempo: un solo toque corto y percusivo al principio de CADA compás
+      if (stepIndex !== 0) return;
+      pianoLooperPlayChord(time, info.chord, beatDur * 0.5, true);
+    }
   }
 
 
@@ -5001,7 +5047,7 @@
       const style = DRUM_STYLES[state.drumMachine.style];
       const totalSteps = style.steps || 16;
       const isFillBar = state.drumMachine.fillEnabled && (drumBarCount % 4 === 3);
-      if (drumStepIndex === 0) pianoLooperMaybeTrigger(drumBarCount, drumNextStepTime, totalSteps);
+      pianoLooperMaybeTrigger(drumBarCount, drumStepIndex, drumNextStepTime, totalSteps);
       drumScheduleStep(drumStepIndex, drumNextStepTime, isFillBar, totalSteps);
       const beatDur = 60 / state.bpm;      // duración de una negra
       let stepDur = (beatDur / 4) * feelMultiplier; // cada paso = semicorchea, estirada o encogida
@@ -5186,7 +5232,18 @@
       chip.className = 'drum-looper-chip';
       chip.dataset.idx = i;
       const q = CHORD_QUALITIES[c.quality];
-      chip.innerHTML = `<span>${DISPLAY[c.root]}${q.suffix} (oct.${c.octave}) · ${c.bars}c</span>`;
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = `${DISPLAY[c.root]}${q.suffix} (oct.${c.octave})`;
+      chip.appendChild(nameSpan);
+      const barsBtn = document.createElement('button');
+      barsBtn.className = 'drum-looper-bars-btn';
+      barsBtn.textContent = c.bars + 'c';
+      barsBtn.title = 'Toca para cambiar cuántos compases dura este acorde';
+      barsBtn.addEventListener('click', () => {
+        c.bars = c.bars === 1 ? 2 : c.bars === 2 ? 4 : 1; // cicla 1 -> 2 -> 4 -> 1
+        renderPianoLooperList();
+      });
+      chip.appendChild(barsBtn);
       const rm = document.createElement('button');
       rm.textContent = '✕';
       rm.addEventListener('click', () => {
@@ -5196,6 +5253,17 @@
       chip.appendChild(rm);
       wrap.appendChild(chip);
     });
+    const totalBars = pianoLooperTotalBars();
+    const totalSteps = drumCurrentSteps();
+    const barDurSec = (60 / state.bpm) * (totalSteps / 4);
+    const info = document.createElement('div');
+    info.className = 'theory-note-small';
+    info.style.width = '100%';
+    info.textContent = `Bucle total: ${totalBars} compás${totalBars === 1 ? '' : 'es'} (~${(totalBars * barDurSec).toFixed(1)}s a este tempo) · ` +
+      (state.pianoLooper.chords.length === 1
+        ? 'con un solo acorde, los compases solo se notan en el patrón "Pad" (controla cada cuánto vuelve a atacar).'
+        : 'toca el número de compases de una tarjeta para cambiarlo (1→2→4→1) sin tener que quitarla y añadirla de nuevo.');
+    wrap.appendChild(info);
   }
 
   // Karplus-Strong: modelo físico clásico de cuerda pulsada. Se llena una línea de retardo con
@@ -5695,6 +5763,7 @@
     // construirse (para poder tener ritmos como el galope o el swing) — sin volver a construir el
     // riff aquí, cambiar el tempo no tenía ningún efecto sobre ellos hasta el siguiente render().
     render();
+    renderPianoLooperList();
   });
   $('#drumBpmSlider').addEventListener('input', e => {
     state.bpm = Number(e.target.value);
@@ -5702,6 +5771,7 @@
     $('#bpmSlider').value = state.bpm;
     $('#bpmLabel').textContent = state.bpm + ' BPM';
     render();
+    renderPianoLooperList();
   });
   $('#metroToggle').addEventListener('click', () => {
     if (state.metronome.active) stopMetronome(); else startMetronome();
@@ -5938,6 +6008,15 @@
     state.pianoLooper.active = !state.pianoLooper.active;
     $('#pianoLooperToggle').textContent = state.pianoLooper.active ? '⏹ Desactivar' : '▶ Activar';
     $('#pianoLooperToggle').classList.toggle('active', state.pianoLooper.active);
+    if (!state.pianoLooper.active) {
+      document.querySelectorAll('.drum-looper-chip.current-chord').forEach(c => c.classList.remove('current-chord'));
+    }
+  });
+  document.querySelectorAll('#pianoLooperPatternGroup button').forEach(b => {
+    b.addEventListener('click', () => {
+      state.pianoLooper.pattern = b.dataset.pattern;
+      document.querySelectorAll('#pianoLooperPatternGroup button').forEach(x => x.classList.toggle('active', x === b));
+    });
   });
   $('#pianoLooperVolSlider').addEventListener('input', e => {
     state.pianoLooper.volume = Number(e.target.value) / 100;
