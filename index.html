@@ -136,10 +136,6 @@
 
   .triad-shell{ flex: none; width:100%; display:flex; flex-direction:column; gap:12px; }
   .oido-shell{ flex: none; width:100%; display:flex; flex-direction:column; gap:12px; }
-  .tecnica-extra-section{ background: var(--panel-2); border:1px solid var(--panel-edge); border-radius:12px;
-    padding:14px 16px; margin-top:12px; display:flex; flex-direction:column; gap:10px; }
-  .tecnica-extra-title{ font-family:'Oswald', sans-serif; font-weight:700; font-size: calc(13px * var(--fs-scale));
-    color: var(--accent-blue); text-transform:uppercase; letter-spacing:0.5px; }
   #oidoAnswerGroup{ flex-wrap:wrap; }
   #oidoAnswerGroup button.correct{ background: var(--accent-green); color:#0A0E1A; border-color: var(--accent-green); }
   #oidoAnswerGroup button.wrong{ background: var(--accent-root); color:#fff; border-color: var(--accent-root-dark); }
@@ -742,51 +738,55 @@
   <div class="pill-group" id="tecnicaExerciseGroup"></div>
 </div>
 
-<div class="tecnica-extra-section" id="powerChordSection" style="display:none;">
-  <div class="tecnica-extra-title">🎸 Power chords (acordes de 5ª)</div>
-  <p class="theory-note theory-note-small">La base del rock, punk y metal: solo 2 notas (fundamental y 5ª), sin
-  tercera — por eso no son ni mayores ni menores, y suenan igual de bien con distorsión. Es una forma "movible":
-  la misma digitación sirve en cualquier traste, solo cambia dónde la colocas.</p>
-  <div class="sub-row" style="padding:0;">
-    <span class="label">Tónica</span>
-    <div class="pill-group" id="powerChordRootGroup"></div>
-  </div>
-  <div class="sub-row" style="padding:0;">
-    <span class="label">Cuerda</span>
-    <div class="pill-group" id="powerChordStringGroup">
-      <button data-pstring="0" class="active">6ª (Mi grave)</button>
-      <button data-pstring="1">5ª (La)</button>
-      <button data-pstring="2">4ª (Re)</button>
+<details class="theory-section" id="powerChordSection" style="display:none;">
+  <summary>🎸 Power chords (acordes de 5ª)</summary>
+  <div class="theory-body">
+    <p class="theory-note theory-note-small">La base del rock, punk y metal: solo 2 notas (fundamental y 5ª), sin
+    tercera — por eso no son ni mayores ni menores, y suenan igual de bien con distorsión. Es una forma "movible":
+    la misma digitación sirve en cualquier traste, solo cambia dónde la colocas.</p>
+    <div class="sub-row" style="padding:0;">
+      <span class="label">Tónica</span>
+      <div class="pill-group" id="powerChordRootGroup"></div>
     </div>
-    <button class="drum-mini-btn" id="powerChordOctaveToggle">+ Octava</button>
-    <button class="play-btn" id="powerChordPlayBtn">🔊 Tocar</button>
+    <div class="sub-row" style="padding:0;">
+      <span class="label">Cuerda</span>
+      <div class="pill-group" id="powerChordStringGroup">
+        <button data-pstring="0" class="active">6ª (Mi grave)</button>
+        <button data-pstring="1">5ª (La)</button>
+        <button data-pstring="2">4ª (Re)</button>
+      </div>
+      <button class="drum-mini-btn" id="powerChordOctaveToggle">+ Octava</button>
+      <button class="play-btn" id="powerChordPlayBtn">🔊 Tocar</button>
+    </div>
+    <div class="triad-diagram" id="powerChordDiagram" style="width:180px;"></div>
   </div>
-  <div class="triad-diagram" id="powerChordDiagram" style="width:180px;"></div>
-</div>
+</details>
 
-<div class="tecnica-extra-section" id="lickTechSection" style="display:none;">
-  <div class="tecnica-extra-title">🎯 Técnicas de mástil</div>
-  <div class="sub-row" style="padding:0;">
-    <div class="pill-group" id="lickTechGroup">
-      <button data-ltech="ligado" class="active">Ligados (hammer-on/pull-off)</button>
-      <button data-ltech="slide">Deslizamiento (slide)</button>
-      <button data-ltech="bend">Bending</button>
+<details class="theory-section" id="lickTechSection" style="display:none;">
+  <summary>🎯 Técnicas de mástil</summary>
+  <div class="theory-body">
+    <div class="sub-row" style="padding:0;">
+      <div class="pill-group" id="lickTechGroup">
+        <button data-ltech="ligado" class="active">Ligados (hammer-on/pull-off)</button>
+        <button data-ltech="slide">Deslizamiento (slide)</button>
+        <button data-ltech="bend">Bending</button>
+      </div>
+    </div>
+    <p class="theory-note theory-note-small" id="lickTechExplainer"></p>
+    <div class="sub-row" style="padding:0;">
+      <span class="label">Cuerda</span>
+      <div class="pill-group" id="lickTechStringGroup"></div>
+      <span class="label">Traste inicio</span>
+      <div class="pill-group" id="lickTechFretGroup">
+        <button data-lfret="0" class="active">0</button>
+        <button data-lfret="3">3</button>
+        <button data-lfret="5">5</button>
+        <button data-lfret="7">7</button>
+      </div>
+      <button class="play-btn" id="lickTechPlayBtn">🔊 Escuchar</button>
     </div>
   </div>
-  <p class="theory-note theory-note-small" id="lickTechExplainer"></p>
-  <div class="sub-row" style="padding:0;">
-    <span class="label">Cuerda</span>
-    <div class="pill-group" id="lickTechStringGroup"></div>
-    <span class="label">Traste inicio</span>
-    <div class="pill-group" id="lickTechFretGroup">
-      <button data-lfret="0" class="active">0</button>
-      <button data-lfret="3">3</button>
-      <button data-lfret="5">5</button>
-      <button data-lfret="7">7</button>
-    </div>
-    <button class="play-btn" id="lickTechPlayBtn">🔊 Escuchar</button>
-  </div>
-</div>
+</details>
 
 <div class="sub-row" id="tecnicaRow" style="display:none;">
   <span class="label">Traste de inicio</span>
@@ -3497,6 +3497,30 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     }
   }
 
+  // pestañas "autocontenidas" (no forman parte del mástil de guitarra/bajo: Piano, Tríadas,
+  // Oído) — ocultan TODO lo específico de guitarra/bajo de golpe, en un único sitio. Antes cada
+  // pestaña autocontenida repetía su propia lista a mano, y 7 elementos nuevos (power chords,
+  // técnicas de mástil, y 5 de la fila de progresión) se habían quedado fuera de las 3 listas —
+  // se quedaban visibles "colgando" si venías de otra pestaña con esas filas abiertas. Con una
+  // sola lista centralizada, cualquier fila nueva que se añada en el futuro solo hay que
+  // incluirla aquí una vez.
+  const GUITAR_ONLY_IDS = [
+    'rootRow', 'zoneRow', 'fingerLine', 'chordPanel', 'progChordsPanel', 'instrumentGroup',
+    'quizPanel', 'chordQualityRow', 'acordesModeRow', 'progKeyRow', 'progDegreesRow',
+    'progSequenceRow', 'tecnicaRow', 'tecnicaExerciseRow', 'pickingModeRow', 'theorySection',
+    'modeTheorySection', 'circleTheorySection', 'powerChordSection', 'lickTechSection',
+    'cagedToggleRow', 'progFormRow', 'progViewRow', 'bassPatternRow', 'jamSummary',
+    'patternGroup', 'styleGroup', 'styleRandomBtn', 'scaleSelect', 'chromaticToggle',
+    'quizToggle', 'styleZoneRow'
+  ];
+  const GUITAR_ONLY_CLASSES = ['board-shell', 'riff-panel'];
+
+  function hideAllGuitarUI(){
+    GUITAR_ONLY_IDS.forEach(id => { const el = $('#' + id); if (el) el.style.display = 'none'; });
+    GUITAR_ONLY_CLASSES.forEach(cls => { const el = document.querySelector('.' + cls); if (el) el.style.display = 'none'; });
+    $('footer').style.display = 'none';
+  }
+
   function renderInner(usingStyle, styleBoxes){
     const usingAcordes = state.tab === 'acordes';
     const usingMastil = state.tab === 'mastil';
@@ -3508,86 +3532,11 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       b.classList.toggle('active', b.dataset.tab === state.tab);
     });
     $('#oidoShell').style.display = usingOido ? 'flex' : 'none';
-    if (usingOido) {
-      $('#rootRow').style.display = 'none';
-      $('#zoneRow').style.display = 'none';
-      $('.board-shell').style.display = 'none';
-      $('.riff-panel').style.display = 'none';
-      $('#fingerLine').style.display = 'none';
-      $('#chordPanel').style.display = 'none';
-      $('#progChordsPanel').style.display = 'none';
-      $('#instrumentGroup').style.display = 'none';
-      $('#quizPanel').style.display = 'none';
-      $('#chordQualityRow').style.display = 'none';
-      $('#acordesModeRow').style.display = 'none';
-      $('#progKeyRow').style.display = 'none';
-      $('#progDegreesRow').style.display = 'none';
-      $('#progSequenceRow').style.display = 'none';
-      $('#tecnicaRow').style.display = 'none';
-      $('#tecnicaExerciseRow').style.display = 'none';
-      $('#pickingModeRow').style.display = 'none';
-      $('#theorySection').style.display = 'none';
-      $('#modeTheorySection').style.display = 'none';
-      $('#circleTheorySection').style.display = 'none';
-      $('footer').style.display = 'none';
-      $('#pianoShell').style.display = 'none';
-      $('#triadShell').style.display = 'none';
-      renderOidoSection();
-      return; // Oído es autocontenido, igual que Piano y Tríadas
-    }
     $('#triadShell').style.display = usingTriads ? 'flex' : 'none';
-    if (usingTriads) {
-      $('#rootRow').style.display = 'none';
-      $('#zoneRow').style.display = 'none';
-      $('.board-shell').style.display = 'none';
-      $('.riff-panel').style.display = 'none';
-      $('#fingerLine').style.display = 'none';
-      $('#chordPanel').style.display = 'none';
-      $('#progChordsPanel').style.display = 'none';
-      $('#instrumentGroup').style.display = 'none';
-      $('#quizPanel').style.display = 'none';
-      $('#chordQualityRow').style.display = 'none';
-      $('#acordesModeRow').style.display = 'none';
-      $('#progKeyRow').style.display = 'none';
-      $('#progDegreesRow').style.display = 'none';
-      $('#progSequenceRow').style.display = 'none';
-      $('#tecnicaRow').style.display = 'none';
-      $('#tecnicaExerciseRow').style.display = 'none';
-      $('#pickingModeRow').style.display = 'none';
-      $('#theorySection').style.display = 'none';
-      $('#modeTheorySection').style.display = 'none';
-      $('#circleTheorySection').style.display = 'none';
-      $('footer').style.display = 'none';
-      $('#pianoShell').style.display = 'none';
-      renderTriadSection();
-      return; // las tríadas son autocontenidas, igual que el piano
-    }
     $('#pianoShell').style.display = usingPiano ? 'flex' : 'none';
-    if (usingPiano) {
-      $('#rootRow').style.display = 'none';
-      $('#zoneRow').style.display = 'none';
-      $('.board-shell').style.display = 'none';
-      $('.riff-panel').style.display = 'none';
-      $('#fingerLine').style.display = 'none';
-      $('#chordPanel').style.display = 'none';
-      $('#progChordsPanel').style.display = 'none';
-      $('#instrumentGroup').style.display = 'none';
-      $('#quizPanel').style.display = 'none';
-      $('#chordQualityRow').style.display = 'none';
-      $('#acordesModeRow').style.display = 'none';
-      $('#progKeyRow').style.display = 'none';
-      $('#progDegreesRow').style.display = 'none';
-      $('#progSequenceRow').style.display = 'none';
-      $('#tecnicaRow').style.display = 'none';
-      $('#tecnicaExerciseRow').style.display = 'none';
-      $('#pickingModeRow').style.display = 'none';
-      $('#theorySection').style.display = 'none';
-      $('#modeTheorySection').style.display = 'none';
-      $('#circleTheorySection').style.display = 'none';
-      $('footer').style.display = 'none';
-      renderPianoSection();
-      return; // el piano es autocontenido: no necesita nada del resto del render de guitarra/bajo
-    }
+    if (usingOido) { hideAllGuitarUI(); renderOidoSection(); return; }
+    if (usingTriads) { hideAllGuitarUI(); renderTriadSection(); return; }
+    if (usingPiano) { hideAllGuitarUI(); renderPianoSection(); return; }
     $('#rootRow').style.display = 'flex';
     $('#theorySection').style.display = '';
     $('#modeTheorySection').style.display = '';
@@ -3597,8 +3546,8 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     $('#styleZoneRow').style.display = (usingStyle && !usingAcordes) ? 'flex' : 'none';
     $('#tecnicaRow').style.display = usingTecnica ? 'flex' : 'none';
     $('#tecnicaExerciseRow').style.display = usingTecnica ? 'flex' : 'none';
-    $('#powerChordSection').style.display = usingTecnica ? 'flex' : 'none';
-    $('#lickTechSection').style.display = usingTecnica ? 'flex' : 'none';
+    $('#powerChordSection').style.display = usingTecnica ? '' : 'none';
+    $('#lickTechSection').style.display = usingTecnica ? '' : 'none';
     if (usingTecnica) { renderPowerChordSection(); renderLickTechSection(); }
     $('#pickingModeRow').style.display = (state.tab === 'escalas' || usingTecnica) ? 'flex' : 'none';
     $('#chordQualityRow').style.display = usingAcordes ? 'flex' : 'none';
@@ -3606,6 +3555,11 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     $('#progKeyRow').style.display = (usingAcordes && state.acordesMode === 'progresion') ? 'flex' : 'none';
     $('#progDegreesRow').style.display = (usingAcordes && state.acordesMode === 'progresion') ? 'flex' : 'none';
     $('#progSequenceRow').style.display = (usingAcordes && state.acordesMode === 'progresion') ? 'flex' : 'none';
+    $('#progFormRow').style.display = (usingAcordes && state.acordesMode === 'progresion') ? 'flex' : 'none';
+    $('#progViewRow').style.display = (usingAcordes && state.acordesMode === 'progresion') ? 'flex' : 'none';
+    $('#bassPatternRow').style.display = (usingAcordes && state.acordesMode === 'progresion' && state.progViewMode === 'bajo') ? 'flex' : 'none';
+    $('#jamSummary').style.display = (usingAcordes && state.acordesMode === 'progresion') ? 'flex' : 'none';
+    $('#cagedToggleRow').style.display = (usingAcordes && state.acordesMode === 'individual' && CAGED_ELIGIBLE.has(state.chordQuality)) ? 'flex' : 'none';
     $('.board-shell').style.display = usingAcordes ? 'none' : 'flex';
     $('.riff-panel').style.display = (usingAcordes || usingMastil) ? 'none' : 'flex';
     $('#fingerLine').style.display = (usingAcordes || usingMastil) ? 'none' : '';
