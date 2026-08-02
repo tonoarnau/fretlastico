@@ -1262,6 +1262,36 @@
   </div>
 </details>
 
+<details class="theory-section" id="reverseAnalysisSection" style="display:none;">
+  <summary>🔍 Analizador y transportador de progresiones</summary>
+  <div class="theory-body">
+    <p class="theory-note theory-note-small">Añade los acordes de una canción (tal y como los conozcas, ej. Do,
+    Lam, Fa, Sol) y te digo en qué tonalidad probablemente está y qué números romanos son — y de paso puedes
+    transportar la misma progresión a cualquier otra tonalidad.</p>
+    <div class="sub-row" style="padding:0;">
+      <div class="pill-group" id="raRootGroup"></div>
+      <div class="pill-group" id="raQualityGroup">
+        <button data-raq="major" class="active">Mayor</button>
+        <button data-raq="minor">Menor</button>
+        <button data-raq="dim">Disminuido</button>
+        <button data-raq="aug">Aumentado</button>
+      </div>
+      <button class="drum-mini-btn" id="raAddBtn">+ Añadir acorde</button>
+    </div>
+    <div class="drum-looper-list" id="raChordList"></div>
+    <div class="sub-row" style="padding:0;">
+      <button class="play-btn" id="raAnalyzeBtn">🔍 Analizar tonalidad</button>
+      <button class="drum-mini-btn" id="raClearBtn">Vaciar lista</button>
+    </div>
+    <div id="raAnalysisResult"></div>
+    <div class="sub-row" id="raTransposeRow" style="padding:0; display:none;">
+      <span class="label">Transportar a</span>
+      <div class="pill-group" id="raTransposeGroup"></div>
+    </div>
+    <div id="raTransposeResult"></div>
+  </div>
+</details>
+
 <div class="quiz-panel" id="quizPanel" style="display:none;">
   <span class="riff-label">🎧 Adivina la nota</span>
   <span id="quizStatus">Aciertos: 0/0</span>
@@ -2583,6 +2613,7 @@
     chordQuality: 'major', // calidad de acorde seleccionada en la pestaña Acordes
     extBuild: { root: 0, base: 'major', step: 'triad' },
     seventhHarmonyKey: 'mayor',
+    reverseAnalysis: { chords: [], build: { root: 0, quality: 'major' }, bestKey: null },
     acordesMode: 'individual', // 'individual' | 'progresion'
     progKey: 'mayor', // 'mayor' | 'menor'
     progression: [], // secuencia de grados (0-6) construida por el usuario
@@ -3227,6 +3258,154 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     });
   }
 
+  // ---------- ACORDES: analizador de progresión inversa y transportador ----------
+  function renderReverseAnalysisSection(){
+    if (!$('#raRootGroup').children.length) {
+      DISPLAY.forEach((name, pc) => {
+        const b = document.createElement('button');
+        b.textContent = name;
+        if (pc === state.reverseAnalysis.build.root) b.classList.add('active');
+        b.addEventListener('click', () => {
+          state.reverseAnalysis.build.root = pc;
+          document.querySelectorAll('#raRootGroup button').forEach(x => x.classList.toggle('active', x === b));
+        });
+        $('#raRootGroup').appendChild(b);
+      });
+      document.querySelectorAll('#raQualityGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          state.reverseAnalysis.build.quality = b.dataset.raq;
+          document.querySelectorAll('#raQualityGroup button').forEach(x => x.classList.toggle('active', x === b));
+        });
+      });
+      $('#raAddBtn').addEventListener('click', () => {
+        const b = state.reverseAnalysis.build;
+        state.reverseAnalysis.chords.push({ root: b.root, quality: b.quality });
+        state.reverseAnalysis.bestKey = null;
+        renderRaChordList();
+      });
+      $('#raClearBtn').addEventListener('click', () => {
+        state.reverseAnalysis.chords = [];
+        state.reverseAnalysis.bestKey = null;
+        renderRaChordList();
+      });
+      $('#raAnalyzeBtn').addEventListener('click', runReverseAnalysis);
+
+      DISPLAY.forEach((name, pc) => {
+        const b = document.createElement('button');
+        b.textContent = name;
+        b.addEventListener('click', () => {
+          document.querySelectorAll('#raTransposeGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderTransposedProgression(pc);
+        });
+        $('#raTransposeGroup').appendChild(b);
+      });
+    }
+    renderRaChordList();
+  }
+
+  function renderRaChordList(){
+    const wrap = $('#raChordList');
+    wrap.innerHTML = '';
+    if (state.reverseAnalysis.chords.length === 0) {
+      wrap.innerHTML = '<span class="theory-note-small">Añade al menos 3-4 acordes para un análisis fiable.</span>';
+    } else {
+      state.reverseAnalysis.chords.forEach((c, i) => {
+        const chip = document.createElement('div');
+        chip.className = 'drum-looper-chip';
+        const q = TRIAD_QUALITIES[c.quality];
+        chip.innerHTML = `<span>${DISPLAY[c.root]}${c.quality === 'major' ? '' : c.quality === 'minor' ? 'm' : c.quality === 'dim' ? '°' : '+'}</span>`;
+        const rm = document.createElement('button');
+        rm.textContent = '✕';
+        rm.addEventListener('click', () => {
+          state.reverseAnalysis.chords.splice(i, 1);
+          state.reverseAnalysis.bestKey = null;
+          renderRaChordList();
+        });
+        chip.appendChild(rm);
+        wrap.appendChild(chip);
+      });
+    }
+    $('#raAnalysisResult').innerHTML = '';
+    $('#raTransposeRow').style.display = 'none';
+    $('#raTransposeResult').innerHTML = '';
+  }
+
+  // prueba las 24 tonalidades posibles (12 tónicas x mayor/menor) y cuenta cuántos acordes de la
+  // lista encajan exactamente (misma tónica y misma calidad) en cada una — reutiliza
+  // triadDiatonicDegrees, ya verificada, en vez de repetir la lógica de armonía diatónica
+  function analyzeProgressionChords(inputChords){
+    const candidates = [];
+    for (let root = 0; root < 12; root++) {
+      ['major', 'minor'].forEach(tonality => {
+        const diatonic = triadDiatonicDegrees(root, tonality);
+        let matches = 0;
+        const romanFor = inputChords.map(ch => {
+          const found = diatonic.find(d => d.root === ch.root && d.quality === ch.quality);
+          if (found) matches++;
+          return found ? found.roman : '?';
+        });
+        candidates.push({ root, tonality, matches, romanFor });
+      });
+    }
+    candidates.sort((a, b) => b.matches - a.matches);
+    return candidates;
+  }
+
+  function runReverseAnalysis(){
+    const chords = state.reverseAnalysis.chords;
+    if (chords.length < 2) {
+      $('#raAnalysisResult').innerHTML = '<p class="theory-note-small">Añade al menos 2 acordes para poder analizar.</p>';
+      return;
+    }
+    const results = analyzeProgressionChords(chords);
+    const topScore = results[0].matches;
+    const top = results.filter(r => r.matches === topScore).slice(0, 3); // puede haber empate (ej. relativas mayor/menor)
+    state.reverseAnalysis.bestKey = { root: top[0].root, tonality: top[0].tonality };
+
+    const wrap = $('#raAnalysisResult');
+    wrap.innerHTML = '';
+    top.forEach((r, i) => {
+      const box = document.createElement('div');
+      box.className = 'ft-answer';
+      const tonalityLabel = r.tonality === 'major' ? 'mayor' : 'menor';
+      box.innerHTML = `<h4>${i === 0 ? '🏆 ' : ''}${DISPLAY[r.root]} ${tonalityLabel} (${r.matches}/${chords.length} acordes encajan)</h4>
+        <p>${r.romanFor.join(' - ')}</p>`;
+      wrap.appendChild(box);
+    });
+    if (top.length > 1) {
+      const note = document.createElement('p');
+      note.className = 'theory-note-small';
+      note.textContent = 'Hay más de una tonalidad con la misma puntuación — es normal: las tonalidades relativas (ej. Do mayor y La menor) comparten exactamente los mismos acordes, así que solo el oído (cuál "suena a casa") distingue cuál es la de verdad.';
+      wrap.appendChild(note);
+    }
+    $('#raTransposeRow').style.display = 'flex';
+  }
+
+  function renderTransposedProgression(targetRoot){
+    const chords = state.reverseAnalysis.chords;
+    if (chords.length === 0) return;
+    const shift = ((targetRoot - chords[0].root) % 12 + 12) % 12;
+    const transposed = chords.map(c => ({ root: (c.root + shift) % 12, quality: c.quality }));
+    const wrap = $('#raTransposeResult');
+    wrap.innerHTML = '';
+    const box = document.createElement('div');
+    box.className = 'ft-answer';
+    const qSuffix = q => q === 'major' ? '' : q === 'minor' ? 'm' : q === 'dim' ? '°' : '+';
+    box.innerHTML = `<h4>Transportada (+${shift} semitono${shift === 1 ? '' : 's'})</h4>
+      <p>${transposed.map(c => DISPLAY[c.root] + qSuffix(c.quality)).join(' - ')}</p>`;
+    const btn = document.createElement('button');
+    btn.className = 'ft-action-btn';
+    btn.textContent = '🔊 Escuchar';
+    btn.addEventListener('click', () => {
+      transposed.forEach((c, i) => setTimeout(() => {
+        const rootMidi = (4 + 1) * 12 + c.root;
+        TRIAD_QUALITIES[c.quality].formula.forEach(iv => playPianoTone(rootMidi + iv));
+      }, i * 700));
+    });
+    box.appendChild(btn);
+    wrap.appendChild(box);
+  }
+
   function renderChordPanel(){
     document.querySelectorAll('#chordQualityGroup button').forEach(b => {
       b.classList.toggle('active', b.dataset.quality === state.chordQuality);
@@ -3736,6 +3915,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     'modeTheorySection', 'circleTheorySection', 'powerChordSection', 'lickTechSection',
     'cagedToggleRow', 'progFormRow', 'progViewRow', 'bassPatternRow', 'jamSummary',
     'extensionsSection', 'seventhHarmonySection', 'chordScaleSection', 'chromaticApproachSection',
+    'reverseAnalysisSection',
     'patternGroup', 'styleGroup', 'styleRandomBtn', 'scaleSelect', 'chromaticToggle',
     'quizToggle', 'styleZoneRow'
   ];
@@ -3790,10 +3970,12 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     $('#seventhHarmonySection').style.display = usingAcordes ? '' : 'none';
     $('#chordScaleSection').style.display = (usingAcordes && state.acordesMode === 'individual') ? '' : 'none';
     $('#chromaticApproachSection').style.display = usingAcordes ? '' : 'none';
+    $('#reverseAnalysisSection').style.display = usingAcordes ? '' : 'none';
     if (usingAcordes) {
       renderExtensionsSection();
       renderSeventhHarmonySection();
       if (state.acordesMode === 'individual') renderChordScaleSection();
+      renderReverseAnalysisSection();
     }
     $('.board-shell').style.display = usingAcordes ? 'none' : 'flex';
     $('.riff-panel').style.display = (usingAcordes || usingMastil) ? 'none' : 'flex';
