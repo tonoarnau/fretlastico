@@ -1199,6 +1199,69 @@
   <div class="prog-chords-row" id="progChordsRow"></div>
 </div>
 
+<details class="theory-section" id="extensionsSection" style="display:none;">
+  <summary>🎵 Séptimas y extensiones, paso a paso</summary>
+  <div class="theory-body">
+    <p class="theory-note theory-note-small">Cualquier acorde con séptima o novena se construye apilando terceras
+    encima de una tríada — una nota más cada vez. Ve añadiendo pasos y escucha cómo cambia el color del acorde.</p>
+    <div class="sub-row" style="padding:0;">
+      <span class="label">Tónica</span>
+      <div class="pill-group" id="extRootGroup"></div>
+      <span class="label">Base</span>
+      <div class="pill-group" id="extBaseGroup">
+        <button data-ebase="major" class="active">Mayor</button>
+        <button data-ebase="minor">Menor</button>
+      </div>
+    </div>
+    <div class="sub-row" style="padding:0;">
+      <div class="pill-group" id="extStepGroup">
+        <button data-estep="triad" class="active">1. Tríada</button>
+        <button data-estep="seventh">2. + 7ª</button>
+        <button data-estep="ninth">3. + 9ª</button>
+      </div>
+      <button class="play-btn" id="extPlayBtn">🔊 Tocar</button>
+    </div>
+    <p class="theory-note theory-note-small" id="extInfo"></p>
+  </div>
+</details>
+
+<details class="theory-section" id="seventhHarmonySection" style="display:none;">
+  <summary>🎹 Armonía por grados con séptimas (jazz/bossa)</summary>
+  <div class="theory-body">
+    <p class="theory-note theory-note-small">Como la armonía por grados, pero añadiendo la 7ª a cada acorde — el
+    sonido característico del jazz y la bossa nova. Usa la misma tónica que tengas elegida arriba.</p>
+    <div class="sub-row" style="padding:0;">
+      <span class="label">Tonalidad</span>
+      <div class="pill-group" id="seventhHarmonyKeyGroup">
+        <button data-shkey="mayor" class="active">Mayor</button>
+        <button data-shkey="menor">Menor</button>
+      </div>
+    </div>
+    <div class="triad-progression-cards" id="seventhHarmonyCards"></div>
+  </div>
+</details>
+
+<details class="theory-section" id="chordScaleSection" style="display:none;">
+  <summary>🎯 Qué escala toco sobre este acorde</summary>
+  <div class="theory-body" id="chordScaleBody"></div>
+</details>
+
+<details class="theory-section" id="chromaticApproachSection" style="display:none;">
+  <summary>🎵 Notas de aproximación cromática</summary>
+  <div class="theory-body">
+    <p class="theory-note theory-note-small">Una nota de aproximación cromática es una nota que NO pertenece al
+    acorde, colocada justo un semitono antes de una nota que sí pertenece — crea tensión y la resuelve al instante,
+    dando esa sensación de movimiento "hacia dentro" del acorde. Es el truco favorito del walking bass, pero también
+    se usa mucho en melodías e improvisación.</p>
+    <p class="theory-note theory-note-small"><b>Ejemplo:</b> si vas hacia un acorde de Do (nota Do = fundamental),
+    tocar un Si (un semitono por debajo) justo antes de llegar a Do crea esa sensación de "llegada". Funciona igual
+    de bien por encima (Do# bajando a Do) que por debajo (Si subiendo a Do).</p>
+    <p class="theory-note theory-note-small">Pruébalo en la práctica: activa <b>Acordes → Progresión → Línea de
+    bajo → patrón Walking</b> — el último tiempo de cada compás, justo antes de cambiar de acorde, es exactamente
+    una nota de aproximación cromática hacia la fundamental del siguiente acorde.</p>
+  </div>
+</details>
+
 <div class="quiz-panel" id="quizPanel" style="display:none;">
   <span class="riff-label">🎧 Adivina la nota</span>
   <span id="quizStatus">Aciertos: 0/0</span>
@@ -2518,6 +2581,8 @@
     styleZone: null,   // caja elegida para los riffs de estilo (independiente de la zona de Escalas)
     styleVariant: 0,   // qué variante del riff de este estilo se usa
     chordQuality: 'major', // calidad de acorde seleccionada en la pestaña Acordes
+    extBuild: { root: 0, base: 'major', step: 'triad' },
+    seventhHarmonyKey: 'mayor',
     acordesMode: 'individual', // 'individual' | 'progresion'
     progKey: 'mayor', // 'mayor' | 'menor'
     progression: [], // secuencia de grados (0-6) construida por el usuario
@@ -2642,12 +2707,34 @@ Consejo: no memorices acordes sueltos, memoriza CAMBIOS entre dos acordes. Pract
       keywords: ['pestañas','pestaña','secciones','que hace cada','navegar','tabs'],
       answer: `Escalas: mástil con todas las escalas y modos, con quiz de notas.
 Estilos: riffs de ejemplo en distintos géneros (blues, flamenco, rock...).
-Acordes: acordes CAGED individuales o progresiones (por grados o formas como el blues de 12 compases), incluida la línea de bajo walking.
+Acordes: acordes CAGED individuales o progresiones (por grados o formas como el blues de 12 compases), con línea de bajo (walking, raíz-quinta u octavas).
 Mástil: vista de referencia libre de todo el diapasón.
-Técnica: ejercicios de arpegios y picking alterno/económico.
-Piano: teclado de 6 octavas, notas o acordes, con pentagrama.
+Técnica: arpegios, picking alterno/económico, power chords, y técnicas de mástil (ligados, deslizamiento, bending).
+Piano: teclado de 6 octavas — notas, acordes (con voicings rootless de jazz), o escalas con digitación de dedos.
 Tríadas: teoría, digitaciones, armonía por grados, mapa del mástil y quiz.
-Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería y looper de piano.` },
+Oído: entrenamiento auditivo — identificar intervalos y calidad de acorde (mayor/menor/aumentada/disminuida) solo escuchando.
+Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (silenciable por instrumento), looper de piano y efectos (reverb/chorus/delay).` },
+    { id: 'uso-oido', title: '¿Cómo uso la pestaña Oído?',
+      keywords: ['oido','entrenamiento auditivo','intervalos','reconocer acorde','identificar de oido'],
+      answer: `Tiene 2 modos. Intervalos: suenan 2 notas (elige si melódico, una tras otra, o armónico, juntas — el armónico es más difícil) y adivinas la distancia entre ellas entre 12 opciones. Calidad de acorde: suena una tríada completa y adivinas si es Mayor, Menor, Aumentada o Disminuida, solo de oído. Lleva marcador de aciertos y botón para repetir el sonido.` },
+    { id: 'uso-power-chords', title: '¿Qué son los power chords y cómo los uso?',
+      keywords: ['power chord','power chords','acorde de 5a','acordes de quinta'],
+      answer: `En Técnica, despliega "Power chords". Son acordes de solo 2 notas (fundamental y 5ª, sin tercera) — la base del rock, punk y metal. Elige tónica y cuerda de partida (6ª o 5ª normalmente), y opcionalmente añade una 3ª nota con "+ Octava". Es una forma movible: la misma digitación sirve en cualquier traste.` },
+    { id: 'uso-tecnicas-mastil', title: '¿Qué son ligados, deslizamiento y bending?',
+      keywords: ['ligados','hammer-on','pull-off','deslizamiento','slide','bending','bend'],
+      answer: `En Técnica, despliega "Técnicas de mástil". Ligados: pulsas la cuerda una sola vez y martilleas o tiras con los dedos para que sigan sonando notas sin volver a pulsar. Deslizamiento: pulsas y deslizas el dedo al siguiente traste sin soltar la presión. Bending: subes la altura de la nota empujando la cuerda, sin cambiar de traste. Elige cuerda y traste de inicio, y pulsa "Escuchar" para oír una simulación de cada una.` },
+    { id: 'uso-patrones-bajo', title: '¿Qué patrones de línea de bajo hay además del walking?',
+      keywords: ['patron de bajo','raiz quinta','octavas bajo','patron raiz-quinta'],
+      answer: `En Acordes → Progresión → vista "Línea de bajo", hay un selector "Patrón" con 3 opciones. Raíz-Quinta: alterna la fundamental y la 5ª de cada acorde (el patrón más simple, bueno para empezar). Octavas: alterna la fundamental grave y la misma nota una octava más aguda. Walking: la línea con notas de aproximación cromática, más avanzada. Los 3 usan la misma progresión que hayas construido.` },
+    { id: 'uso-piano-escala', title: '¿Cómo veo la digitación de una escala en el piano?',
+      keywords: ['digitacion piano','dedos piano','digitacion de escalas'],
+      answer: `En Piano, elige el modo "Escala", tónica y octava. Se muestran los números de dedo (mano derecha) directamente sobre las teclas del teclado. Solo está verificada para Do, Sol, Re, La, Mi y Fa mayor — para el resto de tonalidades se ve la escala pero sin digitación, para no arriesgarme a enseñar algo mal.` },
+    { id: 'uso-piano-rootless', title: '¿Qué son los voicings rootless del piano?',
+      keywords: ['rootless','voicing','voicings','acorde sin fundamental'],
+      answer: `En Piano → modo Acorde, con una calidad de séptima (maj7, min7 o dom7) aparece un selector "Voicing". Cerrado es el acorde normal. Rootless tipo A (3-5-7-9) y tipo B (7-9-3-5) son voicings de jazz que omiten la fundamental — se usan en la mano izquierda cuando otro instrumento (el bajo) ya la está tocando, para no duplicarla y sonar más "abierto".` },
+    { id: 'uso-caja-ritmos-avanzado', title: '¿Qué más puedo hacer en la Caja de Ritmos además de elegir un estilo?',
+      keywords: ['silenciar instrumento','silencio','mute','instrumento','bateria','eq','reverb','chorus','delay','looper de piano'],
+      answer: `Cada fila de instrumento tiene un botón 🔊/🔇 para silenciarlo sin borrar lo que tenías programado. El "Looper de piano" te deja construir un bucle de acordes (con patrón Pad, Negras o Primer tiempo) sincronizado con el ritmo. Y "EQ · efectos del conjunto" tiene 3 mandos (Reverb, Chorus, Delay) que afectan a la batería y al looper de piano juntos.` },
     { id: 'uso-zurdo', title: '¿Cómo cambio a zurdo?',
       keywords: ['zurdo','zurda','mano izquierda','cambiar mano','diestro'],
       answer: `Arriba a la derecha del mástil hay un botón con el icono ⇄ (junto al título) — lo tocas y toda la app (mástil, acordes, tríadas) se voltea a orientación zurda, con el clavijero a la derecha. Se aplica en toda la aplicación, no solo en una pestaña.` },
@@ -3000,6 +3087,144 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       '<b>Notas:</b> ' + toneNames.join(' - ');
 
     state.currentChord = { shape, name: rootName + q.suffix };
+  }
+
+  // ---------- ACORDES: séptimas y extensiones, paso a paso ----------
+  const EXT_INTERVALS = {
+    major: { triad: [0,4,7], seventh: [0,4,7,11], ninth: [0,4,7,11,14] }, // tríada -> maj7 -> maj9
+    minor: { triad: [0,3,7], seventh: [0,3,7,10], ninth: [0,3,7,10,14] }, // tríada -> min7 -> min9
+  };
+  const EXT_DEGREE_LABELS = { major: ['1','3','5','7M','9'], minor: ['1','b3','5','7m','9'] };
+
+  function renderExtensionsSection(){
+    if (!$('#extRootGroup').children.length) {
+      DISPLAY.forEach((name, pc) => {
+        const b = document.createElement('button');
+        b.textContent = name;
+        if (pc === state.extBuild.root) b.classList.add('active');
+        b.addEventListener('click', () => {
+          state.extBuild.root = pc;
+          document.querySelectorAll('#extRootGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderExtensionsDisplay();
+        });
+        $('#extRootGroup').appendChild(b);
+      });
+      document.querySelectorAll('#extBaseGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          state.extBuild.base = b.dataset.ebase;
+          document.querySelectorAll('#extBaseGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderExtensionsDisplay();
+        });
+      });
+      document.querySelectorAll('#extStepGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          state.extBuild.step = b.dataset.estep;
+          document.querySelectorAll('#extStepGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderExtensionsDisplay();
+        });
+      });
+      $('#extPlayBtn').addEventListener('click', playExtensionChord);
+    }
+    renderExtensionsDisplay();
+  }
+
+  function extensionMidiNotes(){
+    const b = state.extBuild;
+    const rootMidi = (4 + 1) * 12 + b.root; // octava 4 fija (Do4 = 60), convención estándar del piano
+    return EXT_INTERVALS[b.base][b.step].map(iv => rootMidi + iv);
+  }
+
+  function renderExtensionsDisplay(){
+    const b = state.extBuild;
+    const intervals = EXT_INTERVALS[b.base][b.step];
+    const degreeLabels = EXT_DEGREE_LABELS[b.base].slice(0, intervals.length);
+    const stepLabel = { triad: 'Tríada (3 notas)', seventh: 'Con séptima (4 notas)', ninth: 'Con novena (5 notas)' }[b.step];
+    $('#extInfo').innerHTML = `<b>${DISPLAY[b.root]} ${b.base === 'major' ? 'mayor' : 'menor'} — ${stepLabel}:</b><br>` +
+      intervals.map((iv, i) => `${DISPLAY[(b.root + iv) % 12]} (${degreeLabels[i]})`).join(' · ');
+  }
+
+  function playExtensionChord(){
+    extensionMidiNotes().forEach(midi => playPianoTone(midi));
+  }
+
+  // ---------- ACORDES: armonía por grados con séptimas (jazz/bossa) ----------
+  function renderSeventhHarmonySection(){
+    if (!$('#seventhHarmonyKeyGroup').dataset.wired) {
+      $('#seventhHarmonyKeyGroup').dataset.wired = '1';
+      document.querySelectorAll('#seventhHarmonyKeyGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          state.seventhHarmonyKey = b.dataset.shkey;
+          document.querySelectorAll('#seventhHarmonyKeyGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderSeventhHarmonyCards();
+        });
+      });
+    }
+    renderSeventhHarmonyCards();
+  }
+
+  function renderSeventhHarmonyCards(){
+    const wrap = $('#seventhHarmonyCards');
+    wrap.innerHTML = '';
+    const context = state.seventhHarmonyKey;
+    const baseIntervals = SCALES[context === 'mayor' ? 'jonico' : 'eolico'].intervals;
+    PROG_ROMAN[context].forEach((roman, i) => {
+      const degreeRootPc = (state.root + baseIntervals[i]) % 12;
+      const qualityKey = PROG_DEGREE_QUALITY[context][i];
+      const q = CHORD_QUALITIES[qualityKey];
+      const card = document.createElement('div');
+      card.className = 'chord-mini-card triad-card';
+      card.innerHTML = `<div class="chord-mini-roman">${roman}</div>
+        <div class="theory-note-small" style="padding:8px 4px;">${q.tones.map(iv => DISPLAY[(degreeRootPc + iv) % 12]).join(' · ')}</div>`;
+      const label = document.createElement('div');
+      label.className = 'chord-mini-label';
+      label.textContent = DISPLAY[degreeRootPc] + q.suffix;
+      card.appendChild(label);
+      card.addEventListener('click', () => {
+        const rootMidi = (4 + 1) * 12 + degreeRootPc;
+        q.tones.forEach(iv => playPianoTone(rootMidi + iv));
+      });
+      wrap.appendChild(card);
+    });
+  }
+
+  // ---------- ACORDES: qué escala toco sobre este acorde ----------
+  // cada escala propuesta se verificó que CONTIENE todas las notas del acorde correspondiente
+  const CHORD_SCALE_MAP = {
+    major: [{ key: 'jonico', note: 'La opción más directa y estable: la propia escala mayor de esa tónica.' }],
+    minor: [{ key: 'eolico', note: 'La escala menor natural — la opción más directa.' },
+            { key: 'dorico', note: 'Un color algo más brillante, muy usado en jazz y funk.' }],
+    dom7:  [{ key: 'mixolidio', note: 'La opción clásica para un acorde de dominante (V7).' }],
+    maj7:  [{ key: 'jonico', note: 'La escala mayor de toda la vida.' },
+            { key: 'lidio', note: 'Un color más "flotante", muy propio del jazz.' }],
+    min7:  [{ key: 'dorico', note: 'La opción más común en jazz para un acorde min7.' },
+            { key: 'eolico', note: 'Más oscura, propia de tonalidades menores.' }],
+    m7b5:  [{ key: 'locrio', note: 'El modo que corresponde exactamente a este acorde (el vii del tono mayor).' }],
+  };
+
+  function renderChordScaleSection(){
+    const body = $('#chordScaleBody');
+    body.innerHTML = '';
+    const q = state.chordQuality;
+    const options = CHORD_SCALE_MAP[q];
+    if (!options) {
+      body.innerHTML = `<p class="theory-note theory-note-small">Para "${CHORD_QUALITIES[q].label}" todavía no tengo una recomendación de escala verificada — prueba con Mayor, Menor, Séptima, Séptima mayor, Séptima menor o Semidisminuido.</p>`;
+      return;
+    }
+    const intro = document.createElement('p');
+    intro.className = 'theory-note theory-note-small';
+    intro.innerHTML = `Sobre un acorde de <b>${DISPLAY[state.root]} ${CHORD_QUALITIES[q].label}</b>, estas escalas encajan (contienen todas las notas del acorde):`;
+    body.appendChild(intro);
+    options.forEach(opt => {
+      const box = document.createElement('div');
+      box.className = 'ft-answer';
+      box.innerHTML = `<h4>${DISPLAY[state.root]} ${SCALES[opt.key].name}</h4><p>${opt.note}</p>`;
+      const btn = document.createElement('button');
+      btn.className = 'ft-action-btn';
+      btn.textContent = 'Ver en Escalas';
+      btn.addEventListener('click', () => { state.tab = 'escalas'; state.scaleKey = opt.key; render(); });
+      box.appendChild(btn);
+      body.appendChild(box);
+    });
   }
 
   function renderChordPanel(){
@@ -3510,6 +3735,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     'progSequenceRow', 'tecnicaRow', 'tecnicaExerciseRow', 'pickingModeRow', 'theorySection',
     'modeTheorySection', 'circleTheorySection', 'powerChordSection', 'lickTechSection',
     'cagedToggleRow', 'progFormRow', 'progViewRow', 'bassPatternRow', 'jamSummary',
+    'extensionsSection', 'seventhHarmonySection', 'chordScaleSection', 'chromaticApproachSection',
     'patternGroup', 'styleGroup', 'styleRandomBtn', 'scaleSelect', 'chromaticToggle',
     'quizToggle', 'styleZoneRow'
   ];
@@ -3560,6 +3786,15 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     $('#bassPatternRow').style.display = (usingAcordes && state.acordesMode === 'progresion' && state.progViewMode === 'bajo') ? 'flex' : 'none';
     $('#jamSummary').style.display = (usingAcordes && state.acordesMode === 'progresion') ? 'flex' : 'none';
     $('#cagedToggleRow').style.display = (usingAcordes && state.acordesMode === 'individual' && CAGED_ELIGIBLE.has(state.chordQuality)) ? 'flex' : 'none';
+    $('#extensionsSection').style.display = usingAcordes ? '' : 'none';
+    $('#seventhHarmonySection').style.display = usingAcordes ? '' : 'none';
+    $('#chordScaleSection').style.display = (usingAcordes && state.acordesMode === 'individual') ? '' : 'none';
+    $('#chromaticApproachSection').style.display = usingAcordes ? '' : 'none';
+    if (usingAcordes) {
+      renderExtensionsSection();
+      renderSeventhHarmonySection();
+      if (state.acordesMode === 'individual') renderChordScaleSection();
+    }
     $('.board-shell').style.display = usingAcordes ? 'none' : 'flex';
     $('.riff-panel').style.display = (usingAcordes || usingMastil) ? 'none' : 'flex';
     $('#fingerLine').style.display = (usingAcordes || usingMastil) ? 'none' : '';
