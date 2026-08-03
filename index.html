@@ -45,7 +45,7 @@
   body{ display:flex; flex-direction:column; height:100vh; padding: 10px 20px; gap: 8px; overflow-y:auto; }
 
   header{ display:flex; align-items:center; justify-content:space-between; gap: 16px; flex-wrap: wrap; min-width:0; }
-  .brand{ display:flex; align-items:baseline; gap:10px; min-width:0; }
+  .brand{ display:flex; align-items:center; gap:10px; min-width:0; }
   .brand h1{ font-family:'Anton', 'Oswald', sans-serif; font-weight:400; font-size: calc(24px * var(--fs-scale)); letter-spacing: 0.5px;
     text-transform: uppercase; margin:0; }
   .brand span{ font-size: calc(10px * var(--fs-scale)); color: var(--ink-dim); letter-spacing: 1px; }
@@ -550,6 +550,14 @@
   .ft-action-btn{ background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-dark)); color:#fff;
     border:none; border-radius:999px; padding:7px 14px; font-family:'Oswald', sans-serif; font-weight:700;
     font-size: calc(10.5px * var(--fs-scale)); cursor:pointer; margin-top:4px; }
+  .sm-section{ margin-bottom: 16px; }
+  .sm-section-title{ font-family:'Oswald', sans-serif; font-weight:700; font-size: calc(13px * var(--fs-scale));
+    color: var(--accent-play); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+  .sm-item{ display:block; width:100%; text-align:left; background:none; border:none;
+    border-bottom:1px solid var(--panel-edge); padding:8px 4px; color: var(--ink-secondary);
+    font-family:'Inter', sans-serif; font-size: calc(11.5px * var(--fs-scale)); cursor:pointer; }
+  button.sm-item:hover{ color: var(--ink); background: var(--panel-2); }
+  .sm-item:last-child{ border-bottom:none; }
 </style>
 </head>
 <body>
@@ -558,6 +566,7 @@
   <div class="brand">
     <h1>Fretlastico</h1>
     <span id="instrumentTag">GUITARRA · AFINACIÓN ESTÁNDAR</span>
+    <button class="icon-btn" id="siteMapFab" title="Mapa del sitio: todo lo que ofrece la app de un vistazo">🗺️</button>
   </div>
   <div class="controls-row">
     <div class="pill-group" id="instrumentGroup">
@@ -1423,6 +1432,14 @@
   <div class="ft-results" id="ftResults">
     <p class="theory-note-small">Elige una de las guías de arriba, o escribe tu pregunta — busco en toda la app: teoría, cómo usar cada sección, y consejos de práctica.</p>
   </div>
+</div>
+
+<div id="siteMapPanel" class="ft-panel" style="display:none;">
+  <div class="ft-header">
+    <span class="ft-title">🗺️ Mapa del sitio</span>
+    <button class="icon-btn" id="siteMapClose" title="Cerrar">✕</button>
+  </div>
+  <div class="ft-results" id="siteMapResults"></div>
 </div>
 
 <script>
@@ -2825,6 +2842,9 @@ Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (sil
     { id: 'uso-armonia-septimas', title: '¿Qué es la armonía por grados con séptimas?',
       keywords: ['armonia con septimas','armonia jazz','armonia bossa','grados con septima'],
       answer: `En Acordes, despliega "Armonía por grados con séptimas". Es como la armonía por grados de Tríadas, pero con acordes de 4 notas (maj7, m7, 7, m7b5) en vez de solo 3 — el sonido característico del jazz y la bossa nova. Usa la tónica que tengas elegida arriba, y puedes tocar cada acorde tocando su tarjeta.` },
+    { id: 'uso-mapa-sitio', title: '¿Hay un mapa de todo lo que ofrece la app?',
+      keywords: ['mapa del sitio','mapa','todo lo que ofrece','de un vistazo','que hay en la app'],
+      answer: `Sí — arriba del todo, junto al título "Fretlastico", hay un icono 🗺️. Lo pulsas y se abre un panel con TODO lo que ofrece la app, sección por sección, cada línea llevándote directamente ahí. A diferencia del footer (que se oculta en Piano/Tríadas/Oído), este botón está siempre visible en cualquier pestaña.` },
     { id: 'uso-caged-septimas', title: '¿La vista CAGED funciona con acordes de séptima?',
       keywords: ['caged septima','caged 7','caged maj7','caged min7','caged sus4','vista caged'],
       answer: `Sí. Además de Mayor y Menor, la vista CAGED (Acordes → modo individual) también funciona con Séptima (dom7), Séptima mayor (maj7), Séptima menor (min7) y Sus4 — 5 posiciones para todas salvo Séptima menor, que solo tiene 3 (las formas C y G de esa calidad necesitan digitaciones con cejilla más avanzadas que preferí no incluir sin poder verificarlas del todo). Disminuido y Aumentado no tienen vista CAGED a propósito: son acordes simétricos (se repiten cada 3 semitonos) que normalmente se tocan como una única forma movible, no como 5 posiciones distintas.` },
@@ -4704,7 +4724,9 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       }
     }
 
-    // cabeza de nota (elipse rellena)
+    // cabeza de nota (elipse rellena) — tamaño original: con el espaciado fijo de líneas (6px
+    // por paso), agrandarla rompe hasta una simple 3ª (2 pasos = 12px, ry agrandado necesitaba
+    // 17px) — verificado que este tamaño es el máximo que cabe sin solape en una 3ª.
     const head = mk('ellipse', { cx: nx, cy: y, rx: 8, ry: 6, fill: '#1a1a1a', transform: `rotate(-18 ${nx} ${y})` });
     layer.appendChild(head);
     return { ledgerPositions, y };
@@ -4739,9 +4761,9 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     if (!layer) { layer = mk('g', { id: 'staffNoteLayer' }); svg.appendChild(layer); }
     while (layer.firstChild) layer.removeChild(layer.firstChild);
 
-    const noteX = 560; // el viewBox es fijo (700 de ancho): la nota siempre cae en el mismo sitio
+    const noteX = 380; // centrada, en vez de pegada al borde derecho — aprovecha mejor el ancho del pentagrama
     const entry = pianoDrawNoteAt(layer, mk, p, note, noteX);
-    pianoDrawSharedGuide(layer, mk, p, [entry], noteX + 6);
+    pianoDrawSharedGuide(layer, mk, p, [entry], noteX + 8);
     const ledgerCount = entry.ledgerPositions.length;
 
     const accText = note.acc ? (note.acc === '#' ? '#' : 'b') : '';
@@ -4880,9 +4902,9 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
         side = 1;
       }
       lastRel = note.relPos;
-      entries.push(pianoDrawNoteAt(layer, mk, p, note, 560 + offsetX));
+      entries.push(pianoDrawNoteAt(layer, mk, p, note, 380 + offsetX));
     });
-    pianoDrawSharedGuide(layer, mk, p, entries, 566); // una sola guía para todo el acorde, no una por nota
+    pianoDrawSharedGuide(layer, mk, p, entries, 386); // una sola guía para todo el acorde, no una por nota
     const totalLedger = entries.reduce((sum, e) => sum + e.ledgerPositions.length, 0);
 
     const names = sorted.map(n => n.letter + (n.acc ? (n.acc === '#' ? '#' : 'b') : '') + n.octave).join(' - ');
@@ -5748,9 +5770,37 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     });
   }
 
+  // dibuja la escala completa repartida a lo ancho del pentagrama (como una escala real escrita
+  // en el papel), en vez de apiladas en el mismo sitio como si fuera un acorde — cada nota con su
+  // propia línea guía si necesita líneas adicionales.
+  function showScaleOnStaff(notes){
+    const ns = 'http://www.w3.org/2000/svg';
+    const mk = (tag, attrs) => {
+      const el = document.createElementNS(ns, tag);
+      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, String(v)));
+      return el;
+    };
+    const p = pianoStaffParams();
+    const svg = $('#staffSVG');
+    let layer = svg.querySelector('#staffNoteLayer');
+    if (!layer) { layer = mk('g', { id: 'staffNoteLayer' }); svg.appendChild(layer); }
+    while (layer.firstChild) layer.removeChild(layer.firstChild);
+
+    const marginL = 130, marginR = 40;
+    const usableWidth = 700 - marginL - marginR;
+    const step = notes.length > 1 ? usableWidth / (notes.length - 1) : 0;
+    notes.forEach((note, i) => {
+      const nx = marginL + i * step;
+      const entry = pianoDrawNoteAt(layer, mk, p, note, nx);
+      pianoDrawSharedGuide(layer, mk, p, [entry], nx + 8);
+    });
+    void svg.offsetHeight;
+  }
+
   function renderPianoScale(){
     document.querySelectorAll('.piano-key-white .finger-badge, .piano-key-black .finger-badge').forEach(el => el.remove());
     const notes = pianoScaleNotes();
+    showScaleOnStaff(notes);
     const fingering = PIANO_SCALE_FINGERING_RH[state.pianoScale.root];
     const info = $('#pianoScaleInfo');
     if (!fingering) {
@@ -7375,6 +7425,90 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   $('#ftSearchInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') ftShowEntries(ftSearch($('#ftSearchInput').value));
   });
+
+  // ---------- MAPA DEL SITIO ----------
+  const SITE_MAP = [
+    { title: '🎸 Escalas', items: [
+      { label: 'Mástil con 21 escalas y modos (jónico, dórico, pentatónicas, blues, flamenco...)', apply: () => { state.tab = 'escalas'; render(); } },
+      { label: 'Quiz de identificación de notas', apply: () => { state.tab = 'escalas'; render(); } },
+      { label: 'Secuencias diagonales (araña, zigzag, terceras...)', apply: () => { state.tab = 'escalas'; render(); } },
+    ]},
+    { title: '🎵 Estilos', items: [
+      { label: 'Riffs de ejemplo en varios géneros (blues, rock, flamenco...)', apply: () => { state.tab = 'estilos'; render(); } },
+    ]},
+    { title: '🎼 Acordes', items: [
+      { label: 'Acordes CAGED (25 calidades; 6 con las 5 posiciones movibles)', apply: () => { state.tab = 'acordes'; state.acordesMode = 'individual'; render(); } },
+      { label: 'Progresiones por grados o formas estándar (blues 12c, rhythm changes, cadencia andaluza)', apply: () => { state.tab = 'acordes'; state.acordesMode = 'progresion'; render(); } },
+      { label: 'Línea de bajo: Walking, Raíz-Quinta, Octavas', apply: () => { state.tab = 'acordes'; state.acordesMode = 'progresion'; state.progViewMode = 'bajo'; render(); } },
+      { label: 'Séptimas y extensiones, paso a paso', apply: () => { state.tab = 'acordes'; render(); } },
+      { label: 'Armonía por grados con séptimas (jazz/bossa)', apply: () => { state.tab = 'acordes'; render(); } },
+      { label: 'Qué escala toco sobre este acorde', apply: () => { state.tab = 'acordes'; state.acordesMode = 'individual'; render(); } },
+      { label: 'Notas de aproximación cromática', apply: () => { state.tab = 'acordes'; render(); } },
+      { label: 'Analizador y transportador de progresiones', apply: () => { state.tab = 'acordes'; render(); } },
+    ]},
+    { title: '🎯 Mástil', items: [
+      { label: 'Vista de referencia libre de todo el diapasón', apply: () => { state.tab = 'mastil'; render(); } },
+    ]},
+    { title: '🎯 Técnica', items: [
+      { label: 'Arpegios y picking (alterno/económico)', apply: () => { state.tab = 'tecnica'; render(); } },
+      { label: 'Power chords (acordes de 5ª)', apply: () => { state.tab = 'tecnica'; render(); } },
+      { label: 'Técnicas de mástil: ligados, deslizamiento, bending', apply: () => { state.tab = 'tecnica'; render(); } },
+    ]},
+    { title: '🎹 Piano', items: [
+      { label: 'Nota individual y Acorde (25 calidades + voicings rootless de jazz)', apply: () => { state.tab = 'piano'; render(); } },
+      { label: 'Escala con digitación de dedos (verificada en 6 tonalidades)', apply: () => { state.tab = 'piano'; render(); } },
+    ]},
+    { title: '🔺 Tríadas', items: [
+      { label: 'Teoría y digitaciones (vertical / horizontal / una cuerda)', apply: () => { state.tab = 'triads'; render(); } },
+      { label: 'Zona del mástil y Mapa del mástil', apply: () => { state.tab = 'triads'; render(); } },
+      { label: 'Armonía por grados, progresiones con conducción de voces', apply: () => { state.tab = 'triads'; render(); } },
+      { label: 'Quiz de digitación "ciega"', apply: () => { state.tab = 'triads'; render(); } },
+    ]},
+    { title: '👂 Oído', items: [
+      { label: 'Intervalos (melódico / armónico)', apply: () => { state.tab = 'oido'; render(); } },
+      { label: 'Calidad de acorde (mayor / menor / aumentada / disminuida)', apply: () => { state.tab = 'oido'; render(); } },
+    ]},
+    { title: '🥁 Caja de Ritmos & Looper (siempre disponible, encima de las pestañas)', items: [
+      { label: '12 estilos, fill automático, variación, humanizar, ½×/1×/2×', apply: null },
+      { label: 'Silenciar cada instrumento por separado', apply: null },
+      { label: 'Looper de piano (patrones Pad / Negras / Primer tiempo)', apply: null },
+      { label: 'EQ del conjunto: Reverb, Chorus, Delay', apply: null },
+    ]},
+    { title: '🎓 FretTeacher', items: [
+      { label: 'Guías paso a paso, búsqueda por palabras clave, consejo según lo que tengas abierto', apply: () => { $('#siteMapPanel').style.display = 'none'; $('#fretTeacherFab').click(); } },
+    ]},
+  ];
+
+  function renderSiteMap(){
+    const wrap = $('#siteMapResults');
+    wrap.innerHTML = '';
+    SITE_MAP.forEach(section => {
+      const sec = document.createElement('div');
+      sec.className = 'sm-section';
+      const title = document.createElement('div');
+      title.className = 'sm-section-title';
+      title.textContent = section.title;
+      sec.appendChild(title);
+      section.items.forEach(item => {
+        const el = document.createElement(item.apply ? 'button' : 'div');
+        el.className = 'sm-item';
+        el.textContent = item.label;
+        if (item.apply) {
+          el.addEventListener('click', () => { item.apply(); $('#siteMapPanel').style.display = 'none'; });
+        }
+        sec.appendChild(el);
+      });
+      wrap.appendChild(sec);
+    });
+  }
+
+  $('#siteMapFab').addEventListener('click', () => {
+    const panel = $('#siteMapPanel');
+    const opening = panel.style.display === 'none';
+    panel.style.display = opening ? 'flex' : 'none';
+    if (opening) renderSiteMap();
+  });
+  $('#siteMapClose').addEventListener('click', () => { $('#siteMapPanel').style.display = 'none'; });
 
   render();
 })();
