@@ -375,6 +375,10 @@
   .drum-looper-title{ font-family:'Oswald', sans-serif; font-weight:700; font-size: calc(12px * var(--fs-scale));
     color: var(--accent-blue); text-transform:uppercase; letter-spacing:0.5px; }
   .drum-looper-build{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .drum-looper-preset-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    background: var(--panel); border:1px solid var(--panel-edge); border-radius:10px; padding:8px 12px; }
+  .drum-looper-preset-row .label{ font-family:'Oswald', sans-serif; font-size: calc(10px * var(--fs-scale));
+    color: var(--ink-dim); text-transform:uppercase; letter-spacing:0.5px; }
   .drum-looper-list{ display:flex; flex-wrap:wrap; gap:8px; }
   .drum-looper-chip{ background: var(--panel); border:1px solid var(--panel-edge); border-radius:999px;
     padding:6px 12px; font-family:'Oswald', sans-serif; font-size: calc(10.5px * var(--fs-scale));
@@ -660,6 +664,11 @@
           <input type="range" id="pianoLooperVolSlider" min="0" max="100" step="5" value="50">
           <span id="pianoLooperVolLabel">50%</span>
         </div>
+        <div class="pill-group" id="pianoLooperTimbreGroup">
+          <button data-timbre="triangle" class="active">Suave</button>
+          <button data-timbre="sine">Puro</button>
+          <button data-timbre="bright">Brillante</button>
+        </div>
       </div>
       <div class="drum-looper-build">
         <div class="pill-group" id="pianoLooperRootGroup"></div>
@@ -676,6 +685,15 @@
           <button data-bars="4">4 compases</button>
         </div>
         <button class="drum-mini-btn" id="pianoLooperAddBtn">+ Añadir</button>
+      </div>
+      <div class="drum-looper-preset-row">
+        <span class="label">Progresión típica (usa la tónica de arriba)</span>
+        <div class="pill-group" id="pianoLooperPresetTonalityGroup">
+          <button data-ptonality="major" class="active">Mayor</button>
+          <button data-ptonality="minor">Menor</button>
+        </div>
+        <div class="pill-group" id="pianoLooperPresetGroup"></div>
+        <button class="drum-mini-btn" id="pianoLooperPresetLoadBtn">📋 Cargar (sustituye la lista)</button>
       </div>
       <div class="drum-looper-list" id="pianoLooperList"></div>
     </div>
@@ -2700,7 +2718,7 @@
     drumMachine: { active: false, playing: false, style: 'rock', volume: 0.75, fillEnabled: false, pattern: null, humanize: false, speedFeel: 'normal',
       muted: { crash:false, hihatOpen:false, hihatClosed:false, clap:false, snare:false, kick:false },
       fx: { reverb:0, chorus:0, delay:0 } },
-    pianoLooper: { active:false, volume:0.5, chords:[], pattern:'pad', build:{ root:0, quality:'major', octave:3, bars:1 } },
+    pianoLooper: { active:false, volume:0.5, chords:[], pattern:'pad', timbre:'triangle', presetTonality:'major', build:{ root:0, quality:'major', octave:3, bars:1 } },
     oido: { mode:'intervalo', playback:'melodic', target:null, guess:null, score:0, attempts:0 },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
              tonality: 'major', progressionIdx: null, progShapes: [], mapShapes: [], zoneIdx: 0, singleStringIdx: 0,
@@ -2811,7 +2829,7 @@ Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (sil
       answer: `En Piano → modo Acorde, con una calidad de séptima (maj7, min7 o dom7) aparece un selector "Voicing". Cerrado es el acorde normal. Rootless tipo A (3-5-7-9) y tipo B (7-9-3-5) son voicings de jazz que omiten la fundamental — se usan en la mano izquierda cuando otro instrumento (el bajo) ya la está tocando, para no duplicarla y sonar más "abierto".` },
     { id: 'uso-caja-ritmos-avanzado', title: '¿Qué más puedo hacer en la Caja de Ritmos además de elegir un estilo?',
       keywords: ['silenciar instrumento','silencio','mute','instrumento','bateria','eq','reverb','chorus','delay','looper de piano'],
-      answer: `Cada fila de instrumento tiene un botón 🔊/🔇 para silenciarlo sin borrar lo que tenías programado. El "Looper de piano" te deja construir un bucle de acordes (con patrón Pad, Negras o Primer tiempo) sincronizado con el ritmo. Y "EQ · efectos del conjunto" tiene 3 mandos (Reverb, Chorus, Delay) que afectan a la batería y al looper de piano juntos.` },
+      answer: `Cada fila de instrumento tiene un botón 🔊/🔇 para silenciarlo sin borrar lo que tenías programado. El "Looper de piano" te deja construir un bucle de acordes (con patrón Pad, Negras o Primer tiempo) sincronizado con el ritmo — o cargar una progresión típica ya hecha (I-IV-V, I-vi-IV-V...) con un botón, sin añadir los acordes a mano. También tiene un selector de sonido (Suave/Puro/Brillante). Y "EQ · efectos del conjunto" tiene 3 mandos (Reverb, Chorus, Delay) que afectan a la batería y al looper de piano juntos.` },
     { id: 'uso-zurdo', title: '¿Cómo cambio a zurdo?',
       keywords: ['zurdo','zurda','mano izquierda','cambiar mano','diestro'],
       answer: `Arriba a la derecha del mástil hay un botón con el icono ⇄ (junto al título) — lo tocas y toda la app (mástil, acordes, tríadas) se voltea a orientación zurda, con el clavijero a la derecha. Se aplica en toda la aplicación, no solo en una pestaña.` },
@@ -6065,9 +6083,10 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     const ctx = getAudioCtx();
     const bus = getDrumMasterBus();
     const freq = 440 * Math.pow(2, (midi - 69) / 12);
+    const timbre = state.pianoLooper.timbre;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = 'triangle';
+    osc.type = timbre === 'sine' ? 'sine' : timbre === 'bright' ? 'sawtooth' : 'triangle';
     osc.frequency.value = freq;
     const safeVol = Math.max(vol, 0.0001); // exponentialRampToValueAtTime no admite 0 exacto como destino
     const attack = staccato ? 0.006 : 0.05; // ataque mucho más rápido y percusivo en modo staccato
@@ -6079,6 +6098,22 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     osc.connect(gain).connect(bus);
     osc.start(time);
     osc.stop(time + dur + 0.05);
+
+    // "brillante": una segunda voz sutil una octava por encima, más suave y con caída rápida,
+    // para dar un toque de brillo tipo campana sin cambiar el tono fundamental
+    if (timbre === 'bright') {
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.value = freq * 2;
+      const safeVol2 = Math.max(vol * 0.25, 0.0001);
+      gain2.gain.setValueAtTime(0.0001, time);
+      gain2.gain.exponentialRampToValueAtTime(safeVol2, time + 0.01);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, time + Math.min(dur, 0.5));
+      osc2.connect(gain2).connect(bus);
+      osc2.start(time);
+      osc2.stop(time + Math.min(dur, 0.5) + 0.05);
+    }
   }
 
   function pianoLooperTotalBars(){
@@ -6494,6 +6529,58 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       state.pianoLooper.chords.push({ root: b.root, quality: b.quality, octave: b.octave, bars: b.bars });
       renderPianoLooperList();
     });
+
+    document.querySelectorAll('#pianoLooperTimbreGroup button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.pianoLooper.timbre = b.dataset.timbre;
+        document.querySelectorAll('#pianoLooperTimbreGroup button').forEach(x => x.classList.toggle('active', x === b));
+      });
+    });
+
+    document.querySelectorAll('#pianoLooperPresetTonalityGroup button').forEach(b => {
+      b.addEventListener('click', () => {
+        state.pianoLooper.presetTonality = b.dataset.ptonality;
+        document.querySelectorAll('#pianoLooperPresetTonalityGroup button').forEach(x => x.classList.toggle('active', x === b));
+        renderPianoLooperPresetButtons();
+      });
+    });
+    renderPianoLooperPresetButtons();
+    $('#pianoLooperPresetLoadBtn').addEventListener('click', pianoLooperLoadPreset);
+  }
+
+  function renderPianoLooperPresetButtons(){
+    const wrap = $('#pianoLooperPresetGroup');
+    wrap.innerHTML = '';
+    const list = state.pianoLooper.presetTonality === 'major' ? TRIAD_PROGRESSIONS_MAJOR : TRIAD_PROGRESSIONS_MINOR;
+    list.forEach((preset, i) => {
+      const b = document.createElement('button');
+      b.textContent = preset.label;
+      if (i === 0) b.classList.add('active');
+      b.dataset.presetIdx = i;
+      b.addEventListener('click', () => {
+        document.querySelectorAll('#pianoLooperPresetGroup button').forEach(x => x.classList.toggle('active', x === b));
+      });
+      wrap.appendChild(b);
+    });
+  }
+
+  // carga una progresión típica ya construida (reutiliza triadDiatonicDegrees, ya verificada en
+  // Tríadas) — sustituye por completo la lista actual de acordes del looper, usando como tónica
+  // la que tengas elegida en el constructor de arriba
+  function pianoLooperLoadPreset(){
+    const list = state.pianoLooper.presetTonality === 'major' ? TRIAD_PROGRESSIONS_MAJOR : TRIAD_PROGRESSIONS_MINOR;
+    const activeBtn = document.querySelector('#pianoLooperPresetGroup button.active');
+    const presetIdx = activeBtn ? Number(activeBtn.dataset.presetIdx) : 0;
+    const preset = list[presetIdx];
+    if (!preset) return;
+    const rootPc = state.pianoLooper.build.root;
+    const octave = state.pianoLooper.build.octave;
+    const diatonic = triadDiatonicDegrees(rootPc, state.pianoLooper.presetTonality);
+    state.pianoLooper.chords = preset.degrees.map(d => {
+      const deg = diatonic[d];
+      return { root: deg.root, quality: deg.quality, octave, bars: 1 };
+    });
+    renderPianoLooperList();
   }
 
   function renderPianoLooperList(){
