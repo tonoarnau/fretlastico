@@ -815,6 +815,26 @@
   </div>
 </details>
 
+<details class="theory-section" id="barreTechSection" style="display:none;">
+  <summary>🎸 Cejilla (barré) más allá de CAGED</summary>
+  <div class="theory-body">
+    <p class="theory-note theory-note-small">El dedo índice hace de "cejilla" — pisa varias cuerdas a la vez,
+    haciendo el trabajo de una cejuela móvil (como un capo con el propio dedo). Por eso las formas de acorde que
+    usan una cuerda al aire en posición abierta (los "shapes" E y A) se pueden mover a cualquier traste: el índice
+    sustituye a las cuerdas al aire, y el resto de dedos repiten la misma forma relativa.</p>
+    <div class="sub-row" style="padding:0;">
+      <span class="label">Tónica</span>
+      <div class="pill-group" id="barreRootGroup"></div>
+      <span class="label">Calidad</span>
+      <div class="pill-group" id="barreQualityGroup">
+        <button data-bq="major" class="active">Mayor</button>
+        <button data-bq="minor">Menor</button>
+      </div>
+    </div>
+    <div class="triad-progression-cards" id="barreCards"></div>
+  </div>
+</details>
+
 <div class="sub-row" id="tecnicaRow" style="display:none;">
   <span class="label">Traste de inicio</span>
   <div class="pill-group" id="tecnicaStartGroup"></div>
@@ -1091,6 +1111,7 @@
     <div class="pill-group" id="oidoModeGroup">
       <button data-omode="intervalo" class="active">Intervalos</button>
       <button data-omode="acorde">Calidad de acorde</button>
+      <button data-omode="progresion">Progresiones</button>
     </div>
   </div>
   <div class="sub-row" id="oidoPlaybackRow" style="padding:0;">
@@ -1316,6 +1337,23 @@
       <div class="pill-group" id="raTransposeGroup"></div>
     </div>
     <div id="raTransposeResult"></div>
+  </div>
+</details>
+
+<details class="theory-section" id="cadencesSection" style="display:none;">
+  <summary>🎵 Cadencias</summary>
+  <div class="theory-body">
+    <p class="theory-note theory-note-small">Una cadencia es cómo "termina" una frase musical — el acorde final
+    resuelve (o no) una tensión creada por el acorde anterior. Son solo 2 acordes, pero el orden y qué grados son
+    cambia por completo la sensación.</p>
+    <div class="sub-row" style="padding:0;">
+      <span class="label">Tónica</span>
+      <div class="pill-group" id="cadenceRootGroup"></div>
+    </div>
+    <div class="triad-progression-cards" id="cadenceCards"></div>
+    <p class="theory-note theory-note-small">En tonalidad menor, la cadencia auténtica normalmente necesita
+    elevar la 7ª nota de la escala (menor armónica) para que el V suene mayor — si no, el V ya sale menor de
+    forma natural y pierde parte de esa fuerza de "tirón" hacia la tónica.</p>
   </div>
 </details>
 
@@ -2863,6 +2901,15 @@ Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (sil
     { id: 'uso-mapa-sitio', title: '¿Hay un mapa de todo lo que ofrece la app?',
       keywords: ['mapa del sitio','mapa','todo lo que ofrece','de un vistazo','que hay en la app'],
       answer: `Sí — arriba del todo, junto al título "Fretlastico", hay un icono 🗺️. Lo pulsas y se abre un panel con TODO lo que ofrece la app, sección por sección, cada línea llevándote directamente ahí. A diferencia del footer (que se oculta en Piano/Tríadas/Oído), este botón está siempre visible en cualquier pestaña.` },
+    { id: 'uso-cadencias', title: '¿Qué son las cadencias (auténtica, plagal, rota)?',
+      keywords: ['cadencia','cadencias','autentica','plagal','rota','como termina una frase'],
+      answer: `En Acordes, despliega "Cadencias". Son solo 2 acordes que definen cómo "termina" una frase musical. Auténtica (V-I): la más conclusiva, el final por excelencia. Plagal (IV-I): más suave, la cadencia "Amén" de los himnos. Rota (V-vi): el oído espera el I pero se desvía al vi — sorprende. Elige tónica y toca cada tarjeta para escucharlas.` },
+    { id: 'uso-oido-progresiones', title: '¿Puedo entrenar el oído con progresiones, no solo intervalos?',
+      keywords: ['reconocer progresiones de oido','progresiones de oido','identificar progresion de oido'],
+      answer: `Sí — en Oído, el 3er modo "Progresiones". Suena una progresión de 2 a 4 acordes en una tonalidad al azar, y adivinas cuál es entre 8 opciones (5 progresiones típicas + las 3 cadencias). Es el modo más difícil de los 3, buena forma de comprobar si de verdad reconoces lo que tocas.` },
+    { id: 'uso-cejilla', title: '¿Cómo funciona la cejilla (barré) más allá de CAGED?',
+      keywords: ['cejilla','barre','como funciona la cejilla','dedo indice'],
+      answer: `En Técnica, despliega "Cejilla (barré) más allá de CAGED". El dedo índice pisa varias cuerdas a la vez, haciendo de "cejuela móvil" — por eso las formas E y A (que en posición abierta usan cuerdas al aire) se pueden mover a cualquier traste. Elige tónica y calidad, y te muestra en qué traste exacto va la cejilla para cada forma — por ejemplo, Fa mayor con la forma E siempre va en el traste 1.` },
     { id: 'uso-caged-septimas', title: '¿La vista CAGED funciona con acordes de séptima?',
       keywords: ['caged septima','caged 7','caged maj7','caged min7','caged sus4','vista caged'],
       answer: `Sí. Además de Mayor y Menor, la vista CAGED (Acordes → modo individual) también funciona con Séptima (dom7), Séptima mayor (maj7), Séptima menor (min7) y Sus4 — 5 posiciones para todas salvo Séptima menor, que solo tiene 3 (las formas C y G de esa calidad necesitan digitaciones con cejilla más avanzadas que preferí no incluir sin poder verificarlas del todo). Disminuido y Aumentado no tienen vista CAGED a propósito: son acordes simétricos (se repiten cada 3 semitonos) que normalmente se tocan como una única forma movible, no como 5 posiciones distintas.` },
@@ -3347,6 +3394,107 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   }
 
   // ---------- ACORDES: analizador de progresión inversa y transportador ----------
+  // ---------- ACORDES: cadencias ----------
+  // definidas como grados (0-6) dentro de la tonalidad mayor — reutiliza triadDiatonicDegrees,
+  // ya verificada, para calcular los acordes reales según la tónica elegida
+  const CADENCES = [
+    { key: 'autentica', label: 'Auténtica (V - I)', degrees: [4, 0], desc: 'La más conclusiva — el "final" por excelencia. El V crea tensión que el I resuelve por completo.' },
+    { key: 'plagal', label: 'Plagal (IV - I)', degrees: [3, 0], desc: 'La cadencia "Amén" de los himnos religiosos — más suave que la auténtica, menos tensión que resolver.' },
+    { key: 'rota', label: 'Rota (V - vi)', degrees: [4, 5], desc: 'También llamada "interrumpida": el V promete resolver en el I, pero se desvía hacia el vi — sorprende al oído.' },
+  ];
+
+  // ---------- TÉCNICA: cejilla (barré) más allá de CAGED ----------
+  // reutiliza computeCagedPositions (ya verificada para las 5 posiciones CAGED), filtrando solo
+  // a las formas E y A — las 2 que de verdad se usan como cejilla movible en la práctica — y
+  // señalando explícitamente en qué traste hay que colocar el dedo índice.
+  function renderBarreTechSection(){
+    if (!$('#barreRootGroup').children.length) {
+      DISPLAY.forEach((name, pc) => {
+        const b = document.createElement('button');
+        b.textContent = name;
+        if (pc === 5) b.classList.add('active'); // Fa por defecto: el ejemplo clásico de cejilla
+        b.addEventListener('click', () => {
+          document.querySelectorAll('#barreRootGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderBarreCards();
+        });
+        $('#barreRootGroup').appendChild(b);
+      });
+      document.querySelectorAll('#barreQualityGroup button').forEach(b => {
+        b.addEventListener('click', () => {
+          document.querySelectorAll('#barreQualityGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderBarreCards();
+        });
+      });
+    }
+    renderBarreCards();
+  }
+
+  function renderBarreCards(){
+    const rootBtn = document.querySelector('#barreRootGroup button.active');
+    const qualityBtn = document.querySelector('#barreQualityGroup button.active');
+    const rootPc = rootBtn ? DISPLAY.indexOf(rootBtn.textContent) : 5;
+    const quality = qualityBtn ? qualityBtn.dataset.bq : 'major';
+    const positions = computeCagedPositions(rootPc, quality).filter(p => p.shapeName === 'E' || p.shapeName === 'A');
+    const wrap = $('#barreCards');
+    wrap.innerHTML = '';
+    positions.forEach(shape => {
+      const card = document.createElement('div');
+      card.className = 'chord-mini-card triad-card';
+      const barreNote = shape.baseFret > 0
+        ? `Cejilla con el índice en el traste ${shape.baseFret}`
+        : 'Posición abierta — no hace falta cejilla aquí';
+      card.innerHTML = `<div class="chord-mini-roman">Forma ${shape.shapeName}</div>
+        <div class="chord-mini-diagram">${renderChordSVG(shape)}</div>`;
+      const label = document.createElement('div');
+      label.className = 'chord-mini-label';
+      label.textContent = barreNote;
+      card.appendChild(label);
+      wrap.appendChild(card);
+    });
+  }
+
+  function renderCadencesSection(){
+    if (!$('#cadenceRootGroup').children.length) {
+      DISPLAY.forEach((name, pc) => {
+        const b = document.createElement('button');
+        b.textContent = name;
+        if (pc === state.root) b.classList.add('active');
+        b.addEventListener('click', () => {
+          document.querySelectorAll('#cadenceRootGroup button').forEach(x => x.classList.toggle('active', x === b));
+          renderCadenceCards(pc);
+        });
+        $('#cadenceRootGroup').appendChild(b);
+      });
+    }
+    const activeBtn = document.querySelector('#cadenceRootGroup button.active');
+    renderCadenceCards(activeBtn ? DISPLAY.indexOf(activeBtn.textContent) : state.root);
+  }
+
+  function renderCadenceCards(rootPc){
+    const wrap = $('#cadenceCards');
+    wrap.innerHTML = '';
+    const diatonic = triadDiatonicDegrees(rootPc, 'major');
+    CADENCES.forEach(cad => {
+      const chords = cad.degrees.map(d => diatonic[d]);
+      const card = document.createElement('div');
+      card.className = 'chord-mini-card triad-card';
+      const names = chords.map(c => DISPLAY[c.root] + (c.quality === 'minor' ? 'm' : c.quality === 'dim' ? '°' : ''));
+      card.innerHTML = `<div class="chord-mini-roman">${cad.label}</div>
+        <div class="theory-note-small" style="padding:8px 4px;">${cad.desc}</div>`;
+      const label = document.createElement('div');
+      label.className = 'chord-mini-label';
+      label.textContent = names.join(' → ');
+      card.appendChild(label);
+      card.addEventListener('click', () => {
+        chords.forEach((c, i) => setTimeout(() => {
+          const rootMidi = (4 + 1) * 12 + c.root;
+          TRIAD_QUALITIES[c.quality].formula.forEach(iv => playPianoTone(rootMidi + iv));
+        }, i * 800));
+      });
+      wrap.appendChild(card);
+    });
+  }
+
   function renderReverseAnalysisSection(){
     if (!$('#raRootGroup').children.length) {
       DISPLAY.forEach((name, pc) => {
@@ -4000,10 +4148,10 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     'rootRow', 'zoneRow', 'fingerLine', 'chordPanel', 'progChordsPanel', 'instrumentGroup',
     'quizPanel', 'chordQualityRow', 'acordesModeRow', 'progKeyRow', 'progDegreesRow',
     'progSequenceRow', 'tecnicaRow', 'tecnicaExerciseRow', 'pickingModeRow', 'theorySection',
-    'modeTheorySection', 'circleTheorySection', 'powerChordSection', 'lickTechSection',
+    'modeTheorySection', 'circleTheorySection', 'powerChordSection', 'lickTechSection', 'barreTechSection',
     'cagedToggleRow', 'progFormRow', 'progViewRow', 'bassPatternRow', 'jamSummary',
     'extensionsSection', 'seventhHarmonySection', 'chordScaleSection', 'chromaticApproachSection',
-    'reverseAnalysisSection',
+    'reverseAnalysisSection', 'cadencesSection',
     'patternGroup', 'styleGroup', 'styleRandomBtn', 'scaleSelect', 'chromaticToggle',
     'quizToggle', 'styleZoneRow'
   ];
@@ -4042,7 +4190,8 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     $('#tecnicaExerciseRow').style.display = usingTecnica ? 'flex' : 'none';
     $('#powerChordSection').style.display = usingTecnica ? '' : 'none';
     $('#lickTechSection').style.display = usingTecnica ? '' : 'none';
-    if (usingTecnica) { renderPowerChordSection(); renderLickTechSection(); }
+    $('#barreTechSection').style.display = usingTecnica ? '' : 'none';
+    if (usingTecnica) { renderPowerChordSection(); renderLickTechSection(); renderBarreTechSection(); }
     $('#pickingModeRow').style.display = (state.tab === 'escalas' || usingTecnica) ? 'flex' : 'none';
     $('#chordQualityRow').style.display = usingAcordes ? 'flex' : 'none';
     $('#acordesModeRow').style.display = usingAcordes ? 'flex' : 'none';
@@ -4059,11 +4208,13 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     $('#chordScaleSection').style.display = (usingAcordes && state.acordesMode === 'individual') ? '' : 'none';
     $('#chromaticApproachSection').style.display = usingAcordes ? '' : 'none';
     $('#reverseAnalysisSection').style.display = usingAcordes ? '' : 'none';
+    $('#cadencesSection').style.display = usingAcordes ? '' : 'none';
     if (usingAcordes) {
       renderExtensionsSection();
       renderSeventhHarmonySection();
       if (state.acordesMode === 'individual') renderChordScaleSection();
       renderReverseAnalysisSection();
+      renderCadencesSection();
     }
     $('.board-shell').style.display = usingAcordes ? 'none' : 'flex';
     $('.riff-panel').style.display = (usingAcordes || usingMastil) ? 'none' : 'flex';
@@ -5571,6 +5722,12 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     { semitones: 12, name: 'Octava' },
   ];
   const OIDO_QUALITY_LABELS = { major: 'Mayor', minor: 'Menor', aug: 'Aumentada', dim: 'Disminuida' };
+  // pool de progresiones a reconocer de oído: reutiliza las progresiones ya verificadas de
+  // Tríadas más las 3 cadencias — nada nuevo que verificar, ya está probado en otras secciones
+  const OIDO_PROGRESSION_POOL = [
+    ...TRIAD_PROGRESSIONS_MAJOR.map(p => ({ label: p.label, degrees: p.degrees })),
+    ...CADENCES.map(c => ({ label: c.label, degrees: c.degrees })),
+  ];
 
   function renderOidoSection(){
     if (!$('#oidoModeGroup').dataset.wired) {
@@ -5596,7 +5753,9 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     }
     $('#oidoExplainer').textContent = state.oido.mode === 'intervalo'
       ? 'Suenan 2 notas. Identifica la distancia entre ellas (el intervalo). Elige "Melódico" para oírlas una tras otra, o "Armónico" para oírlas juntas — el armónico es más difícil.'
-      : 'Suena una tríada (3 notas juntas). Identifica si es Mayor, Menor, Aumentada o Disminuida, solo de oído.';
+      : state.oido.mode === 'acorde'
+      ? 'Suena una tríada (3 notas juntas). Identifica si es Mayor, Menor, Aumentada o Disminuida, solo de oído.'
+      : 'Suena una progresión de 2 a 4 acordes, en una tonalidad al azar. Identifica cuál es — incluye progresiones típicas y las 3 cadencias.';
   }
 
   function oidoNewRound(){
@@ -5607,10 +5766,16 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     if (q.mode === 'intervalo') {
       const iv = INTERVALS[Math.floor(Math.random() * INTERVALS.length)];
       q.target = { rootMidi, semitones: iv.semitones, label: iv.name };
-    } else {
+    } else if (q.mode === 'acorde') {
       const qualities = Object.keys(OIDO_QUALITY_LABELS);
       const quality = qualities[Math.floor(Math.random() * qualities.length)];
       q.target = { rootMidi, quality, label: OIDO_QUALITY_LABELS[quality] };
+    } else {
+      const rootPc = Math.floor(Math.random() * 12);
+      const prog = OIDO_PROGRESSION_POOL[Math.floor(Math.random() * OIDO_PROGRESSION_POOL.length)];
+      const diatonic = triadDiatonicDegrees(rootPc, 'major');
+      const chords = prog.degrees.map(d => diatonic[d]);
+      q.target = { rootPc, chords, label: prog.label };
     }
     renderOidoAnswerButtons();
     oidoPlayCurrent();
@@ -5624,8 +5789,13 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       playPianoTone(q.target.rootMidi);
       if (q.playback === 'melodic') setTimeout(() => playPianoTone(note2), 550);
       else playPianoTone(note2);
-    } else {
+    } else if (q.mode === 'acorde') {
       TRIAD_QUALITIES[q.target.quality].formula.forEach(iv => playPianoTone(q.target.rootMidi + iv));
+    } else {
+      q.target.chords.forEach((c, i) => setTimeout(() => {
+        const rootMidi = (4 + 1) * 12 + c.root;
+        TRIAD_QUALITIES[c.quality].formula.forEach(iv => playPianoTone(rootMidi + iv));
+      }, i * 800));
     }
   }
 
@@ -5633,7 +5803,9 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     const wrap = $('#oidoAnswerGroup');
     wrap.innerHTML = '';
     const q = state.oido;
-    const options = q.mode === 'intervalo' ? INTERVALS.map(iv => iv.name) : Object.values(OIDO_QUALITY_LABELS);
+    const options = q.mode === 'intervalo' ? INTERVALS.map(iv => iv.name)
+      : q.mode === 'acorde' ? Object.values(OIDO_QUALITY_LABELS)
+      : OIDO_PROGRESSION_POOL.map(p => p.label);
     options.forEach(opt => {
       const b = document.createElement('button');
       b.textContent = opt;
