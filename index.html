@@ -537,6 +537,11 @@
   .ft-search-row{ display:flex; gap:8px; padding: 12px 16px 8px; flex: 0 0 auto; }
   .ft-search-row input{ flex:1; min-width:0; background: var(--bg); border:1px solid var(--panel-edge);
     border-radius:8px; padding:8px 12px; color: var(--ink); font-family:'Inter', sans-serif; font-size: calc(12px * var(--fs-scale)); }
+  .ft-backing-label{ padding: 2px 16px 0; color: var(--ink-dim); flex: 0 0 auto; }
+  #ftBackingResult{ margin: 0 16px 8px; border-color: var(--accent-play); flex: 0 0 auto; }
+  .ft-manual-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .ft-manual-row .pill-group button{ padding:5px 9px; font-size: calc(9.5px * var(--fs-scale)); }
+  .ft-action-btn + .ft-action-btn{ margin-left:8px; }
   .ft-quick-row{ display:flex; flex-wrap:wrap; gap:6px; padding: 4px 16px 10px; flex: 0 0 auto; }
   .ft-quick-btn{ background: var(--panel-2); border:1px solid var(--panel-edge); border-radius:999px;
     padding:6px 12px; font-family:'Oswald', sans-serif; font-size: calc(10px * var(--fs-scale));
@@ -1506,6 +1511,12 @@
     <input type="text" id="ftSearchInput" placeholder="Escribe tu pregunta (ej. cómo practico escalas, qué es una tríada...)">
     <button class="drum-mini-btn" id="ftSearchBtn">Buscar</button>
   </div>
+  <p class="theory-note-small ft-backing-label">🎯 O pega el título de un backing track de YouTube (ej. "Rock Pop BACKING TRACK A Minor | Am F C G | 70 BPM") y te digo qué tónica y escala usar:</p>
+  <div class="ft-search-row">
+    <input type="text" id="ftBackingInput" placeholder="Pega aquí el título del vídeo...">
+    <button class="drum-mini-btn" id="ftBackingBtn">🎯 Analizar</button>
+  </div>
+  <div class="ft-answer" id="ftBackingResult" style="display:none;"></div>
   <div class="ft-answer" id="ftContextTip" style="display:none;"></div>
   <div class="ft-quick-row" id="ftQuickRow"></div>
   <div class="ft-results" id="ftResults">
@@ -2886,6 +2897,10 @@ Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (sil
     { id: 'uso-bajo-looper', title: '¿Cómo funciona la línea de bajo del looper en la Caja de Ritmos?',
       keywords: ['bajo looper','linea de bajo caja de ritmos','bajo automatico','practicar con bajo y bateria','walking bajo looper'],
       answer: `Dentro de "🥁 Caja de Ritmos & Looper", debajo del Looper de piano, hay una fila "🎸 Línea de bajo (looper)". No escribes acordes aparte: toca sobre la MISMA lista que hayas puesto en el Looper de piano justo arriba. Actívala con su propio botón, elige patrón (Raíz sostenida, Raíz-Quinta, Octavas o Walking) y registro (Grave/Medio). Con batería + este bajo + el looper de piano sonando a la vez, tienes una base completa para practicar guitarra encima — y todo pasa por el mismo EQ (reverb/chorus/delay) del conjunto.` },
+    { id: 'uso-backing-track-youtube', title: '¿Cómo practico con un backing track de YouTube?',
+      keywords: ['backing track','youtube','video de youtube','practicar con video','que escala usar con backing track','tonalidad del video'],
+      answer: `Dentro del panel de FretTeacher (🎓, abajo a la derecha) hay una caja específica: "🎯 O pega el título de un backing track de YouTube...". Pega ahí el título completo del vídeo (cuantos más datos, mejor: título + lo que ponga la descripción) y pulsa Analizar. Si detecta la tonalidad (busca patrones como "A Minor" o una lista de acordes tipo "Am-F-C-G"), te muestra la tónica, el modo, el relativo, y dos botones: uno para ir a Escalas con la Pentatónica correspondiente y otro con la escala completa. Si no detecta nada claro, te deja elegir tónica y modo a mano con un par de botones y te lleva igual. Esto es un analizador de patrones de texto, no entiende el vídeo ni lo escucha — si el título no sigue un formato reconocible, usa el selector manual que aparece debajo.
+La app no se sincroniza con el vídeo (son dos reproductores independientes): pon el vídeo sonando aparte y toca por encima con la escala que te indique.` },
     { id: 'uso-piano-escala', title: '¿Cómo veo la digitación de una escala en el piano?',
       keywords: ['digitacion piano','dedos piano','digitacion de escalas'],
       answer: `En Piano, elige el modo "Escala", tónica y octava. Se muestran los números de dedo (mano derecha) directamente sobre las teclas del teclado. Solo está verificada para Do, Sol, Re, La, Mi y Fa mayor — para el resto de tonalidades se ve la escala pero sin digitación, para no arriesgarme a enseñar algo mal.` },
@@ -6388,25 +6403,53 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   // se apliquen por igual a los 3. NO reutiliza playTone/playMuteTone porque esas funciones
   // disparan la nota en ctx.currentTime (pensadas para tocar en vivo), y aquí hace falta
   // programarla en un instante futuro exacto (el mismo "time" que ya usa drumScheduler).
+  // ataque de púa/dedo específico para el bajo: reutiliza pickAttackBuffer (ya verificada para
+  // guitarra), pero con el paso alto más bajo (900Hz en vez de 1600Hz) porque el "golpe" de una
+  // cuerda de bajo es más grave que el de una de guitarra — con 1600Hz el ataque sonaba fino y
+  // "de juguete", que es justo lo que hacía que el bajo se notase poco real.
+  function playBassPickAttack(ctx, bus, time, peakGain){
+    const dur = 0.014 + Math.random() * 0.008;
+    const buffer = pickAttackBuffer(ctx, dur);
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 900;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(peakGain, time);
+    gain.gain.exponentialRampToValueAtTime(0.0005, time + dur);
+    src.connect(hp).connect(gain).connect(bus);
+    src.start(time);
+  }
+
   function playBassLooperTone(time, midi, vol, dur){
     const ctx = getAudioCtx();
     const bus = getDrumMasterBus();
     const freq = 440 * Math.pow(2, (midi - 69) / 12);
-    const ringTail = dur + 0.25;
-    const buffer = pluckedBuffer(ctx, freq, ringTail, 0.9965); // decay alto: cuerda grave, sostiene más
+    const ringTail = dur + 0.3;
+    // decay y filtro ligeramente aleatorios (±) para que dos notas iguales seguidas no suenen
+    // clónicas — el mismo truco que ya usa pluckedBuffer para la guitarra, aplicado aquí también
+    // al corte del filtro, que antes era un valor fijo.
+    const buffer = pluckedBuffer(ctx, freq, ringTail, 0.9965 + Math.random() * 0.0008);
     const src = ctx.createBufferSource();
     src.buffer = buffer;
     const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass'; filter.frequency.value = 1200; filter.Q.value = 0.7;
+    filter.type = 'lowpass'; filter.frequency.value = 950 + Math.random() * 150; filter.Q.value = 0.8;
+    // realce en 90-130Hz: el "cuerpo"/resonancia grave de una caja de bajo real, que faltaba del
+    // todo antes (por eso sonaba plano/sintético) — mismo concepto que el filtro "body" de la
+    // guitarra (180Hz), pero bajado de frecuencia y con más ganancia porque el bajo vive más grave.
+    const body = ctx.createBiquadFilter();
+    body.type = 'peaking'; body.frequency.value = 100; body.Q.value = 1.3; body.gain.value = 7;
     const gain = ctx.createGain();
     const safeVol = Math.max(vol, 0.0001);
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(safeVol, time + 0.008);
+    gain.gain.exponentialRampToValueAtTime(safeVol, time + 0.01);
     gain.gain.setValueAtTime(safeVol, time + Math.max(dur - 0.05, 0.01));
     gain.gain.exponentialRampToValueAtTime(0.0001, time + dur + 0.05);
-    src.connect(filter).connect(gain).connect(bus);
+    src.connect(filter).connect(body).connect(gain).connect(bus);
     src.start(time);
     src.stop(time + ringTail + 0.05);
+    playBassPickAttack(ctx, bus, time, 0.16); // el "clack" del ataque, antes ausente por completo
   }
 
   // ¿es este el ÚLTIMO compás que le toca sonar a este acorde antes de pasar al siguiente?
@@ -7720,6 +7763,145 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   });
   renderDrumSection();
 
+  // ---------- FRETTEACHER: analizador de títulos de backing track ----------
+  // heurística por patrones de texto (NO es un modelo de lenguaje: no entiende el título, solo
+  // busca formas típicas que usan casi todos los canales de backing tracks). Dos estrategias,
+  // por orden de fiabilidad:
+  // 1) forma explícita "Nota (#/b)? Major|Minor" (ej. "A Minor", "F# Minor", "Bb Major") — la
+  //    inmensa mayoría de títulos la incluyen literal, así que es la más fiable con diferencia.
+  // 2) si no aparece, se busca una lista de 3+ acordes tipo "Am-F-C-G" o "Am F C G" y se toma el
+  //    PRIMER acorde como referencia de tonalidad — es una suposición razonable (el primer acorde
+  //    de una progresión simple suele ser el "de casa"), no una certeza, y el resultado lo avisa.
+  const BT_NOTE_TO_PC = { C:0, 'C#':1, Db:1, D:2, 'D#':3, Eb:3, E:4, F:5, 'F#':6, Gb:6, G:7, 'G#':8, Ab:8, A:9, 'A#':10, Bb:10, B:11 };
+  const BT_DISPLAY_ES = ['Do','Reb','Re','Mib','Mi','Fa','Fa#','Sol','Lab','La','Sib','Si']; // mismo orden/índices que DISPLAY
+
+  function btParseTitle(text){
+    const raw = (text || '').trim();
+    if (!raw) return null;
+    const bpmMatch = raw.match(/(\d{2,3})\s*bpm/i);
+    const bpm = bpmMatch ? Number(bpmMatch[1]) : null;
+
+    let m = raw.match(/\b([A-G])\s*(#|b|♭|♯)?\s*(major|minor|maj|min)\b/i);
+    if (m) {
+      let acc = (m[2] || '').toLowerCase();
+      if (acc === '♭') acc = 'b'; if (acc === '♯') acc = '#';
+      const pc = BT_NOTE_TO_PC[m[1].toUpperCase() + acc];
+      if (pc !== undefined) {
+        const mode = m[3].toLowerCase().startsWith('maj') ? 'mayor' : 'menor';
+        return { pc, mode, bpm, source: 'explicit' };
+      }
+    }
+
+    const chordTokenRe = '[A-G](?:#|b)?m?(?:aj7|7|maj7|sus4|sus2|dim|aug)?';
+    const chordListRe = new RegExp(`\\b(${chordTokenRe})(?:\\s*-\\s*|\\s+)(${chordTokenRe})(?:\\s*-\\s*|\\s+)(${chordTokenRe})`);
+    const chordListMatch = raw.match(chordListRe);
+    if (chordListMatch) {
+      const cm = chordListMatch[1].match(/^([A-G])(#|b)?(m)?/);
+      if (cm) {
+        const pc = BT_NOTE_TO_PC[cm[1].toUpperCase() + (cm[2] || '').toLowerCase()];
+        if (pc !== undefined) return { pc, mode: cm[3] ? 'menor' : 'mayor', bpm, source: 'chord' };
+      }
+    }
+
+    return bpm !== null ? { pc: null, mode: null, bpm, source: 'bpm-only' } : null;
+  }
+
+  let ftManualRoot = 0, ftManualMode = 'mayor';
+
+  function ftGoToScale(pc, scaleKey){
+    state.tab = 'escalas'; state.root = pc; state.scaleKey = scaleKey;
+    render();
+    $('#fretTeacherPanel').style.display = 'none';
+  }
+
+  function ftRenderManualPicker(container){
+    const row1 = document.createElement('div');
+    row1.className = 'ft-manual-row';
+    const rootWrap = document.createElement('div');
+    rootWrap.className = 'pill-group';
+    BT_DISPLAY_ES.forEach((name, pc) => {
+      const b = document.createElement('button');
+      b.textContent = name;
+      if (pc === ftManualRoot) b.classList.add('active');
+      b.addEventListener('click', () => {
+        ftManualRoot = pc;
+        rootWrap.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+      });
+      rootWrap.appendChild(b);
+    });
+    row1.appendChild(rootWrap);
+
+    const modeWrap = document.createElement('div');
+    modeWrap.className = 'pill-group';
+    ['mayor', 'menor'].forEach(mode => {
+      const b = document.createElement('button');
+      b.textContent = mode === 'mayor' ? 'Mayor' : 'Menor';
+      if (mode === ftManualMode) b.classList.add('active');
+      b.addEventListener('click', () => {
+        ftManualMode = mode;
+        modeWrap.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+      });
+      modeWrap.appendChild(b);
+    });
+    row1.appendChild(modeWrap);
+    container.appendChild(row1);
+
+    const btn = document.createElement('button');
+    btn.className = 'ft-action-btn';
+    btn.style.marginTop = '8px';
+    btn.textContent = 'Ir a Escalas con esta tónica y modo';
+    btn.addEventListener('click', () => {
+      ftGoToScale(ftManualRoot, ftManualMode === 'menor' ? 'pent_menor' : 'pent_mayor');
+    });
+    container.appendChild(btn);
+  }
+
+  function ftRenderBackingResult(){
+    const text = $('#ftBackingInput').value;
+    const wrap = $('#ftBackingResult');
+    const parsed = btParseTitle(text);
+    wrap.style.display = 'block';
+    wrap.innerHTML = '';
+
+    if (!parsed || parsed.pc === null) {
+      const h4 = document.createElement('h4');
+      h4.textContent = 'No he podido detectar la tonalidad';
+      const p = document.createElement('p');
+      p.textContent = `No encuentro un patrón claro como "A Minor" o una lista de acordes tipo "Am-F-C-G" en ese texto${parsed && parsed.bpm ? ` (sí detecté ${parsed.bpm} BPM)` : ''}. Elige tú mismo la tónica y el modo, y te llevo a Escalas:`;
+      wrap.appendChild(h4); wrap.appendChild(p);
+      ftRenderManualPicker(wrap);
+      return;
+    }
+
+    const rootName = BT_DISPLAY_ES[parsed.pc];
+    const relativePc = parsed.mode === 'menor' ? (parsed.pc + 3) % 12 : (parsed.pc + 9) % 12;
+    const relativeName = BT_DISPLAY_ES[relativePc];
+    const relativeMode = parsed.mode === 'menor' ? 'mayor' : 'menor';
+    const pentKey = parsed.mode === 'menor' ? 'pent_menor' : 'pent_mayor';
+    const fullKey = parsed.mode === 'menor' ? 'eolico' : 'jonico';
+    const confidenceNote = parsed.source === 'chord'
+      ? ' — detectado a partir del primer acorde de la lista; suele ser la tónica, pero confírmalo si lo sabes seguro'
+      : '';
+
+    const h4 = document.createElement('h4');
+    h4.textContent = `${rootName} ${parsed.mode}${confidenceNote ? ' (probable)' : ''}`;
+    const p = document.createElement('p');
+    p.textContent = `Relativo: ${relativeName} ${relativeMode} (mismas notas, cambia cuál sientes como "casa").${parsed.bpm ? ` Tempo detectado: ${parsed.bpm} BPM.` : ''}${confidenceNote}`;
+    wrap.appendChild(h4); wrap.appendChild(p);
+
+    const btnPent = document.createElement('button');
+    btnPent.className = 'ft-action-btn';
+    btnPent.textContent = `Ir a Escalas (${rootName} Pentatónica ${parsed.mode})`;
+    btnPent.addEventListener('click', () => ftGoToScale(parsed.pc, pentKey));
+    wrap.appendChild(btnPent);
+
+    const btnFull = document.createElement('button');
+    btnFull.className = 'ft-action-btn';
+    btnFull.textContent = `Ir a Escalas (${rootName} Escala ${parsed.mode} completa)`;
+    btnFull.addEventListener('click', () => ftGoToScale(parsed.pc, fullKey));
+    wrap.appendChild(btnFull);
+  }
+
   // ---------- FRETTEACHER: interfaz ----------
   function ftRenderQuickButtons(){
     const wrap = $('#ftQuickRow');
@@ -7825,6 +8007,10 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   $('#ftSearchBtn').addEventListener('click', () => ftShowEntries(ftSearch($('#ftSearchInput').value)));
   $('#ftSearchInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') ftShowEntries(ftSearch($('#ftSearchInput').value));
+  });
+  $('#ftBackingBtn').addEventListener('click', ftRenderBackingResult);
+  $('#ftBackingInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') ftRenderBackingResult();
   });
 
   // ---------- MAPA DEL SITIO ----------
