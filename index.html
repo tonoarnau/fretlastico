@@ -698,6 +698,29 @@
       <div class="drum-looper-list" id="pianoLooperList"></div>
     </div>
 
+    <div class="drum-looper-row">
+      <div class="drum-looper-header">
+        <span class="drum-looper-title">🎸 Línea de bajo (looper)</span>
+        <button class="drum-mini-btn" id="bassLooperToggle">▶ Activar</button>
+        <div class="pill-group" id="bassLooperPatternGroup">
+          <button data-bpattern="raiz">Raíz sostenida</button>
+          <button data-bpattern="raiz5" class="active">Raíz-Quinta</button>
+          <button data-bpattern="octavas">Octavas</button>
+          <button data-bpattern="walking">Walking</button>
+        </div>
+        <div class="drum-volume-ctrl">
+          <span class="label">Volumen</span>
+          <input type="range" id="bassLooperVolSlider" min="0" max="100" step="5" value="60">
+          <span id="bassLooperVolLabel">60%</span>
+        </div>
+        <div class="pill-group" id="bassLooperOctaveGroup">
+          <button data-boct="1" class="active">Grave</button>
+          <button data-boct="2">Medio</button>
+        </div>
+      </div>
+      <p class="theory-note-small">Usa la MISMA lista de acordes del "Looper de piano" de arriba — actívalo aquí también para que suene junto al ritmo. Así puedes practicar guitarra encima de batería + bajo + piano sonando a la vez.</p>
+    </div>
+
     <details class="drum-eq-section" id="drumEqSection">
       <summary>🎛️ EQ · efectos del conjunto</summary>
       <div class="drum-eq-row">
@@ -717,7 +740,7 @@
           <span id="drumFxDelayLabel">0%</span>
         </div>
       </div>
-      <p class="theory-note-small">Afecta a todo lo que suena en esta sección: batería y looper de piano juntos.</p>
+      <p class="theory-note-small">Afecta a todo lo que suena en esta sección: batería, looper de piano y línea de bajo juntos.</p>
     </details>
   </div>
 </details>
@@ -2757,6 +2780,7 @@
       muted: { crash:false, hihatOpen:false, hihatClosed:false, clap:false, snare:false, kick:false },
       fx: { reverb:0, chorus:0, delay:0 } },
     pianoLooper: { active:false, volume:0.5, chords:[], pattern:'pad', timbre:'triangle', presetTonality:'major', build:{ root:0, quality:'major', octave:3, bars:1 } },
+    bassLooper: { active:false, volume:0.6, pattern:'raiz5', octave:1 }, // usa los MISMOS acordes que pianoLooper.chords — no duplica la progresión
     oido: { mode:'intervalo', playback:'melodic', target:null, guess:null, score:0, attempts:0 },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
              tonality: 'major', progressionIdx: null, progShapes: [], mapShapes: [], zoneIdx: 0, singleStringIdx: 0,
@@ -2846,7 +2870,7 @@ Técnica: arpegios, picking alterno/económico, power chords, y técnicas de má
 Piano: teclado de 6 octavas — notas, acordes (con voicings rootless de jazz), o escalas con digitación de dedos.
 Tríadas: teoría, digitaciones, armonía por grados, mapa del mástil y quiz.
 Oído: entrenamiento auditivo — identificar intervalos y calidad de acorde (mayor/menor/aumentada/disminuida) solo escuchando.
-Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (silenciable por instrumento), looper de piano y efectos (reverb/chorus/delay).` },
+Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (silenciable por instrumento), looper de piano, looper de bajo y efectos (reverb/chorus/delay).` },
     { id: 'uso-oido', title: '¿Cómo uso la pestaña Oído?',
       keywords: ['oido','entrenamiento auditivo','intervalos','reconocer acorde','identificar de oido'],
       answer: `Tiene 2 modos. Intervalos: suenan 2 notas (elige si melódico, una tras otra, o armónico, juntas — el armónico es más difícil) y adivinas la distancia entre ellas entre 12 opciones. Calidad de acorde: suena una tríada completa y adivinas si es Mayor, Menor, Aumentada o Disminuida, solo de oído. Lleva marcador de aciertos y botón para repetir el sonido.` },
@@ -2858,7 +2882,10 @@ Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (sil
       answer: `En Técnica, despliega "Técnicas de mástil". Ligados: pulsas la cuerda una sola vez y martilleas o tiras con los dedos para que sigan sonando notas sin volver a pulsar. Deslizamiento: pulsas y deslizas el dedo al siguiente traste sin soltar la presión. Bending: subes la altura de la nota empujando la cuerda, sin cambiar de traste. Elige cuerda y traste de inicio, y pulsa "Escuchar" para oír una simulación de cada una.` },
     { id: 'uso-patrones-bajo', title: '¿Qué patrones de línea de bajo hay además del walking?',
       keywords: ['patron de bajo','raiz quinta','octavas bajo','patron raiz-quinta'],
-      answer: `En Acordes → Progresión → vista "Línea de bajo", hay un selector "Patrón" con 3 opciones. Raíz-Quinta: alterna la fundamental y la 5ª de cada acorde (el patrón más simple, bueno para empezar). Octavas: alterna la fundamental grave y la misma nota una octava más aguda. Walking: la línea con notas de aproximación cromática, más avanzada. Los 3 usan la misma progresión que hayas construido.` },
+      answer: `En Acordes → Progresión → vista "Línea de bajo", hay un selector "Patrón" con 3 opciones. Raíz-Quinta: alterna la fundamental y la 5ª de cada acorde (el patrón más simple, bueno para empezar). Octavas: alterna la fundamental grave y la misma nota una octava más aguda. Walking: la línea con notas de aproximación cromática, más avanzada. Los 3 usan la misma progresión que hayas construido. (Esto es distinto del looper de bajo automático de la Caja de Ritmos — ver esa pregunta aparte.)` },
+    { id: 'uso-bajo-looper', title: '¿Cómo funciona la línea de bajo del looper en la Caja de Ritmos?',
+      keywords: ['bajo looper','linea de bajo caja de ritmos','bajo automatico','practicar con bajo y bateria','walking bajo looper'],
+      answer: `Dentro de "🥁 Caja de Ritmos & Looper", debajo del Looper de piano, hay una fila "🎸 Línea de bajo (looper)". No escribes acordes aparte: toca sobre la MISMA lista que hayas puesto en el Looper de piano justo arriba. Actívala con su propio botón, elige patrón (Raíz sostenida, Raíz-Quinta, Octavas o Walking) y registro (Grave/Medio). Con batería + este bajo + el looper de piano sonando a la vez, tienes una base completa para practicar guitarra encima — y todo pasa por el mismo EQ (reverb/chorus/delay) del conjunto.` },
     { id: 'uso-piano-escala', title: '¿Cómo veo la digitación de una escala en el piano?',
       keywords: ['digitacion piano','dedos piano','digitacion de escalas'],
       answer: `En Piano, elige el modo "Escala", tónica y octava. Se muestran los números de dedo (mano derecha) directamente sobre las teclas del teclado. Solo está verificada para Do, Sol, Re, La, Mi y Fa mayor — para el resto de tonalidades se ve la escala pero sin digitación, para no arriesgarme a enseñar algo mal.` },
@@ -2867,7 +2894,7 @@ Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (sil
       answer: `En Piano → modo Acorde, con una calidad de séptima (maj7, min7 o dom7) aparece un selector "Voicing". Cerrado es el acorde normal. Rootless tipo A (3-5-7-9) y tipo B (7-9-3-5) son voicings de jazz que omiten la fundamental — se usan en la mano izquierda cuando otro instrumento (el bajo) ya la está tocando, para no duplicarla y sonar más "abierto".` },
     { id: 'uso-caja-ritmos-avanzado', title: '¿Qué más puedo hacer en la Caja de Ritmos además de elegir un estilo?',
       keywords: ['silenciar instrumento','silencio','mute','instrumento','bateria','eq','reverb','chorus','delay','looper de piano'],
-      answer: `Cada fila de instrumento tiene un botón 🔊/🔇 para silenciarlo sin borrar lo que tenías programado. El "Looper de piano" te deja construir un bucle de acordes (con patrón Pad, Negras o Primer tiempo) sincronizado con el ritmo — o cargar una progresión típica ya hecha (I-IV-V, I-vi-IV-V...) con un botón, sin añadir los acordes a mano. También tiene un selector de sonido (Suave/Puro/Brillante). Y "EQ · efectos del conjunto" tiene 3 mandos (Reverb, Chorus, Delay) que afectan a la batería y al looper de piano juntos.` },
+      answer: `Cada fila de instrumento tiene un botón 🔊/🔇 para silenciarlo sin borrar lo que tenías programado. El "Looper de piano" te deja construir un bucle de acordes (con patrón Pad, Negras o Primer tiempo) sincronizado con el ritmo — o cargar una progresión típica ya hecha (I-IV-V, I-vi-IV-V...) con un botón, sin añadir los acordes a mano. También tiene un selector de sonido (Suave/Puro/Brillante). Debajo, la "Línea de bajo (looper)" toca automáticamente sobre la MISMA lista de acordes del looper de piano (no hace falta escribirla dos veces), con 4 patrones: Raíz sostenida, Raíz-Quinta, Octavas y Walking. Y "EQ · efectos del conjunto" tiene 3 mandos (Reverb, Chorus, Delay) que afectan a la batería y a los dos loopers juntos.` },
     { id: 'uso-zurdo', title: '¿Cómo cambio a zurdo?',
       keywords: ['zurdo','zurda','mano izquierda','cambiar mano','diestro'],
       answer: `Arriba a la derecha del mástil hay un botón con el icono ⇄ (junto al título) — lo tocas y toda la app (mástil, acordes, tríadas) se voltea a orientación zurda, con el clavijero a la derecha. Se aplica en toda la aplicación, no solo en una pestaña.` },
@@ -2876,7 +2903,7 @@ Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (sil
       answer: `Te deja elegir en qué parte del mástil (graves, medios, agudos) quieres ver la tríada. Como una nota fija en una cuerda fija solo se repite cada 12 trastes, la app elige automáticamente qué juego de cuerdas encaja mejor en la zona que pediste — no hace falta que tú elijas las cuerdas a mano, se ajustan solas.` },
     { id: 'uso-caja-ritmos', title: '¿Cómo uso la Caja de Ritmos & Looper?',
       keywords: ['caja de ritmos','bateria','batería','looper','ritmo'],
-      answer: `Despliega la sección "🥁 Caja de Ritmos & Looper" (arriba de las pestañas). Elige un estilo (Rock, Funk, Blues Shuffle, Vals...), pulsa Reproducir, y toca las casillas para editar el patrón a tu gusto (apagada → normal → acento). El botón 🔇 de cada fila silencia esa voz sin borrar lo que tenías programado. El "Looper de piano" te deja añadir acordes que suenan en bucle sincronizados con el ritmo — y el "EQ" te deja añadir reverb, chorus y delay a todo el conjunto.` },
+      answer: `Despliega la sección "🥁 Caja de Ritmos & Looper" (arriba de las pestañas). Elige un estilo (Rock, Funk, Blues Shuffle, Vals...), pulsa Reproducir, y toca las casillas para editar el patrón a tu gusto (apagada → normal → acento). El botón 🔇 de cada fila silencia esa voz sin borrar lo que tenías programado. El "Looper de piano" te deja añadir acordes que suenan en bucle sincronizados con el ritmo, y justo debajo la "Línea de bajo (looper)" toca automáticamente sobre esos mismos acordes — actívala también para tener batería + bajo + piano sonando juntos y practicar guitarra encima. El "EQ" te deja añadir reverb, chorus y delay a todo el conjunto.` },
     { id: 'uso-quiz', title: '¿Cómo activo el modo Quiz?',
       keywords: ['quiz','examen','identificar notas','poner a prueba'],
       answer: `Está disponible en varias pestañas: en Escalas (identificar notas del mástil), y en Tríadas (adivinar tónica, calidad e inversión de una digitación "ciega", sin nombres de nota). Busca el botón "Modo Quiz" dentro de cada sección.` },
@@ -6355,6 +6382,99 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   }
 
 
+  // ---------- LOOPER DE BAJO ----------
+  // reutiliza pluckedBuffer (el mismo Karplus-Strong ya verificado para guitarra/bajo) y comparte
+  // el bus maestro con la batería y el looper de piano, para que el reverb/chorus/delay del EQ
+  // se apliquen por igual a los 3. NO reutiliza playTone/playMuteTone porque esas funciones
+  // disparan la nota en ctx.currentTime (pensadas para tocar en vivo), y aquí hace falta
+  // programarla en un instante futuro exacto (el mismo "time" que ya usa drumScheduler).
+  function playBassLooperTone(time, midi, vol, dur){
+    const ctx = getAudioCtx();
+    const bus = getDrumMasterBus();
+    const freq = 440 * Math.pow(2, (midi - 69) / 12);
+    const ringTail = dur + 0.25;
+    const buffer = pluckedBuffer(ctx, freq, ringTail, 0.9965); // decay alto: cuerda grave, sostiene más
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass'; filter.frequency.value = 1200; filter.Q.value = 0.7;
+    const gain = ctx.createGain();
+    const safeVol = Math.max(vol, 0.0001);
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(safeVol, time + 0.008);
+    gain.gain.setValueAtTime(safeVol, time + Math.max(dur - 0.05, 0.01));
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + dur + 0.05);
+    src.connect(filter).connect(gain).connect(bus);
+    src.start(time);
+    src.stop(time + ringTail + 0.05);
+  }
+
+  // ¿es este el ÚLTIMO compás que le toca sonar a este acorde antes de pasar al siguiente?
+  // hace falta para el patrón "walking": la nota de aproximación cromática solo debe sonar en el
+  // último tiempo del último compás del acorde actual, no en cada compás si el acorde dura varios.
+  function pianoLooperIsLastBarOfChord(posInLoop, chordIdx){
+    let acc = 0;
+    for (let i = 0; i < state.pianoLooper.chords.length; i++) {
+      const c = state.pianoLooper.chords[i];
+      if (i === chordIdx) return posInLoop === acc + c.bars - 1;
+      acc += c.bars;
+    }
+    return true;
+  }
+
+  // se llama en cada paso del secuenciador, igual que pianoLooperMaybeTrigger — comparten
+  // deliberadamente la MISMA lista de acordes (state.pianoLooper.chords) para no obligar al
+  // usuario a escribir la progresión dos veces.
+  function bassLooperMaybeTrigger(barIndex, stepIndex, time, totalStepsInBar){
+    if (!state.bassLooper.active) return;
+    const totalBars = pianoLooperTotalBars();
+    if (totalBars === 0) return;
+    const posInLoop = barIndex % totalBars;
+    const info = pianoLooperChordAtBar(posInLoop);
+    if (!info) return;
+    const beatDur = 60 / state.bpm;
+    const pattern = state.bassLooper.pattern;
+    const octaveBase = state.bassLooper.octave;
+    const rootMidi = (octaveBase + 1) * 12 + info.chord.root; // Do4 = MIDI 60, misma convención que pianoChordNotes
+
+    if (pattern === 'raiz') {
+      // una sola nota sostenida al empezar el turno del acorde, como el patrón "Pad" del piano
+      if (stepIndex !== 0 || !info.isFirstBarOfChord) return;
+      const barDur = beatDur * (totalStepsInBar / 4);
+      const holdDur = barDur * info.chord.bars * 0.92;
+      playBassLooperTone(time, rootMidi, state.bassLooper.volume, holdDur);
+      return;
+    }
+
+    // el resto de patrones tocan una vez por TIEMPO (cada 4 pasos, ya sea compás de 4 o de 3 —
+    // los estilos de la app siempre usan 4 pasos por tiempo, incluido el Vals de 12 pasos/3 tiempos)
+    if (stepIndex % 4 !== 0) return;
+    const beatIdx = stepIndex / 4;
+    const dur = beatDur * 0.55;
+
+    if (pattern === 'raiz5') {
+      const fifthMidi = (octaveBase + 1) * 12 + ((info.chord.root + 7) % 12);
+      playBassLooperTone(time, beatIdx % 2 === 0 ? rootMidi : fifthMidi, state.bassLooper.volume, dur);
+    } else if (pattern === 'octavas') {
+      playBassLooperTone(time, beatIdx % 2 === 0 ? rootMidi : rootMidi + 12, state.bassLooper.volume, dur);
+    } else if (pattern === 'walking') {
+      const beatsInBar = totalStepsInBar / 4;
+      const isLastBeat = beatIdx === beatsInBar - 1;
+      if (isLastBeat && pianoLooperIsLastBarOfChord(posInLoop, info.idx)) {
+        // nota de aproximación cromática (medio tono por debajo) hacia la raíz del SIGUIENTE
+        // acorde del bucle — misma técnica ya documentada en la línea de bajo walking de Acordes
+        const nextInfo = pianoLooperChordAtBar((posInLoop + 1) % totalBars);
+        const nextRootPc = nextInfo ? nextInfo.chord.root : info.chord.root;
+        const approachPc = (nextRootPc - 1 + 12) % 12;
+        playBassLooperTone(time, (octaveBase + 1) * 12 + approachPc, state.bassLooper.volume, dur);
+      } else {
+        const tones = walkingBeatTones(info.chord.quality); // [raíz, 3ª-ish, 5ª-ish], ya verificado
+        const pc = (info.chord.root + tones[beatIdx % tones.length]) % 12;
+        playBassLooperTone(time, (octaveBase + 1) * 12 + pc, state.bassLooper.volume, dur);
+      }
+    }
+  }
+
   function playDrumKick(time, vol){
     const ctx = getAudioCtx();
     const osc = ctx.createOscillator();
@@ -6531,6 +6651,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       const totalSteps = style.steps || 16;
       const isFillBar = state.drumMachine.fillEnabled && (drumBarCount % 4 === 3);
       pianoLooperMaybeTrigger(drumBarCount, drumStepIndex, drumNextStepTime, totalSteps);
+      bassLooperMaybeTrigger(drumBarCount, drumStepIndex, drumNextStepTime, totalSteps);
       drumScheduleStep(drumStepIndex, drumNextStepTime, isFillBar, totalSteps);
       const beatDur = 60 / state.bpm;      // duración de una negra
       let stepDur = (beatDur / 4) * feelMultiplier; // cada paso = semicorchea, estirada o encogida
@@ -7564,6 +7685,27 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     state.pianoLooper.volume = Number(e.target.value) / 100;
     $('#pianoLooperVolLabel').textContent = e.target.value + '%';
   });
+  $('#bassLooperToggle').addEventListener('click', () => {
+    state.bassLooper.active = !state.bassLooper.active;
+    $('#bassLooperToggle').textContent = state.bassLooper.active ? '⏹ Desactivar' : '▶ Activar';
+    $('#bassLooperToggle').classList.toggle('active', state.bassLooper.active);
+  });
+  document.querySelectorAll('#bassLooperPatternGroup button').forEach(b => {
+    b.addEventListener('click', () => {
+      state.bassLooper.pattern = b.dataset.bpattern;
+      document.querySelectorAll('#bassLooperPatternGroup button').forEach(x => x.classList.toggle('active', x === b));
+    });
+  });
+  $('#bassLooperVolSlider').addEventListener('input', e => {
+    state.bassLooper.volume = Number(e.target.value) / 100;
+    $('#bassLooperVolLabel').textContent = e.target.value + '%';
+  });
+  document.querySelectorAll('#bassLooperOctaveGroup button').forEach(b => {
+    b.addEventListener('click', () => {
+      state.bassLooper.octave = Number(b.dataset.boct);
+      document.querySelectorAll('#bassLooperOctaveGroup button').forEach(x => x.classList.toggle('active', x === b));
+    });
+  });
   $('#drumFxReverbSlider').addEventListener('input', e => {
     setDrumFxSend('reverb', Number(e.target.value) / 100);
     $('#drumFxReverbLabel').textContent = e.target.value + '%';
@@ -7731,6 +7873,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       { label: '12 estilos, fill automático, variación, humanizar, ½×/1×/2×', apply: null },
       { label: 'Silenciar cada instrumento por separado', apply: null },
       { label: 'Looper de piano (patrones Pad / Negras / Primer tiempo)', apply: null },
+      { label: 'Línea de bajo automática (Raíz / Raíz-Quinta / Octavas / Walking, sobre los acordes del looper de piano)', apply: null },
       { label: 'EQ del conjunto: Reverb, Chorus, Delay', apply: null },
     ]},
     { title: '🎓 FretTeacher', items: [
