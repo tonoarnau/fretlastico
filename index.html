@@ -2,6 +2,13 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script type="importmap">
+{
+  "imports": {
+    "neural-amp-modeler-wasm/engine": "https://cdn.jsdelivr.net/npm/neural-amp-modeler-wasm@2.0.0/dist/engine/index.js"
+  }
+}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>Fretlastico</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -746,6 +753,19 @@
         </div>
       </div>
       <p class="theory-note-small">Afecta a todo lo que suena en esta sección: batería, looper de piano y línea de bajo juntos.</p>
+      <div class="drum-eq-row" style="margin-top:10px; border-top:1px solid var(--panel-edge); padding-top:10px;">
+        <div class="drum-eq-ctrl">
+          <span class="label">🎸 Ampli (NAM)</span>
+          <div class="pill-group" id="namAmpGroup">
+            <button data-nam-mode="none" class="active">Sin ampli</button>
+            <button data-nam-mode="on" disabled>Con ampli NAM</button>
+          </div>
+        </div>
+        <label class="drum-mini-btn" for="namFileInput">📁 Cargar .nam</label>
+        <input type="file" id="namFileInput" accept=".nam" style="display:none;">
+        <span id="namAmpStatus" class="theory-note-small"></span>
+      </div>
+      <p class="theory-note-small">Captura real de ampli (Neural Amp Modeler) aplicada a las notas que toques en Escalas/Mástil/Técnica y a la línea de bajo del looper. Elige cualquier archivo .nam de tu dispositivo — se carga y se activa al momento. "Sin ampli" vuelve al sonido por defecto sin recargar nada.</p>
     </details>
   </div>
 </details>
@@ -2792,6 +2812,7 @@
       fx: { reverb:0, chorus:0, delay:0 } },
     pianoLooper: { active:false, volume:0.5, chords:[], pattern:'pad', timbre:'triangle', presetTonality:'major', build:{ root:0, quality:'major', octave:3, bars:1 } },
     bassLooper: { active:false, volume:0.6, pattern:'raiz5', octave:1 }, // usa los MISMOS acordes que pianoLooper.chords — no duplica la progresión
+    namAmp: { mode:'none', modelName:null, jsonText:null }, // 'none'|'on' — un único slot, se rellena con cualquier .nam elegido del dispositivo
     oido: { mode:'intervalo', playback:'melodic', target:null, guess:null, score:0, attempts:0 },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
              tonality: 'major', progressionIdx: null, progShapes: [], mapShapes: [], zoneIdx: 0, singleStringIdx: 0,
@@ -2897,6 +2918,9 @@ Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (sil
     { id: 'uso-bajo-looper', title: '¿Cómo funciona la línea de bajo del looper en la Caja de Ritmos?',
       keywords: ['bajo looper','linea de bajo caja de ritmos','bajo automatico','practicar con bajo y bateria','walking bajo looper'],
       answer: `Dentro de "🥁 Caja de Ritmos & Looper", debajo del Looper de piano, hay una fila "🎸 Línea de bajo (looper)". No escribes acordes aparte: toca sobre la MISMA lista que hayas puesto en el Looper de piano justo arriba. Actívala con su propio botón, elige patrón (Raíz sostenida, Raíz-Quinta, Octavas o Walking) y registro (Grave/Medio). Con batería + este bajo + el looper de piano sonando a la vez, tienes una base completa para practicar guitarra encima — y todo pasa por el mismo EQ (reverb/chorus/delay) del conjunto.` },
+    { id: 'uso-ampli-nam', title: '¿Qué es el "Ampli (NAM)" del EQ y cómo lo uso?',
+      keywords: ['nam','ampli','neural amp modeler','clean','distorsion','distorsión','sonido real','ampli real','tone3000'],
+      answer: `Dentro de "🎛️ EQ · efectos del conjunto" hay un botón "📁 Cargar .nam" y un selector "Sin ampli / Con ampli NAM". Usa una tecnología llamada Neural Amp Modeler — una captura de un ampli real (no un filtro genérico) que colorea el sonido de forma mucho más realista. Elige cualquier archivo .nam de tu dispositivo (descárgalo de tone3000.com) — no hay modelos predefinidos ni nada que subir a la web, se carga localmente en tu navegador y se activa al momento. Afecta a las notas que toques en Escalas/Mástil/Técnica y a la línea de bajo del looper (no a la batería ni al looper de piano). "Sin ampli" vuelve al sonido normal sin tener que recargar nada; para cambiar de captura, vuelve a pulsar "Cargar .nam" y elige otra.` },
     { id: 'uso-backing-track-youtube', title: '¿Cómo practico con un backing track de YouTube?',
       keywords: ['backing track','youtube','video de youtube','practicar con video','que escala usar con backing track','tonalidad del video'],
       answer: `Dentro del panel de FretTeacher (🎓, abajo a la derecha) hay una caja específica: "🎯 O pega el título de un backing track de YouTube...". Pega ahí el título completo del vídeo (cuantos más datos, mejor: título + lo que ponga la descripción) y pulsa Analizar. Si detecta la tonalidad (busca patrones como "A Minor" o una lista de acordes tipo "Am-F-C-G"), te muestra la tónica, el modo, el relativo, y dos botones: uno para ir a Escalas con la Pentatónica correspondiente y otro con la escala completa. Si no detecta nada claro, te deja elegir tónica y modo a mano con un par de botones y te lleva igual. Esto es un analizador de patrones de texto, no entiende el vídeo ni lo escucha — si el título no sigue un formato reconocible, usa el selector manual que aparece debajo.
@@ -6201,6 +6225,67 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
 
   // ---------- AUDIO + ANIMACIÓN ----------
   let audioCtx = null;
+  // ---------- AMPLI NAM (Neural Amp Modeler) — motor real de bajo nivel ----------
+  // se importa dinámicamente (import() funciona dentro de un <script> clásico) usando el
+  // importmap del <head>; nada de esto bloquea la carga inicial de la app, solo se activa
+  // si el usuario elige un ampli en el EQ.
+  let namEngine = null, namNode = null;
+  let namDryGain = null, namWetGain = null; // mismo patrón dry/wet validado en la prueba aislada
+  let namLoadedText = null; // último texto de modelo ya cargado en el nodo — evita recargar si no ha cambiado
+
+  // cualquier fuente de guitarra/bajo sintetizada (nota interactiva o looper) llama a esto en
+  // vez de conectar directo al destino/bus — reparte la señal por los caminos seco/procesado
+  // y el gain de cada uno decide cuál se oye, sin reconectar nada al cambiar de ampli
+  function ampChainInput(){
+    const ctx = getAudioCtx();
+    if (!namDryGain) {
+      namDryGain = ctx.createGain(); namDryGain.gain.value = 1;
+      namWetGain = ctx.createGain(); namWetGain.gain.value = 0;
+      namDryGain.connect(getDrumMasterBus());
+      namWetGain.connect(getDrumMasterBus());
+    }
+    const input = ctx.createGain(); // nodo de entrada nuevo por nota, se conecta a ambos caminos
+    input.connect(namDryGain);
+    if (namNode) input.connect(namNode);
+    return input;
+  }
+
+  async function setNamAmpMode(mode){
+    state.namAmp.mode = mode;
+    const statusEl = $('#namAmpStatus');
+    if (mode === 'none') {
+      if (namDryGain) { namDryGain.gain.value = 1; namWetGain.gain.value = 0; }
+      if (statusEl) statusEl.textContent = state.namAmp.modelName ? ('cargado: ' + state.namAmp.modelName + ' (en pausa)') : '';
+      return;
+    }
+    if (!state.namAmp.jsonText) {
+      if (statusEl) statusEl.textContent = 'Carga primero un archivo .nam';
+      state.namAmp.mode = 'none';
+      return;
+    }
+    try {
+      if (statusEl) statusEl.textContent = 'cargando...';
+      const ctx = getAudioCtx();
+      ampChainInput(); // asegura que dryGain/wetGain existan antes de conectar namNode
+      if (!namEngine) {
+        const { NamEngine } = await import('neural-amp-modeler-wasm/engine');
+        namEngine = await NamEngine.attach(ctx);
+        namNode = await namEngine.createNode();
+        namNode.connect(namWetGain);
+      }
+      if (namLoadedText !== state.namAmp.jsonText) {
+        await namNode.loadModel(state.namAmp.jsonText);
+        namLoadedText = state.namAmp.jsonText;
+      }
+      namDryGain.gain.value = 0; namWetGain.gain.value = 1;
+      if (statusEl) statusEl.textContent = '✅ ' + state.namAmp.modelName;
+    } catch (err) {
+      if (statusEl) statusEl.textContent = '❌ ' + err.message;
+      state.namAmp.mode = 'none';
+      document.querySelectorAll('#namAmpGroup button').forEach(b => b.classList.toggle('active', b.dataset.namMode === 'none'));
+    }
+  }
+
   function getAudioCtx(){
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -6418,13 +6503,12 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(peakGain, time);
     gain.gain.exponentialRampToValueAtTime(0.0005, time + dur);
-    src.connect(hp).connect(gain).connect(bus);
+    src.connect(hp).connect(gain).connect(ampChainInput()); // mismo camino que el cuerpo de la nota, para que el ataque y el tono pasen juntos por el ampli
     src.start(time);
   }
 
   function playBassLooperTone(time, midi, vol, dur){
     const ctx = getAudioCtx();
-    const bus = getDrumMasterBus();
     const freq = 440 * Math.pow(2, (midi - 69) / 12);
     const ringTail = dur + 0.3;
     // decay y filtro ligeramente aleatorios (±) para que dos notas iguales seguidas no suenen
@@ -6446,10 +6530,10 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     gain.gain.exponentialRampToValueAtTime(safeVol, time + 0.01);
     gain.gain.setValueAtTime(safeVol, time + Math.max(dur - 0.05, 0.01));
     gain.gain.exponentialRampToValueAtTime(0.0001, time + dur + 0.05);
-    src.connect(filter).connect(body).connect(gain).connect(bus);
+    src.connect(filter).connect(body).connect(gain).connect(ampChainInput());
     src.start(time);
     src.stop(time + ringTail + 0.05);
-    playBassPickAttack(ctx, bus, time, 0.16); // el "clack" del ataque, antes ausente por completo
+    playBassPickAttack(ctx, null, time, 0.16); // el "clack" del ataque, antes ausente por completo
   }
 
   // ¿es este el ÚLTIMO compás que le toca sonar a este acorde antes de pasar al siguiente?
@@ -7020,7 +7104,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(peakGain, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.0005, ctx.currentTime + dur);
-    src.connect(hp).connect(gain).connect(ctx.destination);
+    src.connect(hp).connect(gain).connect(ampChainInput());
     src.start();
   }
 
@@ -7041,7 +7125,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(peakGain, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.0005, ctx.currentTime + dur);
-    src.connect(filter).connect(body).connect(gain).connect(ctx.destination);
+    src.connect(filter).connect(body).connect(gain).connect(ampChainInput());
     src.start();
   }
 
@@ -7748,6 +7832,21 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       state.bassLooper.octave = Number(b.dataset.boct);
       document.querySelectorAll('#bassLooperOctaveGroup button').forEach(x => x.classList.toggle('active', x === b));
     });
+  });
+  document.querySelectorAll('#namAmpGroup button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#namAmpGroup button').forEach(x => x.classList.toggle('active', x === b));
+      setNamAmpMode(b.dataset.namMode);
+    });
+  });
+  $('#namFileInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    state.namAmp.jsonText = await file.text();
+    state.namAmp.modelName = file.name;
+    document.querySelector('#namAmpGroup button[data-nam-mode="on"]').disabled = false;
+    document.querySelectorAll('#namAmpGroup button').forEach(x => x.classList.toggle('active', x.dataset.namMode === 'on'));
+    setNamAmpMode('on'); // cargar y aplicar de inmediato, tal como se pidió
   });
   $('#drumFxReverbSlider').addEventListener('input', e => {
     setDrumFxSend('reverb', Number(e.target.value) / 100);
