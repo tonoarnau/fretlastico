@@ -613,6 +613,7 @@
     <button data-tab="acordes">Acordes</button>
     <button data-tab="mastil">Mástil</button>
     <button data-tab="tecnica">Técnica</button>
+    <button data-tab="licks">Licks</button>
     <button data-tab="piano">Piano</button>
     <button data-tab="triads">Tríadas</button>
     <button data-tab="oido">Oído</button>
@@ -887,6 +888,22 @@
   <span class="label">Traste de inicio</span>
   <div class="pill-group" id="tecnicaStartGroup"></div>
 </div>
+
+<div class="sub-row" id="licksRow" style="display:none;">
+  <span class="label">Patrón</span>
+  <div class="pill-group" id="licksModeGroup">
+    <button data-lickmode="house" class="active">🏠 House Pattern (BB Box)</button>
+    <button data-lickmode="box">Caja pentatónica (usa la Zona de arriba)</button>
+  </div>
+</div>
+<div class="sub-row" id="licksPickRow" style="display:none;">
+  <span class="label">Lick</span>
+  <div class="pill-group" id="licksPickGroup"></div>
+</div>
+<div id="licksStaffWrap" style="display:none; background:var(--panel); border:1px solid var(--panel-edge); border-radius:10px; padding:8px; margin: 0 16px 10px;">
+  <svg id="licksStaffSVG" style="width:100%; height:auto; display:block; background:#f4f1e8; border-radius:6px;"></svg>
+</div>
+<p class="theory-note theory-note-small" id="licksExplainer" style="display:none; padding: 0 16px 10px;"></p>
 
 <div class="sub-row" id="styleZoneRow" style="display:none;">
   <span class="label">Posición</span>
@@ -2812,6 +2829,8 @@
       fx: { reverb:0, chorus:0, delay:0 } },
     pianoLooper: { active:false, volume:0.5, chords:[], pattern:'pad', timbre:'triangle', presetTonality:'major', build:{ root:0, quality:'major', octave:3, bars:1 } },
     bassLooper: { active:false, volume:0.6, pattern:'raiz5', octave:1 }, // usa los MISMOS acordes que pianoLooper.chords — no duplica la progresión
+    lickMode: 'house', // 'house' | 'box' — pestaña Licks
+    lickId: 0,
     namAmp: { mode:'none', modelName:null, jsonText:null }, // 'none'|'on' — un único slot, se rellena con cualquier .nam elegido del dispositivo
     oido: { mode:'intervalo', playback:'melodic', target:null, guess:null, score:0, attempts:0 },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
@@ -2921,6 +2940,9 @@ Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (sil
     { id: 'uso-ampli-nam', title: '¿Qué es el "Ampli (NAM)" del EQ y cómo lo uso?',
       keywords: ['nam','ampli','neural amp modeler','clean','distorsion','distorsión','sonido real','ampli real','tone3000'],
       answer: `Dentro de "🎛️ EQ · efectos del conjunto" hay un botón "📁 Cargar .nam" y un selector "Sin ampli / Con ampli NAM". Usa una tecnología llamada Neural Amp Modeler — una captura de un ampli real (no un filtro genérico) que colorea el sonido de forma mucho más realista. Elige cualquier archivo .nam de tu dispositivo (descárgalo de tone3000.com) — no hay modelos predefinidos ni nada que subir a la web, se carga localmente en tu navegador y se activa al momento. Afecta a las notas que toques en Escalas/Mástil/Técnica y a la línea de bajo del looper (no a la batería ni al looper de piano). "Sin ampli" vuelve al sonido normal sin tener que recargar nada; para cambiar de captura, vuelve a pulsar "Cargar .nam" y elige otra.` },
+    { id: 'uso-licks', title: '¿Qué es la pestaña Licks y cómo la uso?',
+      keywords: ['licks','house pattern','bb box','solos','practicar solos','frases','pentatonica'],
+      answer: `La pestaña Licks tiene frases cortas (originales, no copiadas de ningún curso) para practicar improvisación de solos, no solo subir y bajar la escala. Dos modos: "🏠 House Pattern (BB Box)" — un patrón clásico del blues (basado en el concepto de Griff Hamlin/Blues Guitar Unleashed) que mezcla 5 notas de la pentatónica menor en solo 2 cuerdas agudas, sin moverte de sitio — y "Caja pentatónica", que usa la Zona del mástil que elijas arriba, como una escala normal. Elige un lick de la lista, y lo ves a la vez en el mástil animado, en tablatura (debajo) y en un pentagrama compacto. Muévete de tónica como en cualquier otra pestaña — los licks se recalculan solos para la nueva tónica.` },
     { id: 'uso-backing-track-youtube', title: '¿Cómo practico con un backing track de YouTube?',
       keywords: ['backing track','youtube','video de youtube','practicar con video','que escala usar con backing track','tonalidad del video'],
       answer: `Dentro del panel de FretTeacher (🎓, abajo a la derecha) hay una caja específica: "🎯 O pega el título de un backing track de YouTube...". Pega ahí el título completo del vídeo (cuantos más datos, mejor: título + lo que ponga la descripción) y pulsa Analizar. Si detecta la tonalidad (busca patrones como "A Minor" o una lista de acordes tipo "Am-F-C-G"), te muestra la tónica, el modo, el relativo, y dos botones: uno para ir a Escalas con la Pentatónica correspondiente y otro con la escala completa. Si no detecta nada claro, te deja elegir tónica y modo a mano con un par de botones y te lleva igual. Esto es un analizador de patrones de texto, no entiende el vídeo ni lo escucha — si el título no sigue un formato reconocible, usa el selector manual que aparece debajo.
@@ -4141,6 +4163,11 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       if (line.length > 0) return [Math.min(...line.map(n => n.fret)), Math.max(...line.map(n => n.fret))];
       return [0, WALKING_SEARCH_MAX_FRET];
     }
+    if (state.tab === 'licks' && state.lickMode === 'house') {
+      const notes = houseBoxNotes();
+      if (notes.length > 0) return [Math.min(...notes.map(n => n.fret)), Math.max(...notes.map(n => n.fret))];
+      return [0, 4];
+    }
     if (usingSequenceMode()) return [0, MAX_FRET]; // secuencia de calentamiento: mástil entero
     if (state.tab === 'escalas' && state.threeNPS && THREE_NPS_SCALES.has(state.scaleKey)) {
       const pattern = current3NPSPattern();
@@ -4176,10 +4203,12 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     const usingStyle = state.tab === 'estilos';
     const usingMastil = state.tab === 'mastil';
     const usingTecnica = state.tab === 'tecnica';
+    const usingLicks = state.tab === 'licks';
     const usingWalking = usingWalkingBass();
     const saved = usingStyle
       ? { scaleKey: state.scaleKey, chromatic: state.chromatic, zoneMode: state.zoneMode, zone: state.zone }
       : null;
+    const savedLicks = usingLicks ? { scaleKey: state.scaleKey, chromatic: state.chromatic } : null;
     const savedChromatic = (usingMastil || usingTecnica || usingWalking) ? state.chromatic : null;
     let styleBoxes = [];
     if (usingStyle) {
@@ -4194,11 +4223,19 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     if (usingMastil || usingTecnica || usingWalking) {
       state.chromatic = true; // mástil / técnica / línea de bajo: no dependen de ninguna escala
     }
+    if (usingLicks) {
+      // Licks siempre usa pentatónica menor (base clásica del blues/rock), tanto en modo
+      // House Pattern como en modo Caja — la Zona (para el modo Caja) es la que ya elige
+      // el usuario en la fila de Zona reutilizada, sin tocarla aquí.
+      state.chromatic = false;
+      state.scaleKey = 'pent_menor';
+    }
 
     try {
       renderInner(usingStyle, styleBoxes);
     } finally {
       if (usingStyle) Object.assign(state, saved);
+      if (usingLicks) Object.assign(state, savedLicks);
       if (usingMastil || usingTecnica || usingWalking) state.chromatic = savedChromatic; // se restaura la preferencia real del usuario
     }
   }
@@ -4219,7 +4256,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     'extensionsSection', 'seventhHarmonySection', 'chordScaleSection', 'chromaticApproachSection',
     'reverseAnalysisSection', 'cadencesSection',
     'patternGroup', 'styleGroup', 'styleRandomBtn', 'scaleSelect', 'chromaticToggle',
-    'quizToggle', 'styleZoneRow'
+    'quizToggle', 'styleZoneRow', 'licksRow', 'licksPickRow', 'licksStaffWrap', 'licksExplainer'
   ];
   const GUITAR_ONLY_CLASSES = ['board-shell', 'riff-panel'];
 
@@ -4233,6 +4270,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     const usingAcordes = state.tab === 'acordes';
     const usingMastil = state.tab === 'mastil';
     const usingTecnica = state.tab === 'tecnica';
+    const usingLicks = state.tab === 'licks';
     const usingPiano = state.tab === 'piano';
     const usingTriads = state.tab === 'triads';
     const usingOido = state.tab === 'oido';
@@ -4250,10 +4288,15 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     $('#modeTheorySection').style.display = '';
     $('#circleTheorySection').style.display = '';
     $('footer').style.display = '';
-    $('#zoneRow').style.display = (usingStyle || usingAcordes || usingMastil || usingTecnica) ? 'none' : 'flex';
+    $('#zoneRow').style.display = (usingStyle || usingAcordes || usingMastil || usingTecnica || (usingLicks && state.lickMode === 'house')) ? 'none' : 'flex';
     $('#styleZoneRow').style.display = (usingStyle && !usingAcordes) ? 'flex' : 'none';
     $('#tecnicaRow').style.display = usingTecnica ? 'flex' : 'none';
     $('#tecnicaExerciseRow').style.display = usingTecnica ? 'flex' : 'none';
+    $('#licksRow').style.display = usingLicks ? 'flex' : 'none';
+    $('#licksPickRow').style.display = usingLicks ? 'flex' : 'none';
+    $('#licksStaffWrap').style.display = usingLicks ? 'block' : 'none';
+    $('#licksExplainer').style.display = usingLicks ? 'block' : 'none';
+    if (usingLicks) renderLicksControls();
     $('#powerChordSection').style.display = usingTecnica ? '' : 'none';
     $('#lickTechSection').style.display = usingTecnica ? '' : 'none';
     $('#barreTechSection').style.display = usingTecnica ? '' : 'none';
@@ -4349,6 +4392,11 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     // en la vista "línea de bajo" de Acordes > Progresión, solo las notas exactas de esa línea
     if (usingWalkingBass()) {
       nps3Set = new Set(buildBassLine().map(n => n.sIdx + '-' + n.fret));
+    }
+    // Licks en modo House Pattern: solo esas 5 notas concretas en las 2 cuerdas agudas,
+    // no toda la caja pentatónica genérica de la Zona (que sí se muestra en modo "Caja")
+    if (state.tab === 'licks' && state.lickMode === 'house') {
+      nps3Set = new Set(houseBoxNotes().map(n => n.sIdx + '-' + n.fret));
     }
 
     // numeración de trastes (espaciador a la DERECHA, alineado con la columna de etiquetas de cuerda)
@@ -4625,6 +4673,166 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   function buildRiff(){
     if (usingSequenceMode()) return buildSequenceFromNotes(buildDiagonalRangeNotes(0, MAX_FRET));
     return applyPattern(positionNotes());
+  }
+
+  // ---------- LICKS ----------
+  // "House Pattern" (también llamado BB Box): patrón de Griff Hamlin (Blues Guitar Unleashed) que
+  // mezcla, en solo 2 cuerdas agudas, 5 notas concretas de la pentatónica menor — 5ª, b7ª (por
+  // debajo de la tónica), tónica, b3ª y 4ª — sin necesitar moverse de sitio en el mástil. Aquí se
+  // reconstruye la forma buscando esas 5 notas EXACTAS (grados verificados) dentro de la ventana
+  // de trastes más grave posible en las 2 cuerdas más agudas — no es una copia de ningún diagrama
+  // de un curso de pago, es la teoría real recalculada desde cero.
+  function houseBoxNotes(){
+    const tuning = TUNINGS[state.instrument];
+    const midiOpen = OPEN_MIDI[state.instrument];
+    const n = tuning.length;
+    const topStrings = [n - 2, n - 1];
+    const rootPc = state.root;
+    const wantedPcs = [(rootPc + 7) % 12, (rootPc + 10) % 12, rootPc, (rootPc + 3) % 12, (rootPc + 5) % 12];
+    let best = null;
+    for (let lo = 0; lo <= 11 && !best; lo++) {
+      const hi = lo + 4;
+      const found = [];
+      let ok = true;
+      for (const pc of wantedPcs) {
+        let match = null;
+        for (const sIdx of topStrings) {
+          for (let f = lo; f <= hi; f++) {
+            if ((pitchClassIndex(tuning[sIdx]) + f) % 12 === pc) { match = { sIdx, fret: f, pc, midi: midiOpen[sIdx] + f }; break; }
+          }
+          if (match) break;
+        }
+        if (!match) { ok = false; break; }
+        found.push(match);
+      }
+      if (ok) best = found;
+    }
+    if (!best) return [];
+    best.sort((a, b) => a.midi - b.midi);
+    const dedup = [];
+    let lastMidi = null;
+    best.forEach(nt => { if (nt.midi !== lastMidi) { dedup.push(nt); lastMidi = nt.midi; } });
+    return dedup;
+  }
+
+  // licks ORIGINALES (no reproducidos de ningún curso), pensados para practicar frases de solo
+  // reales en vez de solo subir/bajar la escala. Cada paso referencia un índice dentro de las
+  // notas reales de la caja activa (houseBoxNotes() o positionNotes(), según el modo) — igual
+  // que ya hacen los riffs de Estilos, así que cualquier nota siempre sale del motor verificado.
+  const LICK_LIBRARY = {
+    house: [
+      { name: 'Frase corta', steps: [
+        {idx:2,dur:1},{idx:1,dur:1},{idx:0,dur:2},{idx:3,dur:1},{idx:4,dur:2},{idx:2,dur:2}
+      ]},
+      { name: 'Repetición rítmica', steps: [
+        {idx:4,dur:1},{idx:3,dur:1},{idx:4,dur:1},{idx:3,dur:1},{idx:2,dur:1},{idx:1,dur:1},{idx:0,dur:3}
+      ]},
+      { name: 'Resolución a la tónica', steps: [
+        {idx:1,dur:1},{idx:2,dur:1},{idx:3,dur:1},{idx:4,dur:1},{idx:3,dur:1},{idx:2,dur:1},{idx:1,dur:1},{idx:0,dur:4}
+      ]}
+    ],
+    box: [
+      { name: 'Ascendente-descendente', steps: [
+        {idx:0,dur:1},{idx:1,dur:1},{idx:2,dur:1},{idx:3,dur:1},{idx:2,dur:1},{idx:1,dur:1},{idx:0,dur:3}
+      ]},
+      { name: 'Motivo repetido', steps: [
+        {idx:0,dur:1},{idx:2,dur:1},{idx:1,dur:1},{idx:0,dur:2},{idx:2,dur:1},{idx:1,dur:1},{idx:0,dur:3}
+      ]},
+      { name: 'Frase larga con silencio', steps: [
+        {idx:3,dur:1},{idx:2,dur:1},{idx:1,dur:1},{idx:0,dur:1},{rest:true,dur:1},{idx:1,dur:1},{idx:0,dur:3}
+      ]}
+    ]
+  };
+
+  function currentLickNotes(){
+    return state.lickMode === 'house' ? houseBoxNotes() : positionNotes();
+  }
+
+  function buildLickRiff(){
+    const notes = currentLickNotes();
+    if (notes.length === 0) return [];
+    const lib = LICK_LIBRARY[state.lickMode];
+    const lickIdx = Math.min(state.lickId, lib.length - 1);
+    const lick = lib[lickIdx];
+    return lick.steps.map(step => {
+      const durSec = (step.dur / 2) * (60 / state.bpm);
+      if (step.rest) return { rest: true, sIdx: null, fret: null, midi: null, durSec };
+      const n = notes[((step.idx % notes.length) + notes.length) % notes.length];
+      return { ...n, durSec, accent: n.pc === state.root, mute: false };
+    });
+  }
+
+  function renderLicksControls(){
+    document.querySelectorAll('#licksModeGroup button').forEach(b => {
+      b.classList.toggle('active', b.dataset.lickmode === state.lickMode);
+    });
+    const lib = LICK_LIBRARY[state.lickMode];
+    if (state.lickId >= lib.length) state.lickId = 0;
+    const pickWrap = $('#licksPickGroup');
+    pickWrap.innerHTML = '';
+    lib.forEach((lick, i) => {
+      const b = document.createElement('button');
+      b.textContent = lick.name;
+      if (i === state.lickId) b.classList.add('active');
+      b.addEventListener('click', () => { state.lickId = i; render(); });
+      pickWrap.appendChild(b);
+    });
+    $('#licksExplainer').textContent = state.lickMode === 'house'
+      ? 'House Pattern (BB Box): 5 notas de la pentatónica menor repartidas en solo 2 cuerdas agudas, sin cambiar de posición — patrón de Griff Hamlin (Blues Guitar Unleashed), recalculado aquí con teoría real, no copiado de ningún diagrama.'
+      : 'Caja pentatónica: usa la Zona del mástil elegida arriba como si fuera una escala más — cambia de Zona para practicar el mismo lick en otra posición del mástil.';
+  }
+
+  // ---------- LICKS: pentagrama compacto (clave de Sol, secuencia horizontal) ----------
+  // reutiliza las mismas piezas ya verificadas del pentagrama de Piano (pianoY, pianoLedgerPositions,
+  // PIANO_NOTE_INFO) pero en un layout horizontal nuevo: una nota detrás de otra en el tiempo,
+  // en vez de una sola nota fija — eso no existía todavía en la app.
+  const LICK_STAFF_STEP_PX = 34;
+  // escala propia del pentagrama compacto de Licks (no reutiliza pianoY/centerY, que están
+  // pensados para un lienzo mucho más alto, Do1-Do7 completo) — sí reutiliza el CONCEPTO de
+  // "relPos" (posición diatónica respecto a Do4) y las tablas de letras/alteraciones del piano.
+  function lickY(relPos){
+    const stepY = 6.2, centerY = 90, refRel = 6; // refRel=6 -> Sol4, línea central de clave de Sol
+    return centerY - (relPos - refRel) * stepY;
+  }
+  function midiToRelPos(midi){
+    const pc = ((midi % 12) + 12) % 12;
+    const octave = Math.floor(midi / 12) - 1;
+    const info = PIANO_NOTE_INFO[pc];
+    return pianoDiatonicIndex(info.letter, octave) - PIANO_C4_INDEX;
+  }
+  function renderLickStaff(riff){
+    const svg = $('#licksStaffSVG');
+    const ns = 'http://www.w3.org/2000/svg';
+    const mk = (tag, attrs) => {
+      const el = document.createElementNS(ns, tag);
+      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, String(v)));
+      return el;
+    };
+    const notesOnly = riff.filter(s => !s.rest && !s.chord);
+    const w = Math.max(320, 70 + notesOnly.length * LICK_STAFF_STEP_PX + 40);
+    svg.setAttribute('viewBox', `0 0 ${w} 180`);
+    svg.innerHTML = '';
+
+    [2,4,6,8,10].forEach(rel => {
+      const ly = lickY(rel);
+      svg.appendChild(mk('line', { x1: 50, x2: w - 20, y1: ly, y2: ly, stroke:'#2a2a2a', 'stroke-width':1 }));
+    });
+    const clefG = mk('text', { x: 10, y: lickY(4) + 9, 'font-size': 26, 'font-family': 'Georgia, serif', 'font-weight': 700, fill: '#1a1a1a' });
+    clefG.textContent = 'G';
+    svg.appendChild(clefG);
+
+    let x = 65;
+    riff.forEach((step, i) => {
+      if (step.rest || step.chord) { x += LICK_STAFF_STEP_PX; return; }
+      const relPos = midiToRelPos(step.midi);
+      const y = lickY(relPos);
+      const g = mk('g', { class: 'lick-staff-note', 'data-idx': i });
+      if (relPos > 10) for (let r = 12; r <= relPos; r += 2) g.appendChild(mk('line', { x1: x - 10, x2: x + 10, y1: lickY(r), y2: lickY(r), stroke:'#000', 'stroke-width':1 }));
+      if (relPos < 2) for (let r = 0; r >= relPos; r -= 2) g.appendChild(mk('line', { x1: x - 10, x2: x + 10, y1: lickY(r), y2: lickY(r), stroke:'#000', 'stroke-width':1 }));
+      g.appendChild(mk('ellipse', { cx: x, cy: y, rx: 6, ry: 4.5, fill: step.accent ? '#D94F4F' : '#1a1a1a' }));
+      svg.appendChild(g);
+      x += LICK_STAFF_STEP_PX;
+    });
   }
 
   // riff de estilo: aplica la plantilla rítmica del estilo sobre las notas reales de la caja
@@ -6185,9 +6393,11 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   function rebuildCurrentRiff(){
     currentRiff = state.tab === 'estilos' ? buildStyleRiff()
       : state.tab === 'tecnica' ? buildChromaticExercise()
+      : state.tab === 'licks' ? buildLickRiff()
       : usingWalkingBass() ? buildBassLine()
       : buildRiff();
     $('#tabDisplay').textContent = renderTab(currentRiff);
+    if (state.tab === 'licks') renderLickStaff(currentRiff);
     $('#playRiffBtn').disabled = currentRiff.length === 0 || state.playing;
 
     const nps3Active = (state.tab === 'escalas' && state.threeNPS && THREE_NPS_SCALES.has(state.scaleKey)) || state.tab === 'tecnica' || usingWalkingBass();
@@ -7833,6 +8043,13 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       document.querySelectorAll('#bassLooperOctaveGroup button').forEach(x => x.classList.toggle('active', x === b));
     });
   });
+  document.querySelectorAll('#licksModeGroup button').forEach(b => {
+    b.addEventListener('click', () => {
+      state.lickMode = b.dataset.lickmode;
+      state.lickId = 0;
+      render();
+    });
+  });
   document.querySelectorAll('#namAmpGroup button').forEach(b => {
     b.addEventListener('click', () => {
       document.querySelectorAll('#namAmpGroup button').forEach(x => x.classList.toggle('active', x === b));
@@ -8080,6 +8297,9 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     }
     if (t === 'tecnica') {
       return { title: '📍 Ahora mismo: Técnica', text: 'Consejo: practica siempre con metrónomo, aunque vayas despacio — la técnica que se entrena sin pulso estable no se transfiere bien a tocar canciones reales.' };
+    }
+    if (t === 'licks') {
+      return { title: '📍 Ahora mismo: Licks', text: 'Consejo: aprende el lick de memoria primero SIN el metrónomo, y solo después ponle tempo — mezclar "aprender las notas" y "meterlo en tiempo" a la vez suele ser lo que más frena al principio.' };
     }
     if (t === 'estilos') {
       return { title: '📍 Ahora mismo: Estilos', text: `Estás explorando riffs de estilo (${state.style}). Consejo: no te limites a escuchar — activa la reproducción lenta y tócalo tú encima, aunque sea a trozos.` };
