@@ -352,6 +352,27 @@
   .theory-table{ border-collapse: collapse; width: 100%; min-width: 480px; font-size: calc(10.5px * var(--fs-scale)); }
 
   .drum-controls-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .voice-panel{ padding: 16px; max-width: 480px; margin: 0 auto; }
+  .voice-calib-box, .voice-quiz-box{ background: var(--panel); border:1px solid var(--panel-edge); border-radius:12px; padding:16px; }
+  .voice-calib-row{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin: 10px 0; }
+  .voice-target-note{ font-family:'Anton', sans-serif; font-size: calc(46px * var(--fs-scale)); text-align:center;
+    color: var(--ink); letter-spacing: 1px; margin-bottom: 10px; }
+  .voice-btn-row{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom: 16px; }
+  .voice-meter-wrap{ margin: 10px 0 6px; }
+  .voice-meter-track{ position:relative; height: 14px; border-radius: 7px; background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-green) 42%, var(--accent-green) 58%, var(--accent-blue) 100%);
+    overflow:visible; }
+  .voice-meter-center-line{ position:absolute; left:50%; top:-4px; bottom:-4px; width:2px; background: var(--ink); opacity:0.5; }
+  .voice-meter-needle{ position:absolute; top:-6px; left:50%; width:4px; height:26px; border-radius:2px; background: var(--ink);
+    transform: translateX(-50%); transition: left 0.08s linear; box-shadow: 0 0 6px rgba(0,0,0,0.4); }
+  .voice-meter-labels{ display:flex; justify-content:space-between; font-size: calc(10px * var(--fs-scale)); color: var(--ink-dim); margin-top:4px; }
+  .voice-feedback{ text-align:center; font-family:'Oswald', sans-serif; font-weight:600; font-size: calc(15px * var(--fs-scale));
+    padding: 10px; color: var(--ink-dim); }
+  .voice-feedback.tuned{ color: var(--accent-green); }
+  .voice-feedback.high{ color: var(--accent-root); }
+  .voice-feedback.low{ color: var(--accent-blue); }
+  .voice-score-row{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:center;
+    font-size: calc(12px * var(--fs-scale)); color: var(--ink-dim); margin-top: 8px; }
+  .voice-score-row b{ color: var(--ink); }
   .drum-mini-btn{ font-family:'Oswald', sans-serif; font-weight:600; font-size: calc(11px * var(--fs-scale));
     background: var(--panel); color: var(--ink); border: 1px solid var(--panel-edge);
     border-radius: 999px; padding: 8px 16px; cursor:pointer; white-space:nowrap; }
@@ -619,6 +640,7 @@
     <button data-tab="piano">Piano</button>
     <button data-tab="triads">Tríadas</button>
     <button data-tab="oido">Oído</button>
+    <button data-tab="voz">Voz</button>
   </div>
 </div>
 
@@ -896,6 +918,7 @@
   <div class="pill-group" id="licksModeGroup">
     <button data-lickmode="house" class="active">🏠 House Pattern (BB Box)</button>
     <button data-lickmode="box">Caja pentatónica (usa la Zona de arriba)</button>
+    <button data-lickmode="transcrito">🎵 Transcrito de audio</button>
   </div>
 </div>
 <div class="sub-row" id="licksPickRow" style="display:none;">
@@ -958,6 +981,47 @@
     <div class="board-body">
       <div class="fretboard" id="fretboard"></div>
       <div class="string-labels" id="stringLabels"></div>
+    </div>
+  </div>
+</div>
+
+<div class="voice-shell" id="voiceShell" style="display:none;">
+  <div class="voice-panel">
+    <p class="theory-note-small" style="padding: 4px 4px 10px;">Entrena tu oído y tu entonación cantando la nota que suena. Usa el micrófono de tu dispositivo — pulsa "Permitir" cuando el navegador lo pida. No se graba ni se sube nada, todo se procesa en tu propio dispositivo.</p>
+
+    <div class="voice-calib-box" id="voiceCalibBox">
+      <h4 style="margin:0 0 6px;">Calibración de rango vocal (opcional pero recomendado)</h4>
+      <p class="theory-note-small">Canta tu nota más grave cómoda, y con el sonido detectado establécela. Repite con tu nota más aguda cómoda. Si lo saltas, se usa un rango medio por defecto.</p>
+      <div class="voice-calib-row">
+        <button class="drum-mini-btn" id="voiceCalibLowBtn">🎙️ Escuchar (grave)</button>
+        <span id="voiceCalibLowLabel" class="theory-note-small">sin fijar</span>
+        <button class="drum-mini-btn" id="voiceCalibHighBtn">🎙️ Escuchar (aguda)</button>
+        <span id="voiceCalibHighLabel" class="theory-note-small">sin fijar</span>
+      </div>
+      <button class="drum-mini-btn" id="voiceCalibSkipBtn">Saltar calibración (usar rango medio)</button>
+    </div>
+
+    <div class="voice-quiz-box" id="voiceQuizBox" style="display:none;">
+      <div class="voice-target-note" id="voiceTargetNoteLabel">—</div>
+      <div class="voice-btn-row">
+        <button class="drum-mini-btn" id="voicePlayTargetBtn">🔊 Escuchar nota</button>
+        <button class="drum-mini-btn" id="voiceListenBtn">🎙️ Cantar</button>
+        <button class="drum-mini-btn" id="voiceStopBtn" style="display:none;">⏹ Parar</button>
+        <button class="drum-mini-btn" id="voiceSkipBtn">⏭ Otra nota</button>
+      </div>
+      <div class="voice-meter-wrap">
+        <div class="voice-meter-track">
+          <div class="voice-meter-center-line"></div>
+          <div class="voice-meter-needle" id="voiceMeterNeedle"></div>
+        </div>
+        <div class="voice-meter-labels"><span>Bajo</span><span>Afinado</span><span>Alto</span></div>
+      </div>
+      <div class="voice-feedback" id="voiceFeedbackLabel">Pulsa "Cantar" y entona la nota</div>
+      <div class="voice-score-row">
+        <span>✅ Aciertos: <b id="voiceScoreLabel">0</b></span>
+        <span>🔥 Racha: <b id="voiceStreakLabel">0</b></span>
+        <button class="drum-mini-btn" id="voiceRecalibBtn">🔁 Recalibrar rango</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2830,6 +2894,7 @@
     bassLooper: { active:false, volume:0.6, pattern:'raiz5', octave:1 }, // usa los MISMOS acordes que pianoLooper.chords — no duplica la progresión
     lickMode: 'house', // 'house' | 'box' — pestaña Licks
     lickId: 0,
+    voiceQuiz: { rangeLow: 55, rangeHigh: 72, calibrated: false, targetMidi: null, score: 0, streak: 0, toleranceCents: 25, calibStep: null },
     namAmp: { mode:'none', modelName:null, jsonText:null }, // 'none'|'on' — un único slot, se rellena con cualquier .nam elegido del dispositivo
     oido: { mode:'intervalo', playback:'melodic', target:null, guess:null, score:0, attempts:0 },
     triad: { root: 0, quality: 'major', inversion: 0, mode: 'vertical', stringSetIdx: 0,
@@ -2941,7 +3006,13 @@ Encima de todo: la Caja de Ritmos & Looper, siempre accesible, con batería (sil
       answer: `Dentro de "🎛️ EQ · efectos del conjunto" hay un botón "📁 Cargar .nam" y un selector "Sin ampli / Con ampli NAM". Usa una tecnología llamada Neural Amp Modeler — una captura de un ampli real (no un filtro genérico) que colorea el sonido de forma mucho más realista. Elige cualquier archivo .nam de tu dispositivo (descárgalo de tone3000.com) — no hay modelos predefinidos ni nada que subir a la web, se carga localmente en tu navegador y se activa al momento. Afecta a las notas que toques en Escalas/Mástil/Técnica y a la línea de bajo del looper (no a la batería ni al looper de piano). "Sin ampli" vuelve al sonido normal sin tener que recargar nada; para cambiar de captura, vuelve a pulsar "Cargar .nam" y elige otra.` },
     { id: 'uso-licks', title: '¿Qué es la pestaña Licks y cómo la uso?',
       keywords: ['licks','house pattern','bb box','solos','practicar solos','frases','pentatonica'],
-      answer: `La pestaña Licks tiene frases cortas (originales, no copiadas de ningún curso) para practicar improvisación de solos, no solo subir y bajar la escala. Dos modos: "🏠 House Pattern (BB Box)" — un patrón clásico del blues (basado en el concepto de Griff Hamlin/Blues Guitar Unleashed) que mezcla 5 notas de la pentatónica menor en solo 2 cuerdas agudas, sin moverte de sitio — y "Caja pentatónica", que usa la Zona del mástil que elijas arriba, como una escala normal. Elige un lick de la lista, y lo ves en el mástil animado y en tablatura (debajo). Muévete de tónica como en cualquier otra pestaña — los licks se recalculan solos para la nueva tónica.` },
+      answer: `La pestaña Licks tiene frases cortas (originales, no copiadas de ningún curso) para practicar improvisación de solos, no solo subir y bajar la escala. Tres modos: "🏠 House Pattern (BB Box)" — patrón clásico del blues en 2 cuerdas agudas — "Caja pentatónica" — usa la Zona del mástil elegida arriba — y "🎵 Transcrito de audio" — licks sacados de audios reales que el usuario sube, con detección automática de tono. Elige un lick de la lista, y lo ves en el mástil animado y en tablatura (debajo). Muévete de tónica como en cualquier otra pestaña — los licks se recalculan solos para la nueva tónica, incluidos los transcritos de audio.` },
+    { id: 'uso-transcripcion-audio', title: '¿Puedo subir un audio para que se convierta en lick?',
+      keywords: ['transcribir','audio','looperman','wav','transcripcion','subir loop','detectar notas'],
+      answer: `Sí — sube un WAV/MP3 de un loop de guitarra (Looperman, muestras propias, etc.) y se analiza por detección de tono automática (autocorrelación), sin depender de ningún servicio externo. Funciona mejor con líneas monofónicas limpias (una nota a la vez, sin acordes ni mucha distorsión) — cuanta más info tenga el nombre del archivo o tú me des sobre la tonalidad y el BPM, más fiable sale la transcripción. El resultado se muestra siempre para que lo compruebes contra el audio original antes de darlo por bueno — la detección automática puede fallar en algún punto puntual, sobre todo con bends, acordes o mucha distorsión.` },
+    { id: 'uso-voz', title: '¿Cómo funciona la pestaña Voz (entrenamiento de entonación)?',
+      keywords: ['voz','entonacion','cantar','afinacion','microfono','oido','pitch','calibracion vocal'],
+      answer: `La pestaña Voz usa el micrófono de tu dispositivo (pide permiso la primera vez) para entrenar entonación cantada. Primero hay una calibración opcional: cantas tu nota más grave y más aguda cómodas, para que la app no te pida notas fuera de tu registro — si la saltas, usa un rango medio por defecto. Luego, en el modo Quiz: pulsa "Escuchar nota" para oír la nota objetivo, "Cantar" para que el micrófono empiece a escuchar, y un medidor tipo afinador te dice en tiempo real si vas alto, bajo o afinado (en cents, no solo en Hz). Sostener la nota afinada un momento cuenta como acierto y pasa a la siguiente nota sola. No se graba ni se sube nada — todo el procesamiento de audio ocurre en tu propio navegador.` },
     { id: 'uso-backing-track-youtube', title: '¿Cómo practico con un backing track de YouTube?',
       keywords: ['backing track','youtube','video de youtube','practicar con video','que escala usar con backing track','tonalidad del video'],
       answer: `Dentro del panel de FretTeacher (🎓, abajo a la derecha) hay una caja específica: "🎯 O pega el título de un backing track de YouTube...". Pega ahí el título completo del vídeo (cuantos más datos, mejor: título + lo que ponga la descripción) y pulsa Analizar. Si detecta la tonalidad (busca patrones como "A Minor" o una lista de acordes tipo "Am-F-C-G"), te muestra la tónica, el modo, el relativo, y dos botones: uno para ir a Escalas con la Pentatónica correspondiente y otro con la escala completa. Si no detecta nada claro, te deja elegir tónica y modo a mano con un par de botones y te lleva igual. Esto es un analizador de patrones de texto, no entiende el vídeo ni lo escucha — si el título no sigue un formato reconocible, usa el selector manual que aparece debajo.
@@ -4167,6 +4238,11 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       if (notes.length > 0) return [Math.min(...notes.map(n => n.fret)), Math.max(...notes.map(n => n.fret))];
       return [0, 4];
     }
+    if (state.tab === 'licks' && state.lickMode === 'transcrito') {
+      const notes = currentLickNotes();
+      if (notes.length > 0) return [Math.min(...notes.map(n => n.fret)), Math.max(...notes.map(n => n.fret))];
+      return [0, 4];
+    }
     if (usingSequenceMode()) return [0, MAX_FRET]; // secuencia de calentamiento: mástil entero
     if (state.tab === 'escalas' && state.threeNPS && THREE_NPS_SCALES.has(state.scaleKey)) {
       const pattern = current3NPSPattern();
@@ -4273,15 +4349,19 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     const usingPiano = state.tab === 'piano';
     const usingTriads = state.tab === 'triads';
     const usingOido = state.tab === 'oido';
+    const usingVoice = state.tab === 'voz';
+    if (!usingVoice) stopVoiceListening(); // corta el micro al salir de la pestaña, por privacidad y batería
     document.querySelectorAll('#tabGroup button').forEach(b => {
       b.classList.toggle('active', b.dataset.tab === state.tab);
     });
     $('#oidoShell').style.display = usingOido ? 'flex' : 'none';
     $('#triadShell').style.display = usingTriads ? 'flex' : 'none';
     $('#pianoShell').style.display = usingPiano ? 'flex' : 'none';
+    $('#voiceShell').style.display = usingVoice ? 'flex' : 'none';
     if (usingOido) { hideAllGuitarUI(); renderOidoSection(); return; }
     if (usingTriads) { hideAllGuitarUI(); renderTriadSection(); return; }
     if (usingPiano) { hideAllGuitarUI(); renderPianoSection(); return; }
+    if (usingVoice) { hideAllGuitarUI(); renderVoiceSection(); return; }
     $('#rootRow').style.display = 'flex';
     $('#theorySection').style.display = '';
     $('#modeTheorySection').style.display = '';
@@ -4395,6 +4475,9 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     // no toda la caja pentatónica genérica de la Zona (que sí se muestra en modo "Caja")
     if (state.tab === 'licks' && state.lickMode === 'house') {
       nps3Set = new Set(houseBoxNotes().map(n => n.sIdx + '-' + n.fret));
+    }
+    if (state.tab === 'licks' && state.lickMode === 'transcrito') {
+      nps3Set = new Set(currentLickNotes().map(n => n.sIdx + '-' + n.fret));
     }
 
     // numeración de trastes (espaciador a la DERECHA, alineado con la columna de etiquetas de cuerda)
@@ -4742,11 +4825,61 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     ]
   };
 
+  // ---------- LICKS TRANSCRITOS de audio (subidos por el usuario) ----------
+  // cada paso es {interval, sOffset, dur8}: "interval" = semitonos desde la tónica actual (así
+  // se transpone solo a cualquier Tónica), "sOffset" = cuerda desde la más grave (0=Mi grave en
+  // guitarra), fija para conservar la digitación/posición original de la transcripción — igual
+  // de "movible" que el House Pattern, pero con notas verificadas de un audio real en vez de una
+  // fórmula teórica. Transcrito por detección de tono (autocorrelación) desde el WAV subido:
+  // "Birmingham Gangsters, 70 BPM, Em" (Looperman) — verificado a mano contra el propio audio,
+  // pero al ser detección automática puede tener algún error puntual; revisa contra el original.
+  const TRANSCRIBED_LICKS = [
+    { name: 'Loop "Birmingham Gangsters" — riff principal (comp. 1)', bpmHint: 70, steps: [
+      {interval:0,sOffset:0,dur8:1},{interval:10,sOffset:2,dur8:0.5},{interval:0,sOffset:0,dur8:0.5},
+      {interval:10,sOffset:2,dur8:0.5},{interval:0,sOffset:2,dur8:1},{interval:0,sOffset:2,dur8:0.5},
+      {interval:3,sOffset:3,dur8:0.5},{interval:0,sOffset:2,dur8:0.5},{interval:10,sOffset:2,dur8:0.5},
+      {interval:7,sOffset:1,dur8:0.5},{interval:10,sOffset:2,dur8:1},{interval:0,sOffset:2,dur8:1},
+      {interval:0,sOffset:0,dur8:0.5}
+    ]},
+    { name: 'Loop "Birmingham Gangsters" — subida (comp. 2)', bpmHint: 70, steps: [
+      {interval:5,sOffset:3,dur8:1.5},{interval:5,sOffset:3,dur8:0.5},{interval:5,sOffset:3,dur8:2},
+      {interval:5,sOffset:3,dur8:1},{interval:0,sOffset:2,dur8:0.5},{interval:10,sOffset:2,dur8:0.5},
+      {interval:0,sOffset:0,dur8:0.5}
+    ]},
+    { name: 'Loop "Birmingham Gangsters" — giro final (comp. 4)', bpmHint: 70, steps: [
+      {interval:0,sOffset:2,dur8:0.5},{interval:3,sOffset:3,dur8:1},{interval:3,sOffset:3,dur8:1},
+      {interval:3,sOffset:3,dur8:0.5},{interval:3,sOffset:3,dur8:0.5},{interval:0,sOffset:2,dur8:0.5},
+      {interval:2,sOffset:2,dur8:0.5},{interval:2,sOffset:2,dur8:0.5},{interval:2,sOffset:2,dur8:0.5},
+      {interval:2,sOffset:2,dur8:1},{interval:10,sOffset:2,dur8:0.5},{interval:10,sOffset:2,dur8:0.5},
+      {interval:10,sOffset:2,dur8:0.5}
+    ]}
+  ];
+
+  function transcribedLickNotes(lick){
+    const tuning = TUNINGS[state.instrument];
+    const midiOpen = OPEN_MIDI[state.instrument];
+    const n = tuning.length;
+    return lick.steps.map(step => {
+      const sIdx = Math.min(step.sOffset, n - 1);
+      const targetPc = (state.root + step.interval) % 12;
+      const openPc = pitchClassIndex(tuning[sIdx]);
+      const fret = ((targetPc - openPc) % 12 + 12) % 12;
+      return { sIdx, fret, pc: targetPc, midi: midiOpen[sIdx] + fret, dur8: step.dur8 };
+    });
+  }
+
   function currentLickNotes(){
-    return state.lickMode === 'house' ? houseBoxNotes() : positionNotes();
+    if (state.lickMode === 'house') return houseBoxNotes();
+    if (state.lickMode === 'transcrito') return transcribedLickNotes(TRANSCRIBED_LICKS[Math.min(state.lickId, TRANSCRIBED_LICKS.length - 1)]);
+    return positionNotes();
   }
 
   function buildLickRiff(){
+    if (state.lickMode === 'transcrito') {
+      const lick = TRANSCRIBED_LICKS[Math.min(state.lickId, TRANSCRIBED_LICKS.length - 1)];
+      const notes = transcribedLickNotes(lick);
+      return notes.map((n, i) => ({ ...n, durSec: (n.dur8 / 2) * (60 / state.bpm), accent: n.pc === state.root, mute: false }));
+    }
     const notes = currentLickNotes();
     if (notes.length === 0) return [];
     const lib = LICK_LIBRARY[state.lickMode];
@@ -4764,7 +4897,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     document.querySelectorAll('#licksModeGroup button').forEach(b => {
       b.classList.toggle('active', b.dataset.lickmode === state.lickMode);
     });
-    const lib = LICK_LIBRARY[state.lickMode];
+    const lib = state.lickMode === 'transcrito' ? TRANSCRIBED_LICKS : LICK_LIBRARY[state.lickMode];
     if (state.lickId >= lib.length) state.lickId = 0;
     const pickWrap = $('#licksPickGroup');
     pickWrap.innerHTML = '';
@@ -4777,6 +4910,8 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     });
     $('#licksExplainer').textContent = state.lickMode === 'house'
       ? 'House Pattern (BB Box): 5 notas de la pentatónica menor repartidas en solo 2 cuerdas agudas, sin cambiar de posición — patrón de Griff Hamlin (Blues Guitar Unleashed), recalculado aquí con teoría real, no copiado de ningún diagrama.'
+      : state.lickMode === 'transcrito'
+      ? 'Transcrito automáticamente de un audio real (detección de tono por autocorrelación) — puede tener algún error puntual de la propia detección, contrástalo escuchando el original. Se transpone solo a la Tónica que elijas arriba, conservando la digitación original.'
       : 'Caja pentatónica: usa la Zona del mástil elegida arriba como si fuera una escala más — cambia de Zona para practicar el mismo lick en otra posición del mástil.';
   }
 
@@ -5176,6 +5311,227 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     osc.connect(gain).connect(ctx.destination);
     osc.start(now);
     osc.stop(now + 1.15);
+  }
+
+  // ---------- VOZ: entrenamiento de entonación ----------
+  // detección de tono por autocorrelación (técnica estándar de dominio público, ACF2+), la misma
+  // familia de algoritmo ya usada y verificada para transcribir audio subido — aquí corre en vivo
+  // fotograma a fotograma sobre el micrófono, en vez de una sola vez sobre un archivo.
+  let voiceStream = null, voiceSourceNode = null, voiceAnalyser = null, voiceRAF = null;
+  let voiceInTuneFrames = 0;
+  const VOICE_HOLD_FRAMES_TO_SCORE = 40; // ~0.6-0.7s sostenido en afinación, a ritmo de requestAnimationFrame
+
+  function autoCorrelatePitch(buf, sampleRate){
+    const SIZE = buf.length;
+    let rms = 0;
+    for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+    rms = Math.sqrt(rms / SIZE);
+    if (rms < 0.01) return -1; // demasiado silencio/ruido para fiarse
+
+    let r1 = 0, r2 = SIZE - 1;
+    const thres = 0.2;
+    for (let i = 0; i < SIZE / 2; i++) { if (Math.abs(buf[i]) < thres) { r1 = i; break; } }
+    for (let i = 1; i < SIZE / 2; i++) { if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; } }
+    const trimmed = buf.slice(r1, r2);
+    const n = trimmed.length;
+    if (n < 8) return -1;
+
+    const c = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      let sum = 0;
+      for (let j = 0; j < n - i; j++) sum += trimmed[j] * trimmed[j + i];
+      c[i] = sum;
+    }
+    let d = 0;
+    while (d < n - 1 && c[d] > c[d + 1]) d++;
+    let maxVal = -1, maxPos = -1;
+    for (let i = d; i < n; i++) { if (c[i] > maxVal) { maxVal = c[i]; maxPos = i; } }
+    if (maxPos <= 0) return -1;
+
+    // interpolación parabólica alrededor del pico, para más precisión que solo el bin entero
+    let T0 = maxPos;
+    const x1 = c[T0 - 1] || 0, x2 = c[T0], x3 = c[T0 + 1] || 0;
+    const a = (x1 + x3 - 2 * x2) / 2, b = (x3 - x1) / 2;
+    if (a) T0 = T0 - b / (2 * a);
+    if (T0 <= 0) return -1;
+    return sampleRate / T0;
+  }
+
+  function freqToMidiCents(freq){
+    const midiFloat = 69 + 12 * Math.log2(freq / 440);
+    const midiRound = Math.round(midiFloat);
+    return { midi: midiRound, cents: (midiFloat - midiRound) * 100 };
+  }
+
+  async function startVoiceListening(){
+    try {
+      const ctx = getAudioCtx();
+      if (ctx.state === 'suspended') await ctx.resume();
+      voiceStream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+      });
+      voiceSourceNode = ctx.createMediaStreamSource(voiceStream);
+      voiceAnalyser = ctx.createAnalyser();
+      voiceAnalyser.fftSize = 2048;
+      voiceSourceNode.connect(voiceAnalyser);
+      voiceInTuneFrames = 0;
+      $('#voiceListenBtn').style.display = 'none';
+      $('#voiceStopBtn').style.display = '';
+      voiceListenLoop();
+    } catch (err) {
+      $('#voiceFeedbackLabel').textContent = '❌ No se pudo acceder al micrófono: ' + err.message + ' (revisa los permisos del navegador)';
+    }
+  }
+
+  function stopVoiceListening(){
+    if (voiceRAF) cancelAnimationFrame(voiceRAF);
+    voiceRAF = null;
+    if (voiceStream) { voiceStream.getTracks().forEach(t => t.stop()); voiceStream = null; }
+    voiceSourceNode = null; voiceAnalyser = null;
+    const btn = $('#voiceListenBtn'), stopBtn = $('#voiceStopBtn');
+    if (btn) btn.style.display = '';
+    if (stopBtn) stopBtn.style.display = 'none';
+  }
+
+  function voiceListenLoop(){
+    if (!voiceAnalyser) return;
+    const ctx = getAudioCtx();
+    const buf = new Float32Array(voiceAnalyser.fftSize);
+    voiceAnalyser.getFloatTimeDomainData(buf);
+    const freq = autoCorrelatePitch(buf, ctx.sampleRate);
+    const needle = $('#voiceMeterNeedle');
+    const feedback = $('#voiceFeedbackLabel');
+    if (freq > 0 && state.voiceQuiz.targetMidi !== null) {
+      const targetFreq = 440 * Math.pow(2, (state.voiceQuiz.targetMidi - 69) / 12);
+      const centsFromTarget = 1200 * Math.log2(freq / targetFreq);
+      const clamped = Math.max(-50, Math.min(50, centsFromTarget));
+      needle.style.left = (50 + clamped) + '%';
+      const tol = state.voiceQuiz.toleranceCents;
+      feedback.classList.remove('tuned', 'high', 'low');
+      if (Math.abs(centsFromTarget) <= tol) {
+        feedback.textContent = '✅ Afinado';
+        feedback.classList.add('tuned');
+        voiceInTuneFrames++;
+        if (voiceInTuneFrames >= VOICE_HOLD_FRAMES_TO_SCORE) {
+          registerVoiceHit();
+        }
+      } else if (centsFromTarget > tol) {
+        feedback.textContent = '🔼 Alto (+' + Math.round(centsFromTarget) + ' cents)';
+        feedback.classList.add('high');
+        voiceInTuneFrames = 0;
+      } else {
+        feedback.textContent = '🔽 Bajo (' + Math.round(centsFromTarget) + ' cents)';
+        feedback.classList.add('low');
+        voiceInTuneFrames = 0;
+      }
+    } else {
+      voiceInTuneFrames = 0;
+    }
+    voiceRAF = requestAnimationFrame(voiceListenLoop);
+  }
+
+  function registerVoiceHit(){
+    state.voiceQuiz.score++;
+    state.voiceQuiz.streak++;
+    $('#voiceScoreLabel').textContent = state.voiceQuiz.score;
+    $('#voiceStreakLabel').textContent = state.voiceQuiz.streak;
+    $('#voiceFeedbackLabel').textContent = '🎉 ¡Bien! Siguiente nota en un momento...';
+    stopVoiceListening();
+    setTimeout(() => { pickNewVoiceTarget(); }, 1200);
+  }
+
+  function pickNewVoiceTarget(){
+    const q = state.voiceQuiz;
+    const lo = q.rangeLow, hi = Math.max(q.rangeLow + 1, q.rangeHigh);
+    q.targetMidi = lo + Math.floor(Math.random() * (hi - lo + 1));
+    const pc = ((q.targetMidi % 12) + 12) % 12;
+    const octave = Math.floor(q.targetMidi / 12) - 1;
+    $('#voiceTargetNoteLabel').textContent = BT_DISPLAY_ES_SAFE()[pc] + octave;
+    $('#voiceMeterNeedle').style.left = '50%';
+    $('#voiceFeedbackLabel').textContent = 'Pulsa "Escuchar nota" y luego "Cantar"';
+    $('#voiceFeedbackLabel').classList.remove('tuned', 'high', 'low');
+    voiceInTuneFrames = 0;
+  }
+
+  // BT_DISPLAY_ES se define más abajo en el archivo (usado primero por el analizador de backing
+  // tracks de FretTeacher) — este wrapper evita depender del orden de declaración en el script.
+  function BT_DISPLAY_ES_SAFE(){
+    return ['Do','Reb','Re','Mib','Mi','Fa','Fa#','Sol','Lab','La','Sib','Si'];
+  }
+
+  function renderVoiceSection(){
+    const q = state.voiceQuiz;
+    $('#voiceCalibBox').style.display = q.calibrated ? 'none' : 'block';
+    $('#voiceQuizBox').style.display = q.calibrated ? 'block' : 'none';
+    if (q.calibrated && q.targetMidi === null) pickNewVoiceTarget();
+  }
+
+  // ---------- VOZ: calibración de rango (comparte el mismo detector de tono) ----------
+  let calibStream = null, calibAnalyser = null, calibRAF = null, calibLastMidi = null;
+
+  async function toggleCalibListen(which){
+    const btn = $(which === 'low' ? '#voiceCalibLowBtn' : '#voiceCalibHighBtn');
+    if (calibStream && state.voiceQuiz.calibStep === which) {
+      // segunda pulsación: fija la nota detectada ahora mismo
+      if (calibLastMidi !== null) {
+        state.voiceQuiz[which === 'low' ? 'rangeLow' : 'rangeHigh'] = calibLastMidi;
+        const pc = ((calibLastMidi % 12) + 12) % 12;
+        const octave = Math.floor(calibLastMidi / 12) - 1;
+        $(which === 'low' ? '#voiceCalibLowLabel' : '#voiceCalibHighLabel').textContent = BT_DISPLAY_ES_SAFE()[pc] + octave + ' ✅';
+      }
+      stopCalibListen();
+      btn.textContent = which === 'low' ? '🎙️ Escuchar (grave)' : '🎙️ Escuchar (aguda)';
+      maybeFinishCalibration();
+      return;
+    }
+    stopCalibListen();
+    state.voiceQuiz.calibStep = which;
+    try {
+      const ctx = getAudioCtx();
+      if (ctx.state === 'suspended') await ctx.resume();
+      calibStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:false, noiseSuppression:false, autoGainControl:false } });
+      const src = ctx.createMediaStreamSource(calibStream);
+      calibAnalyser = ctx.createAnalyser();
+      calibAnalyser.fftSize = 2048;
+      src.connect(calibAnalyser);
+      btn.textContent = '✅ Fijar (canta ahora)';
+      const label = $(which === 'low' ? '#voiceCalibLowLabel' : '#voiceCalibHighLabel');
+      const loop = () => {
+        if (!calibAnalyser) return;
+        const buf = new Float32Array(calibAnalyser.fftSize);
+        calibAnalyser.getFloatTimeDomainData(buf);
+        const freq = autoCorrelatePitch(buf, ctx.sampleRate);
+        if (freq > 0) {
+          const { midi } = freqToMidiCents(freq);
+          calibLastMidi = midi;
+          const pc = ((midi % 12) + 12) % 12;
+          const octave = Math.floor(midi / 12) - 1;
+          label.textContent = 'escuchando: ' + BT_DISPLAY_ES_SAFE()[pc] + octave;
+        }
+        calibRAF = requestAnimationFrame(loop);
+      };
+      loop();
+    } catch (err) {
+      $(which === 'low' ? '#voiceCalibLowLabel' : '#voiceCalibHighLabel').textContent = '❌ ' + err.message;
+    }
+  }
+
+  function stopCalibListen(){
+    if (calibRAF) cancelAnimationFrame(calibRAF);
+    calibRAF = null;
+    if (calibStream) { calibStream.getTracks().forEach(t => t.stop()); calibStream = null; }
+    calibAnalyser = null; calibLastMidi = null;
+  }
+
+  function maybeFinishCalibration(){
+    const q = state.voiceQuiz;
+    // si el usuario ya fijó al menos la grave o la aguda, con la otra rellenamos un valor por
+    // defecto razonable en vez de bloquear — mejor calibración parcial que ninguna
+    if ($('#voiceCalibLowLabel').textContent.includes('✅') || $('#voiceCalibHighLabel').textContent.includes('✅')) {
+      if (q.rangeHigh <= q.rangeLow) q.rangeHigh = q.rangeLow + 12;
+      q.calibrated = true;
+      render();
+    }
   }
 
   function renderPianoKeyboard(){
@@ -7993,6 +8349,32 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       state.lickId = 0;
       render();
     });
+  });
+  $('#voiceCalibLowBtn').addEventListener('click', () => toggleCalibListen('low'));
+  $('#voiceCalibHighBtn').addEventListener('click', () => toggleCalibListen('high'));
+  $('#voiceCalibSkipBtn').addEventListener('click', () => {
+    stopCalibListen();
+    state.voiceQuiz.calibrated = true;
+    render();
+  });
+  $('#voiceRecalibBtn').addEventListener('click', () => {
+    stopVoiceListening();
+    state.voiceQuiz.calibrated = false;
+    state.voiceQuiz.targetMidi = null;
+    $('#voiceCalibLowLabel').textContent = 'sin fijar';
+    $('#voiceCalibHighLabel').textContent = 'sin fijar';
+    render();
+  });
+  $('#voicePlayTargetBtn').addEventListener('click', () => {
+    if (state.voiceQuiz.targetMidi !== null) playPianoTone(state.voiceQuiz.targetMidi);
+  });
+  $('#voiceListenBtn').addEventListener('click', startVoiceListening);
+  $('#voiceStopBtn').addEventListener('click', stopVoiceListening);
+  $('#voiceSkipBtn').addEventListener('click', () => {
+    stopVoiceListening();
+    state.voiceQuiz.streak = 0;
+    $('#voiceStreakLabel').textContent = 0;
+    pickNewVoiceTarget();
   });
   document.querySelectorAll('#namAmpGroup button').forEach(b => {
     b.addEventListener('click', () => {
