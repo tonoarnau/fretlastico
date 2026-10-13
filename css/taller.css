@@ -771,3 +771,42 @@ select#scaleSelect{ font-family: var(--fuente-titulo); text-transform: none; let
   .escala-cab{ margin-top: 2px; align-items: center; }
   .escala-cab .seg button{ padding: 7px 12px; }
 }
+
+/* Panel de práctica (Ébano): transporte arriba (Reproducir, tempo, metrónomo, acelerar), el riff y el compás debajo,
+   los ajustes del metrónomo como sub-panel y la tablatura en su recuadro. */
+.riff-panel{ padding: 16px 18px; gap: 14px; }
+.practica-transporte{ display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.practica-transporte .play-btn{ min-width: 168px; }
+.practica-transporte .icon-btn{ width: 44px; height: 44px; font-size: calc(15px * var(--fs-scale)); }
+.practica-transporte .tempo-ctrl{ gap: 12px; margin-left: 10px; padding: 6px 14px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--panel-edge); }
+.practica-transporte .tempo-ctrl span#bpmLabel{ font: 700 calc(20px * var(--fs-scale)) var(--fuente-titulo); color: var(--ink); min-width: 96px; }
+.practica-transporte .tempo-ctrl input[type=range]{ width: 170px; accent-color: var(--f-tercera); }
+.toggle-practica{ display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 12px; cursor: pointer;
+  background: var(--panel); border: 1px solid var(--panel-edge); color: var(--ink-secondary);
+  font: 600 calc(14px * var(--fs-scale)) var(--fuente-titulo); }
+.toggle-practica:hover{ border-color: var(--ink-faint); color: var(--ink); }
+.toggle-practica.active{ background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.toggle-practica .metro-dot{ width: 10px; height: 10px; min-width: 10px; max-width: 10px; min-height: 10px; max-height: 10px; }
+.riff-controls-row{ gap: 12px; padding-top: 12px; border-top: 1px solid var(--panel-edge); }
+.timesig-badge{ border-radius: 10px; background: var(--panel-2); border: 1px solid var(--panel-edge); font-family: var(--fuente-titulo); }
+.metro-advanced{ background: var(--panel-2); border-radius: 12px; padding: 10px 14px; }
+.btn-compas{ border-radius: 10px; text-transform: none; letter-spacing: 0; }
+.riff-panel pre{ background: #0E1118; border: 1px solid var(--panel-edge); border-radius: 10px; padding: 12px 14px; overflow-x: auto;
+  font-size: calc(12px * var(--fs-scale)); color: var(--ink-secondary); }
+@media (max-width: 640px){
+  .practica-transporte{ gap: 8px; }
+  .practica-transporte .play-btn{ flex: 1; min-width: 0; }
+  .practica-transporte .tempo-ctrl{ order: 3; margin-left: 0; width: 100%; justify-content: space-between; }
+  .practica-transporte .tempo-ctrl input[type=range]{ flex: 1; width: auto; }
+  .toggle-practica{ order: 4; flex: 1; justify-content: center; }
+}
+
+/* Acordes (Ébano): la ficha del acorde con presencia, como la de Escalas */
+.chord-panel{ background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 14px; box-shadow: 0 20px 50px -24px rgba(0,0,0,.85); }
+.chord-info{ gap: 12px; min-width: 220px; padding: 18px 20px; border-radius: 14px; background: var(--panel-2); border: 1px solid var(--panel-edge); }
+.chord-info-name{ font-size: calc(44px * var(--fs-scale)); letter-spacing: -0.02em; line-height: 1; color: var(--f-tonica); }
+.chord-info-tones{ font-size: calc(15px * var(--fs-scale)); color: var(--ink-secondary); letter-spacing: 0; line-height: 1.7; }
+.chord-info-tones b{ color: var(--ink-faint); font-weight: 600; font-size: calc(12px * var(--fs-scale)); text-transform: uppercase; letter-spacing: .1em; margin-right: 6px; }
+.chord-mini-card{ border-radius: 14px; background: var(--panel); border-color: var(--panel-edge); }
+.chord-mini-card .chord-mini-label{ font-size: calc(18px * var(--fs-scale)); }
+.chord-mini-card.current{ border-color: var(--accent-play); background: rgba(255,138,61,0.08); box-shadow: 0 0 0 1px var(--accent-play); }

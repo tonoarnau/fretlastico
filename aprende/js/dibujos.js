@@ -10,8 +10,16 @@ export function el(tag, attrs = {}, ...hijos) {
 }
 const texto = (x, y, t, attrs = {}) => el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', ...attrs }, String(t));
 
+// Función de cada nota en el acorde (como en el Taller): la fundamental es notas[0].
+const AL_AIRE = [4, 9, 2, 7, 11, 4];   // Mi La Re Sol Si Mi
+function funcion(cuerda, traste, notas) {
+  if (!notas) return '';
+  const iv = ((AL_AIRE[cuerda] + traste - notas[0]) % 12 + 12) % 12;
+  return iv === 0 ? ' tonica' : (iv === 3 || iv === 4) ? ' tercera' : iv === 7 ? ' quinta' : '';
+}
+
 // Diagrama vertical de acorde: cuerdas en vertical (6.ª a la izquierda en diestro), cejuela arriba.
-export function diagramaAcorde({ trastes, dedos, cifrado, zurdo = false }) {
+export function diagramaAcorde({ trastes, dedos, cifrado, notas, zurdo = false }) {
   const n = trastes.length, W = 200, H = 250, x0 = 34, y0 = 58, dx = (W - 2 * x0) / (n - 1), dy = 40, filas = 4;
   const orden = [...Array(n).keys()];
   if (zurdo) orden.reverse();
@@ -27,7 +35,8 @@ export function diagramaAcorde({ trastes, dedos, cifrado, zurdo = false }) {
     else if (t === 0) svg.append(el('circle', { cx: x, cy: y0 - 16, r: 7, class: 'al-aire' }));
     else {
       const y = y0 + (t - 0.5) * dy;
-      svg.append(el('circle', { cx: x, cy: y, r: 14, class: 'dedo' }), texto(x, y + 1, dedos[c], { class: 'dedo-num' }));
+      const f = funcion(c, t, notas);
+      svg.append(el('circle', { cx: x, cy: y, r: 14, class: 'dedo' + f }), texto(x, y + 1, dedos[c], { class: 'dedo-num' + f }));
     }
   });
   return svg;

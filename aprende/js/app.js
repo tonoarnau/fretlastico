@@ -80,7 +80,7 @@ function bienvenida(paso = 0, resp = {}) {
     else { A.guardarPerfil(r); ir('#/hoy'); }
   };
   pintar(h('main', { class: 'pantalla bienvenida' },
-    paso === 0 && h('div', { class: 'marca' }, h('span', { class: 'logo' }, 'FRETLASTICO'), h('span', { class: 'sello' }, 'Aprende')),
+    paso === 0 && h('div', { class: 'marca' }, h('span', { class: 'logo' }, 'Fret', h('b', {}, 'lastico')), h('span', { class: 'sello' }, 'Aprende')),
     paso === 0 && h('p', { class: 'entradilla' }, 'Un camino guiado, con lecciones cortas que te escuchan tocar. Sin agobios: cada día, un paso.'),
     h('div', { class: 'puntos', 'aria-label': `Pregunta ${paso + 1} de ${preguntas.length}` }, preguntas.map((_, i) => h('span', { class: i <= paso ? 'on' : '' }))),
     h('h1', {}, q.titulo),
@@ -153,7 +153,7 @@ function enPreparacion(inst) {
 }
 
 const cabecera = () => h('header', { class: 'cabecera' },
-  h('a', { href: '#/hoy', class: 'marca' }, h('span', { class: 'logo' }, 'FRETLASTICO'), h('span', { class: 'sello' }, 'Aprende')),
+  h('a', { href: '#/hoy', class: 'marca' }, h('span', { class: 'logo' }, 'Fret', h('b', {}, 'lastico')), h('span', { class: 'sello' }, 'Aprende')),
   h('a', { href: '#/ajustes', class: 'icono', 'aria-label': 'Ajustes' }, '⚙️'));
 const pie = () => h('footer', { class: 'pie' }, h('a', { href: '#/creditos' }, 'Créditos y licencias'));
 

@@ -40,6 +40,7 @@
     const isOpenPosition = svgShape.minFret === 0;
     const fretBase = isOpenPosition ? 0 : svgShape.minFret;
 
+    const colorFuncion = (pc, raiz) => { const iv = (pc - raiz + 12) % 12; return iv === 0 ? 'var(--f-tonica,#FF5A4E)' : (iv === 3 || iv === 4) ? 'var(--f-tercera,#FFB347)' : (iv >= 6 && iv <= 8) ? 'var(--f-quinta,#3CC8B4)' : 'var(--f-resto,#8B95AE)'; };
     let svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
     svg += `<rect x="0" y="0" width="${W}" height="${H}" fill="none"/>`;
 
@@ -52,11 +53,11 @@
 
     for (let f = 1; f <= fretsShown; f++) {
       const y = marginTop + f * stepY;
-      svg += `<line x1="${marginX}" y1="${y}" x2="${marginX+gridW}" y2="${y}" stroke="#4a5561" stroke-width="1"/>`;
+      svg += `<line x1="${marginX}" y1="${y}" x2="${marginX+gridW}" y2="${y}" stroke="#c4c8ce" stroke-width="1.6"/>`;
     }
     for (let c = 0; c < nStrings; c++) {
       const x = xAt(c);
-      svg += `<line x1="${x}" y1="${marginTop}" x2="${x}" y2="${marginTop+gridH}" stroke="#4a5561" stroke-width="1"/>`;
+      svg += `<line x1="${x}" y1="${marginTop}" x2="${x}" y2="${marginTop+gridH}" stroke="#c4c8ce" stroke-width="1.6"/>`;
     }
 
     order.forEach((origIdx, col) => {
@@ -66,7 +67,7 @@
         svg += `<text x="${x}" y="${marginTop-10}" font-size="13" fill="#9aa0a8" text-anchor="middle" font-family="'Inter', sans-serif">✕</text>`;
         return;
       }
-      const color = blank ? '#8792AC' : (s.isRoot ? 'var(--accent-root,#FF6B6B)' : NOTE_COLORS[s.pc]);
+      const color = blank ? '#8792AC' : colorFuncion(s.pc, rootPc);   // Ébano: por función en la tríada
       const label = blank ? '' : DISPLAY[s.pc];
       if (s.fret === 0 && isOpenPosition) {
         svg += `<circle cx="${x}" cy="${marginTop-10}" r="8" fill="none" stroke="${color}" stroke-width="2"/>`;
@@ -76,7 +77,7 @@
         const y = marginTop + (rowIdx + 0.5) * stepY;
         svg += `<circle cx="${x}" cy="${y}" r="11" fill="${color}"/>`;
         if (!blank) {
-          svg += `<text x="${x}" y="${y+4}" font-size="11" font-weight="700" fill="#fff" text-anchor="middle" font-family="'Inter', sans-serif">${label}</text>`;
+          svg += `<text x="${x}" y="${y+4}" font-size="11" font-weight="700" fill="${!blank && s.pc === rootPc ? '#fff' : '#0B0D12'}" text-anchor="middle" font-family="'Inter', sans-serif">${label}</text>`;
           svg += `<circle cx="${x+9}" cy="${y+8}" r="6.5" fill="var(--panel,#141B2E)" stroke="#fff" stroke-width="1"/>`;
           svg += `<text x="${x+9}" y="${y+10.5}" font-size="8" font-weight="700" fill="#fff" text-anchor="middle" font-family="'Inter', sans-serif">${s.finger}</text>`;
         }
@@ -99,20 +100,21 @@
     const stringY = 34;
     const fretX = f => state.lefty ? (marginL + (maxFret - f) * stepX) : (marginL + f * stepX);
 
+    const colorFuncion = (pc, raiz) => { const iv = (pc - raiz + 12) % 12; return iv === 0 ? 'var(--f-tonica,#FF5A4E)' : (iv === 3 || iv === 4) ? 'var(--f-tercera,#FFB347)' : (iv >= 6 && iv <= 8) ? 'var(--f-quinta,#3CC8B4)' : 'var(--f-resto,#8B95AE)'; };
     let svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
     svg += `<text x="4" y="${stringY+4}" font-size="12" font-weight="700" fill="#8792AC" font-family="Space Grotesk, Inter, sans-serif">${STRING_ORDINALS[stringIdx]}</text>`;
     svg += `<line x1="${marginL}" y1="${stringY}" x2="${marginL+gridW}" y2="${stringY}" stroke="#9aa0a8" stroke-width="2"/>`;
     for (let f = 0; f <= maxFret; f++) {
       const x = fretX(f);
-      svg += `<line x1="${x}" y1="${stringY-7}" x2="${x}" y2="${stringY+7}" stroke="#4a5561" stroke-width="1"/>`;
+      svg += `<line x1="${x}" y1="${stringY-7}" x2="${x}" y2="${stringY+7}" stroke="#c4c8ce" stroke-width="1.6"/>`;
       svg += `<text x="${x}" y="${stringY+24}" font-size="9" fill="#8792AC" text-anchor="middle" font-family="Space Grotesk, Inter, sans-serif">${f}</text>`;
     }
     positions.forEach(pos => {
       const x = fretX(pos.fret);
       const isRoot = pos.pc === rootPc;
-      const color = isRoot ? 'var(--accent-root,#FF6B6B)' : NOTE_COLORS[pos.pc];
+      const color = colorFuncion(pos.pc, rootPc);
       svg += `<circle cx="${x}" cy="${stringY}" r="11" fill="${color}"/>`;
-      svg += `<text x="${x}" y="${stringY+4}" font-size="10" font-weight="700" fill="#fff" text-anchor="middle" font-family="'Inter', sans-serif">${DISPLAY[pos.pc]}</text>`;
+      svg += `<text x="${x}" y="${stringY+4}" font-size="10" font-weight="700" fill="${isRoot ? '#fff' : '#0B0D12'}" text-anchor="middle" font-family="'Inter', sans-serif">${DISPLAY[pos.pc]}</text>`;
     });
     svg += `</svg>`;
     return svg;
@@ -272,12 +274,26 @@
     // trastes representados en la rejilla: si es posición abierta, 1..4; si no, baseFret..baseFret+3
     const fretBase = isOpenPosition ? 0 : shape.baseFret;
 
+    // Ébano: función de cada nota en el acorde (la fundamental es la nota más grave de todas las formas de la app)
+    const openPcsD = TUNINGS.guitarra.map(n => pitchClassIndex(n));
+    const suena = shape.strings.map((s, k) => (s.mute ? null : (openPcsD[k] + s.fret) % 12));
+    const raizD = suena.find(p => p !== null);
+    const ivsD = [...new Set(suena.filter(p => p !== null).map(p => (p - raizD + 12) % 12))];
+    const colorD = idx => {
+      const iv = (suena[idx] - raizD + 12) % 12;
+      if (iv === 0) return 'var(--f-tonica,#FF5A4E)';
+      if (iv === 4 || (iv === 3 && !ivsD.includes(4))) return 'var(--f-tercera,#FFB347)';
+      if (iv === 7 || (!ivsD.includes(7) && (iv === 6 || iv === 8))) return 'var(--f-quinta,#3CC8B4)';
+      return 'var(--f-resto,#8B95AE)';
+    };
+
     let svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
     svg += `<rect x="0" y="0" width="${W}" height="${H}" fill="none"/>`;
+    svg += `<rect x="${marginX - 8}" y="${marginTop}" width="${gridW + 16}" height="${gridH}" rx="4" fill="var(--madera-a,#17130F)" stroke="var(--madera-b,#221B15)"/>`;
 
     // cejilla / nut
     if (isOpenPosition) {
-      svg += `<rect x="${marginX}" y="${marginTop-3}" width="${gridW}" height="4" fill="var(--bone,#ede4d3)"/>`;
+      svg += `<rect x="${marginX - 8}" y="${marginTop-5}" width="${gridW + 16}" height="6" rx="1.5" fill="#E8E0CF"/>`;
     } else {
       svg += `<line x1="${marginX}" y1="${marginTop}" x2="${marginX+gridW}" y2="${marginTop}" stroke="#9aa0a8" stroke-width="1.5"/>`;
       svg += `<text x="${marginX+gridW+4}" y="${marginTop+10}" font-size="11" fill="#9aa0a8" font-family="Space Grotesk, Inter, sans-serif">${fretBase}fr</text>`;
@@ -286,12 +302,13 @@
     // lineas de traste horizontales
     for (let f = 1; f <= fretsShown; f++) {
       const y = marginTop + f * stepY;
-      svg += `<line x1="${marginX}" y1="${y}" x2="${marginX+gridW}" y2="${y}" stroke="#4a5561" stroke-width="1"/>`;
+      svg += `<line x1="${marginX - 8}" y1="${y}" x2="${marginX+gridW + 8}" y2="${y}" stroke="#b9bec6" stroke-width="2"/>`;
     }
     // lineas de cuerda verticales
     for (let c = 0; c < nStrings; c++) {
       const x = xAt(c);
-      svg += `<line x1="${x}" y1="${marginTop}" x2="${x}" y2="${marginTop+gridH}" stroke="#4a5561" stroke-width="1"/>`;
+      const grosor = 0.8 + (state.lefty ? c : nStrings - 1 - c) * 0.32;   // la 6.ª, la más gruesa
+      svg += `<line x1="${x}" y1="${marginTop}" x2="${x}" y2="${marginTop+gridH}" stroke="#d9dde3" stroke-width="${grosor.toFixed(2)}"/>`;
     }
 
     // barra (cejilla): solo cuerdas realmente traste-adas (nunca al aire) con dedo 1 en el mismo traste
@@ -305,7 +322,8 @@
         const c1 = Math.min(...idxs), c2 = Math.max(...idxs);
         const rowIdx = isOpenPosition ? (targetFret - fretBase - 1) : (targetFret - fretBase);
         const y = marginTop + (rowIdx + 0.5) * stepY;
-        svg += `<line x1="${xAt(c1)}" y1="${y}" x2="${xAt(c2)}" y2="${y}" stroke="#FFB020" stroke-width="10" stroke-linecap="round" opacity="0.85"/>`;
+        svg += `<line x1="${xAt(c1)}" y1="${y}" x2="${xAt(c2)}" y2="${y}" stroke="#F2F4F8" stroke-width="13" stroke-linecap="round" opacity="0.9"/>`;
+        svg += `<text x="${(xAt(c1) + xAt(c2)) / 2}" y="${y + 4}" font-size="10.5" font-weight="700" fill="#0B0D12" text-anchor="middle" font-family="'Inter', sans-serif">1</text>`;
         sameFret.forEach(o => barreCoveredIdx.add(o.i));
       }
     }
@@ -325,8 +343,9 @@
         // en cejilla la fila 0 es el propio traste de la cejilla (donde se dibuja la barra).
         const rowIdx = isOpenPosition ? (s.fret - fretBase - 1) : (s.fret - fretBase);
         const y = marginTop + (rowIdx + 0.5) * stepY;
-        svg += `<circle cx="${x}" cy="${y}" r="9" fill="#FFB020"/>`;
-        svg += `<text x="${x}" y="${y+4}" font-size="10.5" font-weight="700" fill="#241300" text-anchor="middle" font-family="'Inter', sans-serif">${s.finger}</text>`;
+        const esRaiz = (suena[origIdx] - raizD + 12) % 12 === 0;
+        svg += `<circle cx="${x}" cy="${y}" r="10" fill="${colorD(origIdx)}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>`;
+        svg += `<text x="${x}" y="${y+4}" font-size="11" font-weight="700" fill="${esRaiz ? '#fff' : '#0B0D12'}" text-anchor="middle" font-family="'Inter', sans-serif">${s.finger}</text>`;
       }
     });
 
@@ -891,12 +910,13 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     const shape = buildChordShape(rootPc, qualityKey);
     $('#chordDiagramWrap').innerHTML = renderChordSVG(shape);
     const q = shape.q;
-    const rootName = DISPLAY[rootPc];
+    const rootName = state.ortografia === 'lamina' ? DISPLAY[rootPc] : nombreEnTonalidad(rootPc, rootPc, [0, 4, 7]);
     $('#chordInfoName').textContent = rootName + q.suffix;
 
     const formula = CHORD_FORMULAS[qualityKey];
     const formulaText = formula.map(([deg]) => deg).join('-');
-    const toneNames = formula.map(([, semi]) => DISPLAY[(rootPc + semi) % 12]);
+    const tonosQ = formula.map(([, semi]) => semi % 12);
+    const toneNames = formula.map(([, semi]) => state.ortografia === 'lamina' ? DISPLAY[(rootPc + semi) % 12] : nombreEnTonalidad((rootPc + semi) % 12, rootPc, tonosQ));
     $('#chordInfoTones').innerHTML =
       '<b>Fórmula:</b> ' + formulaText + '<br>' +
       '<b>Notas:</b> ' + toneNames.join(' - ');

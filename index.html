@@ -566,7 +566,7 @@
 </div>
 
 <div class="triad-shell" id="triadShell" style="display:none;">
-  <details class="theory-section" id="triadTheorySection" open>
+  <details class="theory-section" id="triadTheorySection">
     <summary>Teoría de Tríadas</summary>
     <div class="theory-body">
       <p class="theory-note"><b>¿Cómo se compone una tríada?</b> Apilando dos terceras a partir de una
@@ -737,6 +737,18 @@
 </div>
 
 <div class="riff-panel">
+  <div class="practica-transporte">
+    <button class="play-btn" id="playRiffBtn">▶ Reproducir</button>
+    <button class="icon-btn" id="stopRiffBtn" title="Detener" disabled>⏹</button>
+    <button class="icon-btn" id="resetRiffBtn" title="Reset (detener y limpiar el mástil)">↺</button>
+    <div class="tempo-ctrl">
+      <span class="riff-label">Tempo</span>
+      <span id="bpmLabel">100 BPM</span>
+      <input type="range" id="bpmSlider" min="50" max="250" step="5" value="100" aria-label="Tempo">
+    </div>
+    <button class="toggle-practica" id="metroToggle" title="Metrónomo (clic audible independiente, mismo tempo)"><span class="metro-dot" id="metroDot"></span>Metrónomo</button>
+    <button class="toggle-practica" id="speedTrainerToggle" title="Entrenador de velocidad: sube el tempo automáticamente cada vuelta completa"><span aria-hidden="true">🚀</span>Acelerar</button>
+  </div>
   <div class="riff-controls-row">
     <span class="riff-label" id="riffPanelLabel">Riff de práctica</span>
     <div class="pill-group" id="patternGroup"></div>
@@ -758,18 +770,7 @@
         <button data-sig="7/8">7/8</button>
       </div>
     </div>
-    <div class="tempo-ctrl">
-      <span class="riff-label">Tempo</span>
-      <input type="range" id="bpmSlider" min="50" max="250" step="5" value="100">
-      <span id="bpmLabel">100 BPM</span>
-      <button class="icon-btn" id="metroToggle" title="Metrónomo (clic audible independiente, mismo tempo)">🥁</button>
-      <span class="metro-dot" id="metroDot"></span>
-      <button class="icon-btn" id="speedTrainerToggle" title="Entrenador de velocidad: sube el tempo automáticamente cada vuelta completa">🚀</button>
-    </div>
-    <button class="play-btn" id="playRiffBtn">▶ Reproducir</button>
-    <button class="icon-btn" id="stopRiffBtn" title="Detener" disabled>⏹</button>
-    <button class="icon-btn" id="resetRiffBtn" title="Reset (detener y limpiar el mástil)">↺</button>
-
+  </div>
 <div class="sub-row metro-advanced" id="metroAdvanced" style="display:none;">
   <span class="label">Subdivisión</span>
   <div class="pill-group" id="subdivGroup">
@@ -792,8 +793,6 @@
   </div>
 </div>
 <div class="compas-wheel" id="compasWheel" style="display:none;"></div>
-
-  </div>
   <pre id="tabDisplay"></pre>
 </div>
 <div class="sub-row" id="pickingModeRow" style="display:none;">
