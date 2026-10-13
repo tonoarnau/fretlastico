@@ -1,0 +1,12 @@
+{
+  "name": "Fretlastico Aprende",
+  "short_name": "Aprende",
+  "description": "Aprende guitarra paso a paso con lecciones cortas que te escuchan tocar.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0A0E1A",
+  "theme_color": "#0A0E1A",
+  "icons": [{ "src": "icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

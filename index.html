@@ -9,7 +9,7 @@
   }
 }
 </script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fretlastico</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Noto+Music&family=Anton&display=swap" rel="stylesheet">
@@ -597,6 +597,81 @@
     font-family:'Inter', sans-serif; font-size: calc(11.5px * var(--fs-scale)); cursor:pointer; }
   button.sm-item:hover{ color: var(--ink); background: var(--panel-2); }
   .sm-item:last-child{ border-bottom:none; }
+
+  /* ───── Rediseño 2026-10 (fase 1): cabecera compacta, navegación por grupos, ritmos flotantes, móvil ───── */
+  .aprende-link{ font-family:'Oswald', sans-serif; font-weight:600; font-size: calc(11px * var(--fs-scale)); letter-spacing:1px;
+    text-transform:uppercase; color: var(--accent-play); border:1px solid currentColor; border-radius:999px; padding: 6px 12px;
+    text-decoration:none; white-space:nowrap; }
+  .aprende-link:hover{ background: rgba(255,176,32,0.12); }
+  .ajustes-panel{ display:flex; flex-wrap:wrap; align-items:center; gap: 12px; padding: 12px 14px; border-radius: 14px;
+    background: var(--panel); border: 1px solid var(--panel-edge); }
+  .ajustes-panel[hidden]{ display:none; }
+  .ajuste{ display:flex; align-items:center; gap: 8px; background: var(--panel-2); border:1px solid var(--panel-edge);
+    border-radius:999px; padding: 4px 12px 4px 12px; }
+  .ajuste .label{ font-family:'Oswald', sans-serif; font-weight:700; font-size: 12px; color: var(--ink-dim); }
+  .ajuste-valor{ font-size: calc(12px * var(--fs-scale)); color: var(--ink); }
+
+  .grupo-nav{ display:flex; gap: 6px; }
+  .grupo-nav button{ display:flex; align-items:center; gap: 8px; padding: 9px 16px; border-radius: 12px; cursor:pointer;
+    background: var(--panel); border: 1px solid var(--panel-edge); color: var(--ink-secondary);
+    font-family:'Oswald', sans-serif; font-weight:600; font-size: calc(13px * var(--fs-scale)); letter-spacing: .5px; text-transform: uppercase; }
+  .grupo-nav button[aria-current="true"]{ color:#fff; border-color: var(--accent-blue);
+    background: linear-gradient(180deg, rgba(91,140,255,0.28), rgba(91,140,255,0.10)); }
+  .sub-tabs #tabGroup button[hidden]{ display:none; }
+  .sub-tabs.solo-una{ display:none; }
+
+  #ritmoFab{ position: fixed; right: 20px; bottom: 86px; z-index: 499; display:flex; align-items:center; gap: 8px;
+    height: 46px; padding: 0 16px; border-radius: 999px; cursor:pointer; color: var(--ink);
+    background: var(--panel-2); border: 1px solid var(--panel-edge); box-shadow: 0 8px 20px -6px rgba(0,0,0,0.6);
+    font-family:'Oswald', sans-serif; font-weight:600; letter-spacing:.5px; text-transform:uppercase; font-size: 13px; }
+  #ritmoFab.sonando{ border-color: var(--accent-play); color: var(--accent-play); box-shadow: 0 0 0 4px rgba(255,176,32,0.18); }
+  .ritmo-hoja{ position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; z-index: 600; width: min(1100px, 100vw);
+    max-height: 78vh; overflow-y: auto; background: var(--panel); border: 1px solid var(--panel-edge); border-bottom: 0;
+    border-radius: 18px 18px 0 0; box-shadow: 0 -20px 50px -10px rgba(0,0,0,0.7); padding: 0 12px 16px; }
+  .ritmo-hoja[hidden]{ display:none; }
+  .ritmo-hoja-cabecera{ position: sticky; top: 0; z-index: 1; display:flex; justify-content:space-between; align-items:center;
+    padding: 12px 4px; background: var(--panel); }
+  .ritmo-hoja #drumSection > summary{ display:none; }
+  .ritmo-hoja #drumSection{ border: 0; background: transparent; }
+
+  .eleccion-mano{ position: fixed; inset: 0; z-index: 900; display:grid; place-items:center; background: rgba(5,8,16,0.82); padding: 16px; }
+  .eleccion-mano[hidden]{ display:none; }
+  .eleccion-mano .caja{ max-width: 420px; background: var(--panel); border:1px solid var(--panel-edge); border-radius: 18px; padding: 22px; text-align:center; }
+  .eleccion-mano h2{ font-family:'Oswald', sans-serif; margin: 0 0 6px; }
+  .eleccion-mano p{ color: var(--ink-secondary); font-size: 14px; }
+  .eleccion-mano .botones{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .eleccion-mano button{ min-height: 64px; border-radius: 14px; border:1px solid var(--panel-edge); background: var(--panel-2);
+    color: var(--ink); font-family:'Oswald', sans-serif; font-size: 16px; cursor:pointer; }
+  .eleccion-mano button:hover, .eleccion-mano button:focus-visible{ border-color: var(--accent-play); }
+  :focus-visible{ outline: 3px solid var(--accent-play); outline-offset: 2px; }
+
+  @media (max-width: 640px){
+    body{ padding-bottom: 86px; }
+    header{ gap: 8px; }
+    .brand{ width: 100%; }
+    .brand span#instrumentTag{ display:none; }
+    .brand .icon-btn{ width: 38px; height: 38px; }
+    .brand #siteMapFab{ margin-left: auto; }
+    .controls-row{ width: 100%; gap: 8px; }
+    .grupo-nav{ position: fixed; left: 0; right: 0; bottom: 0; z-index: 550; justify-content: space-around; gap: 0;
+      padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); background: rgba(10,14,26,0.96); border-top: 1px solid var(--panel-edge);
+      backdrop-filter: blur(10px); }
+    .grupo-nav button{ flex: 1; flex-direction: column; gap: 2px; padding: 6px 2px; border: 0; background: transparent;
+      font-size: calc(10px * var(--fs-scale)); min-height: 52px; justify-content:center; }
+    .grupo-nav button span{ font-size: 20px; }
+    .grupo-nav button[aria-current="true"]{ background: transparent; color: var(--accent-blue); }
+    #fretTeacherFab{ bottom: 78px; right: 12px; width: 48px; height: 48px; font-size: 21px; }
+    #ritmoFab{ bottom: 136px; right: 12px; height: 44px; padding: 0 14px; }
+    #ritmoFab .ritmo-fab-texto{ display:none; }
+    .ft-panel{ bottom: 76px; }
+    .ritmo-hoja{ max-height: 85vh; }
+    /* mástil: tamaño cómodo y se desliza con el dedo, en vez de 16 trastes apretados en 390 px */
+    .board-shell{ overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity;
+      height: 46vh; min-height: 280px; justify-content: flex-start; }   /* centrado + desbordado = la izquierda queda inalcanzable */
+    .board-shell .board-frame{ min-width: 880px; }
+    .note-circle{ max-width: 34px; }
+    .icon-btn{ width: 38px; height: 38px; }
+  }
 </style>
 </head>
 <body>
@@ -606,6 +681,8 @@
     <h1>Fretlastico</h1>
     <span id="instrumentTag">GUITARRA · AFINACIÓN ESTÁNDAR</span>
     <button class="icon-btn" id="siteMapFab" title="Mapa del sitio: todo lo que ofrece la app de un vistazo">🗺️</button>
+    <button class="icon-btn" id="ajustesBtn" title="Ajustes: mano, cejilla y tamaño de letra" aria-expanded="false" aria-controls="ajustesPanel">⚙️</button>
+    <a class="aprende-link" href="aprende/" title="Camino guiado paso a paso">Aprende</a>
   </div>
   <div class="controls-row">
     <div class="pill-group" id="instrumentGroup">
@@ -615,21 +692,36 @@
     <select id="scaleSelect"></select>
     <button class="icon-btn" id="chromaticToggle" title="Ver todas las notas (modo verificación)">♯</button>
     <button class="icon-btn" id="quizToggle" title="Adivina la nota (entrenamiento de oído)">🎧</button>
-    <button class="icon-btn" id="handToggle" title="Zurdo / Diestro">⇄</button>
-    <div class="capo-ctrl" id="capoCtrl" title="Cejilla (capo): renumera los trastes desde la cejilla y oscurece lo que queda detrás">
-      <span class="label">Cejilla</span>
-      <select id="capoSelect"></select>
-    </div>
-    <div class="font-size-ctrl" title="Tamaño de letra">
-      <span>Aa</span>
-      <input type="range" id="fontSizeSlider" min="0.85" max="1.5" step="0.05" value="1">
-    </div>
   </div>
 </header>
 
+<div class="ajustes-panel" id="ajustesPanel" hidden>
+  <div class="ajuste">
+    <span class="label">Mano</span>
+    <button class="icon-btn" id="handToggle" title="Zurdo / Diestro">⇄</button>
+    <span class="ajuste-valor" id="manoValor"></span>
+  </div>
+  <div class="capo-ctrl" id="capoCtrl" title="Cejilla (capo): renumera los trastes desde la cejilla y oscurece lo que queda detrás">
+    <span class="label">Cejilla</span>
+    <select id="capoSelect" aria-label="Cejilla"></select>
+  </div>
+  <div class="font-size-ctrl" title="Tamaño de letra">
+    <span>Aa</span>
+    <input type="range" id="fontSizeSlider" min="0.85" max="1.5" step="0.05" value="1" aria-label="Tamaño de letra">
+  </div>
+</div>
+
 <div class="capo-info" id="capoInfo" style="display:none;"></div>
 
-<div class="sub-row">
+<nav class="grupo-nav" id="grupoNav" aria-label="Secciones">
+  <button data-grupo="escalas"><span aria-hidden="true">🎸</span>Escalas</button>
+  <button data-grupo="acordes"><span aria-hidden="true">🎼</span>Acordes</button>
+  <button data-grupo="tocar"><span aria-hidden="true">🔥</span>Tocar</button>
+  <button data-grupo="oido"><span aria-hidden="true">👂</span>Oído</button>
+  <button data-grupo="piano"><span aria-hidden="true">🎹</span>Piano</button>
+</nav>
+
+<div class="sub-row sub-tabs">
   <div class="pill-group" id="tabGroup">
     <button data-tab="escalas" class="active">Escalas</button>
     <button data-tab="estilos">Estilos</button>
@@ -644,7 +736,13 @@
   </div>
 </div>
 
-<details class="theory-section drum-section" id="drumSection">
+<button id="ritmoFab" title="Caja de ritmos y looper" aria-expanded="false" aria-controls="ritmoHoja"><span aria-hidden="true">🥁</span><span class="ritmo-fab-texto">Ritmos</span></button>
+<div class="ritmo-hoja" id="ritmoHoja" hidden>
+  <div class="ritmo-hoja-cabecera">
+    <span class="ft-title">🥁 Caja de ritmos y looper</span>
+    <button class="icon-btn" id="ritmoCerrar" title="Cerrar">✕</button>
+  </div>
+<details class="theory-section drum-section" id="drumSection" open>
   <summary id="drumSummary">🥁 Caja de Ritmos & Looper</summary>
   <div class="theory-body">
     <div class="drum-controls-row">
@@ -794,6 +892,7 @@
     </details>
   </div>
 </details>
+</div>
 
 <div class="sub-row" id="modeConvertRow" style="display:none;">
   <span class="label">Convertir a modo</span>
@@ -1493,7 +1592,7 @@
 </div>
 
 <footer>
-  <span id="fretCountFooter">15 trastes · toca el ⇄ para cambiar de mano</span>
+  <span id="fretCountFooter">15 trastes · la mano se cambia en ⚙️ Ajustes</span>
   <span class="legend"><span class="dot-legend"></span> Nota raíz (tónica)</span>
 </footer>
 
@@ -3028,7 +3127,7 @@ La app no se sincroniza con el vídeo (son dos reproductores independientes): po
       answer: `Cada fila de instrumento tiene un botón 🔊/🔇 para silenciarlo sin borrar lo que tenías programado. El "Looper de piano" te deja construir un bucle de acordes (con patrón Pad, Negras o Primer tiempo) sincronizado con el ritmo — o cargar una progresión típica ya hecha (I-IV-V, I-vi-IV-V...) con un botón, sin añadir los acordes a mano. También tiene un selector de sonido (Suave/Puro/Brillante). Debajo, la "Línea de bajo (looper)" toca automáticamente sobre la MISMA lista de acordes del looper de piano (no hace falta escribirla dos veces), con 4 patrones: Raíz sostenida, Raíz-Quinta, Octavas y Walking. Y "EQ · efectos del conjunto" tiene 3 mandos (Reverb, Chorus, Delay) que afectan a la batería y a los dos loopers juntos.` },
     { id: 'uso-zurdo', title: '¿Cómo cambio a zurdo?',
       keywords: ['zurdo','zurda','mano izquierda','cambiar mano','diestro'],
-      answer: `Arriba a la derecha del mástil hay un botón con el icono ⇄ (junto al título) — lo tocas y toda la app (mástil, acordes, tríadas) se voltea a orientación zurda, con el clavijero a la derecha. Se aplica en toda la aplicación, no solo en una pestaña.` },
+      answer: `En ⚙️ Ajustes (arriba, junto al título) está el botón ⇄ de la mano — lo tocas y toda la app (mástil, acordes, tríadas) se voltea a orientación zurda, con el clavijero a la derecha. Se aplica en toda la aplicación, no solo en una pestaña.` },
     { id: 'uso-zona-mastil', title: '¿Qué es la "Zona del mástil" en Tríadas?',
       keywords: ['zona del mastil','zona mastil','trastes 0-5','trastes 9-12'],
       answer: `Te deja elegir en qué parte del mástil (graves, medios, agudos) quieres ver la tríada. Como una nota fija en una cuerda fija solo se repite cada 12 trastes, la app elige automáticamente qué juego de cuerdas encaja mejor en la zona que pediste — no hace falta que tú elijas las cuerdas a mano, se ajustan solas.` },
@@ -4427,8 +4526,8 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     renderModeConvertRow();
     updateCapoInfo();
     $('#fretCountFooter').textContent = usingMastil
-      ? '16 trastes · vista de referencia completa · toca el ⇄ para cambiar de mano'
-      : '15 trastes · toca el ⇄ para cambiar de mano';
+      ? '16 trastes · vista de referencia completa · la mano se cambia en ⚙️ Ajustes'
+      : '15 trastes · la mano se cambia en ⚙️ Ajustes';
 
     $('#instrumentTag').textContent =
       (state.instrument === 'guitarra' ? 'GUITARRA' : 'BAJO') +
@@ -5992,8 +6091,12 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     }
     const list = state.triad.tonality === 'major' ? TRIAD_PROGRESSIONS_MAJOR : TRIAD_PROGRESSIONS_MINOR;
     const prog = list[state.triad.progressionIdx];
+    // la lista menor tiene menos progresiones que la mayor (y el modo horizontal, menos juegos de cuerdas que el
+    // vertical): al cambiar, el índice elegido podía quedar fuera y la sección se rompía
+    if (!prog) { state.triad.progressionIdx = null; $('#triadProgPlayBtn').disabled = true; return; }
     const degrees = triadDiatonicDegrees(state.triad.root, state.triad.tonality);
     const sets = state.triad.mode === 'vertical' ? TRIAD_STRING_SETS_VERTICAL : TRIAD_STRING_SETS_HORIZONTAL;
+    if (!sets[state.triad.stringSetIdx]) state.triad.stringSetIdx = 0;
     const stringSet = sets[state.triad.stringSetIdx];
     let prevShape = null;
     prog.degrees.forEach((degIdx, i) => {
@@ -8743,6 +8846,116 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   });
   $('#siteMapClose').addEventListener('click', () => { $('#siteMapPanel').style.display = 'none'; });
 
+
+  // ───── Rediseño 2026-10 (fase 1): grupos de secciones, ajustes recordados, mano, ritmos flotantes ─────
+  // Capa por encima de la app: no cambia la lógica de las pestañas, solo cómo se llega a ellas y qué se recuerda.
+  const GRUPOS = { escalas: ['escalas', 'mastil'], acordes: ['acordes', 'triads'], tocar: ['estilos', 'licks', 'tecnica'], oido: ['oido', 'voz'], piano: ['piano'] };
+  const grupoDe = tab => Object.keys(GRUPOS).find(g => GRUPOS[g].includes(tab)) || 'escalas';
+  const ultimaDelGrupo = {};
+  document.querySelectorAll('#grupoNav button').forEach(b => b.addEventListener('click', () => {
+    const g = b.dataset.grupo;
+    if (grupoDe(state.tab) === g) return;
+    const destino = ultimaDelGrupo[g] || GRUPOS[g][0];
+    document.querySelector(`#tabGroup button[data-tab="${destino}"]`).click();   // el mismo camino que la pestaña de siempre
+  }));
+  function sincronizarGrupos(){
+    const g = grupoDe(state.tab);
+    ultimaDelGrupo[g] = state.tab;
+    document.querySelectorAll('#grupoNav button').forEach(b => b.setAttribute('aria-current', String(b.dataset.grupo === g)));
+    document.querySelectorAll('#tabGroup button').forEach(b => { b.hidden = !GRUPOS[g].includes(b.dataset.tab); });
+    document.querySelector('.sub-tabs').classList.toggle('solo-una', GRUPOS[g].length < 2);
+  }
+
+  // Ajustes recordados en este navegador (si el almacenamiento falla, la app funciona igual sin recordar).
+  const CLAVE_TALLER = 'fretlastico.taller.v1';
+  let ajustesGuardados = null;
+  try { ajustesGuardados = JSON.parse(localStorage.getItem(CLAVE_TALLER)); } catch (e) { ajustesGuardados = null; }
+  const tabsValidas = [...document.querySelectorAll('#tabGroup button')].map(b => b.dataset.tab);
+  const entero = (v, min, max) => Number.isInteger(v) && v >= min && v <= max;
+  if (ajustesGuardados && typeof ajustesGuardados === 'object') {
+    const g = ajustesGuardados;
+    if (g.instrument === 'guitarra' || g.instrument === 'bajo') state.instrument = g.instrument;
+    if (typeof g.lefty === 'boolean') state.lefty = g.lefty;
+    if (entero(g.capo, 0, 11)) state.capo = g.capo;
+    if (tabsValidas.includes(g.tab)) state.tab = g.tab;
+    if (entero(g.root, 0, 11)) state.root = g.root;
+    if (typeof g.scaleKey === 'string' && Object.prototype.hasOwnProperty.call(SCALES, g.scaleKey)) state.scaleKey = g.scaleKey;
+    if (entero(g.bpm, 50, 250)) state.bpm = g.bpm;
+    const fs = Number(g.fs);
+    if (fs >= 0.85 && fs <= 1.5) { $('#fontSizeSlider').value = fs; document.documentElement.style.setProperty('--fs-scale', fs); }
+  } else {
+    state.lefty = false;   // para cualquiera: diestro por defecto; se pregunta la primera vez (abajo)
+  }
+  $('#capoSelect').value = state.capo;
+  $('#scaleSelect').value = state.scaleKey;
+  $('#bpmSlider').value = state.bpm; $('#bpmLabel').textContent = state.bpm + ' BPM';
+  $('#drumBpmSlider').value = state.bpm; $('#drumBpmLabel').textContent = state.bpm + ' BPM';
+  function guardarAjustes(){
+    try {
+      localStorage.setItem(CLAVE_TALLER, JSON.stringify({
+        instrument: state.instrument, lefty: state.lefty, capo: state.capo, tab: state.tab, root: state.root,
+        scaleKey: state.scaleKey, bpm: state.bpm, fs: $('#fontSizeSlider').value,
+        manoElegida: !!(ajustesGuardados && ajustesGuardados.manoElegida) || manoElegida }));
+    } catch (e) { /* sin almacenamiento: solo esta sesión */ }
+  }
+  $('#fontSizeSlider').addEventListener('change', guardarAjustes);
+  $('#bpmSlider').addEventListener('change', guardarAjustes);
+
+  // La primera vez, ¿diestro o zurdo? (antes la app arrancaba siempre en zurdo)
+  let manoElegida = false;
+  if (!(ajustesGuardados && ajustesGuardados.manoElegida)) {
+    const caja = document.createElement('div');
+    caja.className = 'eleccion-mano'; caja.setAttribute('role', 'dialog'); caja.setAttribute('aria-modal', 'true'); caja.setAttribute('aria-labelledby', 'manoTitulo');
+    const interior = document.createElement('div'); interior.className = 'caja';
+    const h2 = document.createElement('h2'); h2.id = 'manoTitulo'; h2.textContent = '¿Con qué mano rasgueas?';
+    const p = document.createElement('p'); p.textContent = 'Así el mástil y los diagramas salen como los ves en tu instrumento. Puedes cambiarlo cuando quieras en ⚙️ Ajustes.';
+    const botones = document.createElement('div'); botones.className = 'botones';
+    [['Con la derecha', false, 'Diestro'], ['Con la izquierda', true, 'Zurdo']].forEach(([texto, zurdo, sub]) => {
+      const b = document.createElement('button'); b.textContent = `${texto} · ${sub}`;
+      b.addEventListener('click', () => { state.lefty = zurdo; manoElegida = true; caja.remove(); render(); });
+      botones.appendChild(b);
+    });
+    interior.append(h2, p, botones); caja.appendChild(interior); document.body.appendChild(caja);
+    setTimeout(() => botones.firstChild.focus(), 50);
+  }
+  $('#handToggle').addEventListener('click', () => { manoElegida = true; guardarAjustes(); });
+
+  // Panel de ajustes (mano, cejilla, tamaño de letra)
+  $('#ajustesBtn').addEventListener('click', () => {
+    const panel = $('#ajustesPanel'), abrir = panel.hidden;
+    panel.hidden = !abrir; $('#ajustesBtn').setAttribute('aria-expanded', String(abrir)); $('#ajustesBtn').classList.toggle('active', abrir);
+  });
+
+  // Caja de ritmos: hoja deslizable con botón flotante, disponible en cualquier sección
+  const abrirRitmos = abrir => { $('#ritmoHoja').hidden = !abrir; $('#ritmoFab').setAttribute('aria-expanded', String(abrir)); };
+  $('#ritmoFab').addEventListener('click', () => abrirRitmos($('#ritmoHoja').hidden));
+  $('#ritmoCerrar').addEventListener('click', () => abrirRitmos(false));
+  new MutationObserver(() => $('#ritmoFab').classList.toggle('sonando', $('#drumSummary').textContent.includes('sonando')))
+    .observe($('#drumSummary'), { childList: true, characterData: true, subtree: true });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    abrirRitmos(false); $('#ajustesPanel').hidden = true; $('#ajustesBtn').setAttribute('aria-expanded', 'false');
+  });
+
+  // Botones de solo icono: su título también como nombre accesible (lectores de pantalla)
+  document.querySelectorAll('button[title]').forEach(b => {
+    if (!b.getAttribute('aria-label') && !/[\p{L}\p{N}]{2,}/u.test(b.textContent)) b.setAttribute('aria-label', b.title);
+  });
+
+  // Tras cada render: grupos, mano, ajustes guardados y mástil centrado en la cejuela (en el móvil se desliza)
+  let ultimaVista = '';
+  const renderBase = render;
+  render = function(){
+    try { renderBase(); } finally { despuesDeRender(); }   // aunque una sección falle, la navegación y los ajustes siguen al día
+  };
+  function despuesDeRender(){
+    sincronizarGrupos();
+    $('#manoValor').textContent = state.lefty ? 'Zurdo' : 'Diestro';
+    guardarAjustes();
+    const vista = state.tab + state.lefty + state.instrument, shell = document.querySelector('.board-shell');
+    if (vista !== ultimaVista && shell && shell.scrollWidth > shell.clientWidth) shell.scrollLeft = state.lefty ? shell.scrollWidth : 0;
+    ultimaVista = vista;
+  }
   render();
 })();
 </script>
