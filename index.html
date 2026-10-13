@@ -12,14 +12,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fretlastico</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Noto+Music&family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Music&family=Anton&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/taller.css">
 </head>
 <body>
 
 <header>
   <div class="brand">
-    <h1>Fretlastico</h1>
+    <h1>Fret<b>lastico</b></h1>
     <span id="instrumentTag">GUITARRA · AFINACIÓN ESTÁNDAR</span>
     <button class="icon-btn" id="siteMapFab" title="Mapa del sitio: todo lo que ofrece la app de un vistazo">🗺️</button>
     <button class="icon-btn" id="ajustesBtn" title="Ajustes: mano, cejilla y tamaño de letra" aria-expanded="false" aria-controls="ajustesPanel">⚙️</button>
@@ -51,6 +51,13 @@
     <div class="pill-group" id="sonidoGroup" title="Real: grabaciones de guitarra, bajo y piano · Sintético: el sonido generado de siempre">
       <button data-sonido="real">Real</button>
       <button data-sonido="sintetico">Sintético</button>
+    </div>
+  </div>
+  <div class="ajuste">
+    <span class="label">Nombres</span>
+    <div class="pill-group" id="ortografiaGroup" title="Según la tonalidad: G♯ en Mi mayor, B♭ en Fa mayor · Lámina: siempre C Db D Eb E F F# G Ab A Bb B">
+      <button data-ortografia="tonalidad">Según la tonalidad</button>
+      <button data-ortografia="lamina">Lámina</button>
     </div>
   </div>
   <div class="font-size-ctrl" title="Tamaño de letra">
@@ -247,6 +254,17 @@
   <div class="pill-group" id="modeConvertGroup"></div>
 </div>
 
+<section class="escala-cab" id="escalaCab" hidden>
+  <div>
+    <div class="eyebrow" id="escalaEyebrow">Escalas · todo el mástil</div>
+    <h2 class="escala-titulo"><span class="raiz" id="escalaRaiz"></span> <span id="escalaNombre"></span></h2>
+  </div>
+  <div class="seg" id="etiquetasGroup" role="group" aria-label="Qué se ve en cada nota">
+    <button data-etiquetas="notas">Notas</button>
+    <button data-etiquetas="grados">Grados</button>
+  </div>
+</section>
+
 <div class="sub-row" id="rootRow">
   <span class="label">Tónica</span>
   <div id="rootButtons"></div>
@@ -422,14 +440,25 @@
   <div class="pill-group" id="progDegreesGroup"></div>
 </div>
 
+<div class="escala-zona" id="escalaZona">
 <div class="board-shell">
   <div class="board-frame">
+    <div class="leyenda-funciones" id="leyendaFunciones" aria-hidden="true">
+      <span class="f-tonica">Tónica</span><span class="f-tercera">3.ª</span><span class="f-quinta">5.ª</span><span class="f-resto">Resto</span>
+    </div>
     <div class="fret-numbers" id="fretNumbers"></div>
     <div class="board-body">
       <div class="fretboard" id="fretboard"></div>
       <div class="string-labels" id="stringLabels"></div>
     </div>
   </div>
+</div>
+<aside class="escala-ficha" id="escalaFicha" hidden>
+  <h3 id="fichaTitulo"></h3>
+  <div class="formula" id="fichaFormula"></div>
+  <p id="fichaTexto"></p>
+  <div class="etiquetas-estilo" id="fichaEstilos"></div>
+</aside>
 </div>
 
 <div class="voice-shell" id="voiceShell" style="display:none;">

@@ -72,6 +72,31 @@
     }
   });
 
+  prueba('Grados: en cada escala de 7 notas salen los números 1 a 7, una vez cada uno', () => {
+    for (const [k, e] of Object.entries(T.SCALES)) {
+      if (e.intervals.length !== 7) continue;
+      const nums = e.intervals.map(iv => T.gradoEnEscala(iv, e.intervals).replace(/[♭♯]/g, '')).sort().join('');
+      assert(nums === '1234567', `${e.name}: ${e.intervals.map(iv => T.gradoEnEscala(iv, e.intervals)).join(' ')}`);
+    }
+  });
+  prueba('Grados conocidos: lidio ♯4, locrio ♭5, blues ♭5, jónico ♯5 ♯5, superlocrio ♭4 y ♭♭7', () => {
+    const g = (k, iv) => T.gradoEnEscala(iv, T.SCALES[k].intervals);
+    assert(g('lidio', 6) === '♯4' && g('locrio', 6) === '♭5' && g('blues', 6) === '♭5', 'cuarta/quinta');
+    assert(g('armonica_jonico5', 8) === '♯5' && g('armonica_superloc', 4) === '♭4' && g('armonica_superloc', 9) === '♭♭7', 'aumentada/alterada');
+  });
+  prueba('Cada escala tiene una sola tónica, como mucho una 3.ª y como mucho una 5.ª', () => {
+    for (const [k, e] of Object.entries(T.SCALES)) {
+      const f = e.intervals.map(iv => T.funcionEnEscala(iv, e.intervals));
+      assert(f.filter(x => x === 'tonica').length === 1 && f.filter(x => x === 'tercera').length <= 1 && f.filter(x => x === 'quinta').length <= 1, `${e.name}: ${f}`);
+    }
+  });
+  prueba('Nombres según la tonalidad: G♯ en Mi mayor, B♭ en Fa mayor y en Re menor, sin alteraciones en La menor', () => {
+    const M = T.SCALES.jonico.intervals, m = T.SCALES.eolico.intervals;
+    assert(T.nombreEnTonalidad(8, 4, T.SCALES.pent_mayor.intervals) === 'G♯', 'Mi');
+    assert(T.nombreEnTonalidad(10, 5, M) === 'B♭' && T.nombreEnTonalidad(10, 2, m) === 'B♭', 'Fa / Re menor');
+    assert([0, 2, 4, 5, 7, 9, 11].every(pc => !/[♯♭]/.test(T.nombreEnTonalidad(pc, 9, m))), 'La menor');
+  });
+
   const ul = document.getElementById('r');
   for (const [n, e] of res) { const li = document.createElement('li'); li.className = e ? 'ko' : 'ok'; li.textContent = (e ? '✗ ' : '✓ ') + n + (e ? ` — ${e}` : ''); ul.append(li); }
   for (const a of avisos) { const li = document.createElement('li'); li.className = 'av'; li.textContent = 'ℹ ' + a; ul.append(li); }

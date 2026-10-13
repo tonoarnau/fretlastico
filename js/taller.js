@@ -1,7 +1,8 @@
 // Fretlastico · Taller: lógica de la app (antes dentro de index.html). Script clásico, se carga al final del body.
 (function(){
   const {
-    pitchClassIndex, NOTES, DISPLAY, MAX_FRET, TUNINGS, OPEN_MIDI, TRIAD_QUALITIES, STRING_ORDINALS, TRIAD_STRING_SETS_VERTICAL, TRIAD_STRING_SETS_HORIZONTAL, TRIAD_ZONES, triadTones, triadInversionOrder, triadClosestVoicing, triadClosestVoicingPreferZone, TRIAD_MAJOR_STEPS, TRIAD_MINOR_STEPS, TRIAD_ROMAN_MAJOR, TRIAD_ROMAN_MINOR, triadBuildScale, triadQualityFromIntervals, triadDiatonicDegrees, TRIAD_PROGRESSIONS_MAJOR, TRIAD_PROGRESSIONS_MINOR, triadComputeShape, computePowerChordShape, triadSingleStringPositions, SCALES, MODE_RECIPES, CHORD_QUALITIES, CHORD_FORMULAS, PROG_DEGREE_QUALITY, PROG_ROMAN, PROG_PRESETS, DRUM_STYLES, DRUM_VOICES, DRUM_VOICE_LABELS, DRUM_FILL_GENERIC, DRUM_FILLS_BY_STYLE, drumFillForStyle, drumBuildPatternFromStyle, FORM_TEMPLATES, MODE_FAMILY, suggestedModeForDegree, degreeChordInfo, WALKING_SEARCH_MAX_FRET, walkingBeatTones, findClosestBassNote, findBassNoteWideRange, buildChordShape, CAGED_SHAPES, CAGED_ELIGIBLE, assignFingersGeneric, computeCagedPositions, PATTERNS, ZONES, STYLES, STYLE_TEMPLATES, applySwing, NOTE_COLORS, ROOT_COLOR
+    pitchClassIndex, NOTES, DISPLAY, MAX_FRET, TUNINGS, OPEN_MIDI, TRIAD_QUALITIES, STRING_ORDINALS, TRIAD_STRING_SETS_VERTICAL, TRIAD_STRING_SETS_HORIZONTAL, TRIAD_ZONES, triadTones, triadInversionOrder, triadClosestVoicing, triadClosestVoicingPreferZone, TRIAD_MAJOR_STEPS, TRIAD_MINOR_STEPS, TRIAD_ROMAN_MAJOR, TRIAD_ROMAN_MINOR, triadBuildScale, triadQualityFromIntervals, triadDiatonicDegrees, TRIAD_PROGRESSIONS_MAJOR, TRIAD_PROGRESSIONS_MINOR, triadComputeShape, computePowerChordShape, triadSingleStringPositions, SCALES, MODE_RECIPES, CHORD_QUALITIES, CHORD_FORMULAS, PROG_DEGREE_QUALITY, PROG_ROMAN, PROG_PRESETS, DRUM_STYLES, DRUM_VOICES, DRUM_VOICE_LABELS, DRUM_FILL_GENERIC, DRUM_FILLS_BY_STYLE, drumFillForStyle, drumBuildPatternFromStyle, FORM_TEMPLATES, MODE_FAMILY, suggestedModeForDegree, degreeChordInfo, WALKING_SEARCH_MAX_FRET, walkingBeatTones, findClosestBassNote, findBassNoteWideRange, buildChordShape, CAGED_SHAPES, CAGED_ELIGIBLE, assignFingersGeneric, computeCagedPositions, PATTERNS, ZONES, STYLES, STYLE_TEMPLATES, applySwing, NOTE_COLORS, ROOT_COLOR,
+    gradoEnEscala, funcionEnEscala, nombreEnTonalidad, NOMBRES_LATINOS, FICHAS_ESCALAS
   } = window.FretTeoria;   // js/teoria-taller.js
 
   function triadShapeToSvgFormat(shape, stringIdxs, rootPc){
@@ -46,7 +47,7 @@
       svg += `<rect x="${marginX}" y="${marginTop-3}" width="${gridW}" height="4" fill="var(--bone,#ede4d3)"/>`;
     } else {
       svg += `<line x1="${marginX}" y1="${marginTop}" x2="${marginX+gridW}" y2="${marginTop}" stroke="#9aa0a8" stroke-width="1.5"/>`;
-      svg += `<text x="${marginX+gridW+4}" y="${marginTop+10}" font-size="11" fill="#9aa0a8" font-family="Oswald, sans-serif">${fretBase}fr</text>`;
+      svg += `<text x="${marginX+gridW+4}" y="${marginTop+10}" font-size="11" fill="#9aa0a8" font-family="Space Grotesk, Inter, sans-serif">${fretBase}fr</text>`;
     }
 
     for (let f = 1; f <= fretsShown; f++) {
@@ -99,12 +100,12 @@
     const fretX = f => state.lefty ? (marginL + (maxFret - f) * stepX) : (marginL + f * stepX);
 
     let svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`;
-    svg += `<text x="4" y="${stringY+4}" font-size="12" font-weight="700" fill="#8792AC" font-family="Oswald, sans-serif">${STRING_ORDINALS[stringIdx]}</text>`;
+    svg += `<text x="4" y="${stringY+4}" font-size="12" font-weight="700" fill="#8792AC" font-family="Space Grotesk, Inter, sans-serif">${STRING_ORDINALS[stringIdx]}</text>`;
     svg += `<line x1="${marginL}" y1="${stringY}" x2="${marginL+gridW}" y2="${stringY}" stroke="#9aa0a8" stroke-width="2"/>`;
     for (let f = 0; f <= maxFret; f++) {
       const x = fretX(f);
       svg += `<line x1="${x}" y1="${stringY-7}" x2="${x}" y2="${stringY+7}" stroke="#4a5561" stroke-width="1"/>`;
-      svg += `<text x="${x}" y="${stringY+24}" font-size="9" fill="#8792AC" text-anchor="middle" font-family="Oswald, sans-serif">${f}</text>`;
+      svg += `<text x="${x}" y="${stringY+24}" font-size="9" fill="#8792AC" text-anchor="middle" font-family="Space Grotesk, Inter, sans-serif">${f}</text>`;
     }
     positions.forEach(pos => {
       const x = fretX(pos.fret);
@@ -279,7 +280,7 @@
       svg += `<rect x="${marginX}" y="${marginTop-3}" width="${gridW}" height="4" fill="var(--bone,#ede4d3)"/>`;
     } else {
       svg += `<line x1="${marginX}" y1="${marginTop}" x2="${marginX+gridW}" y2="${marginTop}" stroke="#9aa0a8" stroke-width="1.5"/>`;
-      svg += `<text x="${marginX+gridW+4}" y="${marginTop+10}" font-size="11" fill="#9aa0a8" font-family="Oswald, sans-serif">${fretBase}fr</text>`;
+      svg += `<text x="${marginX+gridW+4}" y="${marginTop+10}" font-size="11" fill="#9aa0a8" font-family="Space Grotesk, Inter, sans-serif">${fretBase}fr</text>`;
     }
 
     // lineas de traste horizontales
@@ -1751,13 +1752,28 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     return state.lefty ? frets.slice().reverse() : frets;
   }
 
-  // orden de cuerdas arriba->abajo (índices sobre TUNINGS[instrumento])
-  // diestro: grave arriba -> aguda abajo (vista estándar del guitarrista)
-  // zurdo:   aguda arriba -> grave abajo (Mi grave queda ABAJO)
+  // orden de cuerdas arriba->abajo (índices sobre TUNINGS[instrumento]): la 1.ª (la más aguda) arriba, como en una
+  // tablatura, tanto en diestro como en zurdo (rediseño Ébano, 13/10/2026). La mano solo da la vuelta en horizontal.
   function stringRenderOrder(){
     const n = TUNINGS[state.instrument].length;
-    const idx = [...Array(n).keys()];
-    return state.lefty ? idx.slice().reverse() : idx;
+    return [...Array(n).keys()].reverse();
+  }
+
+  // Ancho relativo de cada traste: proporción de guitarra real (cada traste es 2^(-1/12) del anterior), suavizada al
+  // 60 % para que los agudos no se amontonen; la columna de las cuerdas al aire, algo más estrecha.
+  const anchoTraste = f => f === 0 ? 0.62 : 0.4 + 0.6 * Math.pow(2, -(f - 1) / 12);
+  const columnasTrastes = fOrder => fOrder.map(f => anchoTraste(f).toFixed(4) + 'fr').join(' ');
+
+  // Nombre y función (color) de cada nota del mástil, según la escala que se ve
+  function etiquetaNota(pc){
+    const intervals = state.chromatic ? [0, 2, 4, 5, 7, 9, 11] : SCALES[state.scaleKey].intervals;
+    const iv = (pc - state.root + 12) % 12;
+    if (state.etiquetas === 'grados') return gradoEnEscala(iv, state.chromatic ? [...Array(12).keys()] : intervals);
+    return state.ortografia === 'lamina' ? DISPLAY[pc] : nombreEnTonalidad(pc, state.root, intervals);
+  }
+  function funcionNota(pc){
+    const intervals = state.chromatic ? [0, 4, 7] : SCALES[state.scaleKey].intervals;
+    return funcionEnEscala((pc - state.root + 12) % 12, intervals);
   }
 
   // Vista de cada sección. Estilos, Licks, Mástil, Técnica y la línea de bajo reutilizan el motor de escalas ya
@@ -1983,7 +1999,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     // numeración de trastes (espaciador a la DERECHA, alineado con la columna de etiquetas de cuerda)
     // con cejilla puesta, se renumera relativo a ella (la cejilla pasa a ser el "0")
     const fretNumbers = $('#fretNumbers');
-    fretNumbers.style.gridTemplateColumns = `repeat(${fOrder.length}, 1fr) 40px`;
+    fretNumbers.style.gridTemplateColumns = `${columnasTrastes(fOrder)} 40px`;
     fretNumbers.innerHTML = '';
     fOrder.forEach(f => {
       const d = document.createElement('div');
@@ -2003,18 +2019,30 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     board.classList.toggle('quiz-mode', state.quiz.active);
     board.innerHTML = '';
     board.style.gridTemplateRows = `repeat(${sOrder.length}, 1fr)`;
-    board.style.gridTemplateColumns = `repeat(${fOrder.length}, 1fr)`;
+    board.style.gridTemplateColumns = columnasTrastes(fOrder);
 
     // líneas de traste: continuas de arriba a abajo, calculadas una sola vez sobre todo el mástil
     const fretLines = document.createElement('div');
     fretLines.className = 'fret-lines';
+    const anchos = fOrder.map(anchoTraste), total = anchos.reduce((a, b) => a + b, 0);
+    const bordeIzq = i => anchos.slice(0, i).reduce((a, b) => a + b, 0) / total * 100;   // % desde la izquierda
+    fOrder.forEach((f, i) => {                     // puntos de nácar: una vez por traste, centrados (dos en el 12)
+      const centro = (bordeIzq(i) + bordeIzq(i + 1)) / 2;
+      const alturas = [3, 5, 7, 9, 15].includes(f) ? [50] : f === 12 ? [30, 70] : [];
+      for (const y of alturas) {
+        const punto = document.createElement('div');
+        punto.className = 'marca-nacar';
+        punto.style.left = centro + '%'; punto.style.top = y + '%';
+        fretLines.appendChild(punto);
+      }
+    });
     for (let i = 1; i < fOrder.length; i++) {
       const a = fOrder[i - 1], b = fOrder[i];
       const isNut = (a === 0 && b === 1) || (a === 1 && b === 0);
       const isCapo = state.capo > 0 && ((a === state.capo - 1 && b === state.capo) || (a === state.capo && b === state.capo - 1));
       const wire = document.createElement('div');
       wire.className = 'fret-wire' + (isNut ? ' nut-wire' : '') + (isCapo ? ' capo-wire' : '');
-      wire.style.left = ((i / fOrder.length) * 100) + '%';
+      wire.style.left = bordeIzq(i) + '%';
       fretLines.appendChild(wire);
     }
     board.appendChild(fretLines);
@@ -2027,7 +2055,8 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       const openNote = tuning[sIdx];
       const row = document.createElement('div');
       row.className = 'string-row';
-      row.style.gridTemplateColumns = `repeat(${fOrder.length}, 1fr)`;
+      row.style.gridTemplateColumns = columnasTrastes(fOrder);
+      row.style.setProperty('--grosor', (1 + (tuning.length - 1 - sIdx) * 0.45).toFixed(2) + 'px');   // la grave, la más gruesa
 
       const stringLine = document.createElement('div');
       stringLine.className = 'string-line';
@@ -2059,9 +2088,8 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
           } else {
             const circle = document.createElement('div');
             const isRoot = pc === rootIdx;
-            circle.className = 'note-circle' + (isRoot ? ' is-root' : '');
-            circle.style.background = isRoot ? ROOT_COLOR : NOTE_COLORS[pc];
-            circle.textContent = DISPLAY[pc];
+            circle.className = 'note-circle' + (isRoot ? ' is-root' : '') + ' f-' + funcionNota(pc);
+            circle.textContent = etiquetaNota(pc);
             circle.dataset.pc = pc;
             cell.appendChild(circle);
 
@@ -6345,6 +6373,8 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     state.lefty = false;   // para cualquiera: diestro por defecto; se pregunta la primera vez (abajo)
   }
   state.sonidoReal = !(ajustesGuardados && ajustesGuardados.sonidoReal === false);
+  state.etiquetas = ajustesGuardados && ajustesGuardados.etiquetas === 'grados' ? 'grados' : 'notas';
+  state.ortografia = ajustesGuardados && ajustesGuardados.ortografia === 'lamina' ? 'lamina' : 'tonalidad';
   $('#capoSelect').value = state.capo;
   $('#scaleSelect').value = state.scaleKey;
   $('#bpmSlider').value = state.bpm; $('#bpmLabel').textContent = state.bpm + ' BPM';
@@ -6354,6 +6384,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
       localStorage.setItem(CLAVE_TALLER, JSON.stringify({
         instrument: state.instrument, lefty: state.lefty, capo: state.capo, tab: state.tab, root: state.root,
         scaleKey: state.scaleKey, bpm: state.bpm, fs: $('#fontSizeSlider').value, sonidoReal: state.sonidoReal,
+        etiquetas: state.etiquetas, ortografia: state.ortografia,
         manoElegida: !!(ajustesGuardados && ajustesGuardados.manoElegida) || manoElegida }));
     } catch (e) { /* sin almacenamiento: solo esta sesión */ }
   }
@@ -6384,6 +6415,44 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     const panel = $('#ajustesPanel'), abrir = panel.hidden;
     panel.hidden = !abrir; $('#ajustesBtn').setAttribute('aria-expanded', String(abrir)); $('#ajustesBtn').classList.toggle('active', abrir);
   });
+
+  // Escalas (rediseño Ébano): cabecera con el nombre de la escala, Notas/Grados y la ficha junto al mástil
+  document.querySelectorAll('#etiquetasGroup button').forEach(b => b.addEventListener('click', () => { state.etiquetas = b.dataset.etiquetas; render(); }));
+  document.querySelectorAll('#ortografiaGroup button').forEach(b => b.addEventListener('click', () => { state.ortografia = b.dataset.ortografia; render(); }));
+  const RELATIVA = { pent_mayor: 9, jonico: 9, pent_menor: 3, eolico: 3, blues: 3 };   // semitonos hasta la relativa
+  function renderEscalaFicha(){
+    const enEscalas = state.tab === 'escalas', conMastil = ['escalas', 'estilos', 'mastil', 'tecnica', 'licks'].includes(state.tab);
+    $('#escalaCab').hidden = !enEscalas;
+    $('#escalaFicha').hidden = !enEscalas;
+    $('#escalaZona').classList.toggle('con-ficha', enEscalas);
+    $('#leyendaFunciones').hidden = !conMastil || state.quiz.active;
+    document.querySelectorAll('#etiquetasGroup button').forEach(b => b.classList.toggle('active', b.dataset.etiquetas === state.etiquetas));
+    document.querySelectorAll('#ortografiaGroup button').forEach(b => b.classList.toggle('active', b.dataset.ortografia === state.ortografia));
+    if (!enEscalas) return;
+    const esc = SCALES[state.scaleKey], r = state.root;
+    const nombre = esc.name.charAt(0).toLowerCase() + esc.name.slice(1).replace(/\b(Mayor|Menor)\b/g, m => m.toLowerCase());
+    $('#escalaRaiz').textContent = NOMBRES_LATINOS[r];
+    $('#escalaNombre').textContent = state.chromatic ? '· todas las notas' : nombre;
+    $('#escalaEyebrow').textContent = 'Escalas · ' + (state.zone === 'full' ? 'todo el mástil' : 'una zona del mástil');
+    $('#fichaTitulo').textContent = NOMBRES_LATINOS[r] + ' ' + nombre;
+    const formula = $('#fichaFormula'); formula.replaceChildren();
+    esc.intervals.forEach(iv => {
+      const celda = document.createElement('span');
+      celda.className = 'f-' + funcionEnEscala(iv, esc.intervals);
+      const n = document.createElement('b'); n.textContent = nombreEnTonalidad((r + iv) % 12, r, esc.intervals);
+      const g = document.createElement('small'); g.textContent = gradoEnEscala(iv, esc.intervals);
+      celda.append(n, g); formula.appendChild(celda);
+    });
+    const ficha = FICHAS_ESCALAS[state.scaleKey];
+    $('#fichaTexto').textContent = ficha ? ficha.texto : `Escala de ${esc.intervals.length} notas. Mira en la fórmula qué grados cambian respecto a la mayor o a la menor natural.`;
+    const estilos = $('#fichaEstilos'); estilos.replaceChildren();
+    const etiquetas = ficha ? [...ficha.estilos] : [];
+    if (RELATIVA[state.scaleKey] !== undefined) {
+      const rel = (r + RELATIVA[state.scaleKey]) % 12, menor = RELATIVA[state.scaleKey] === 9;
+      etiquetas.push(`Relativa: ${NOMBRES_LATINOS[rel]} ${menor ? 'menor' : 'mayor'}`);
+    }
+    etiquetas.forEach(t => { const e = document.createElement('span'); e.textContent = t; estilos.appendChild(e); });
+  }
 
   // Enlaces directos: index.html#acordes?tonica=9&acorde=minor (también escala=…, instrumento=…).
   // Se aplican al cargar y al cambiar el hash, mandan sobre lo recordado y luego se quitan de la barra de direcciones.
@@ -6436,6 +6505,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   };
   function despuesDeRender(){
     sincronizarGrupos();
+    renderEscalaFicha();
     $('#manoValor').textContent = state.lefty ? 'Zurdo' : 'Diestro';
     document.querySelectorAll('#sonidoGroup button').forEach(b => b.classList.toggle('active', (b.dataset.sonido === 'real') === state.sonidoReal));
     guardarAjustes();

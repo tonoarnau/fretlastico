@@ -880,7 +880,67 @@ window.FretTeoria = (function(){
   const NOTE_COLORS = NOTES.map((_, i) => `hsl(${30 + i * 23}, 62%, 28%)`); // evita la banda roja, reservada a la raíz. L=28% asegura contraste >=4.5:1 con el texto blanco en las 12 notas (verificado)
   const ROOT_COLOR = '#FF6B6B'; // mismo tono que --accent-root, oscurecido para que el texto blanco cumpla contraste
 
+
+  // ---------- ESCALAS: grados, función de cada nota y nombres según la tonalidad (rediseño Ébano) ----------
+  // Nombre del grado de un intervalo dentro de una escala. En las escalas de 7 notas cada número (1-7) sale una sola
+  // vez, con su alteración: ♭3 o ♯2, ♭5 o ♯4, ♯5 o ♭6… según qué otros grados tenga (lo comprueba tests/taller.html).
+  function gradoEnEscala(iv, intervals){
+    const tiene = x => intervals.includes(x);
+    const alterada = tiene(1) && tiene(3) && tiene(4);      // superlocrio / alterada: ♭2 ♭3 ♭4
+    switch (iv) {
+      case 0: return '1';
+      case 1: return '♭2';
+      case 2: return '2';
+      case 3: return tiene(4) && !alterada ? '♯2' : '♭3';
+      case 4: return alterada && !tiene(5) ? '♭4' : '3';
+      case 5: return '4';
+      case 6: return tiene(5) || alterada ? '♭5' : '♯4';
+      case 7: return '5';
+      case 8: return tiene(7) || !tiene(9) || alterada ? '♭6' : '♯5';
+      case 9: return tiene(8) && !tiene(10) && !tiene(11) ? '♭♭7' : '6';
+      case 10: return '♭7';
+      case 11: return '7';
+    }
+    return '';
+  }
+  // Función de la nota (decide su color): 'tonica', 'tercera', 'quinta' o 'resto'.
+  function funcionEnEscala(iv, intervals){
+    const g = gradoEnEscala(iv, intervals);
+    if (g === '1') return 'tonica';
+    if (g === '3' || g === '♭3') return 'tercera';
+    if (g === '5' || (!intervals.includes(7) && (g === '♭5' || g === '♯5'))) return 'quinta';
+    return 'resto';
+  }
+  // Nombre de una nota con la ortografía de la tonalidad (Mi mayor: G♯ y C♯, no A♭ y D♭).
+  // La escala cuenta como mayor si tiene 3.ª mayor; si no, se usa la armadura de su relativa mayor.
+  const SOSTENIDOS_UNI = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+  const BEMOLES_UNI = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B'];
+  const TONOS_BEMOL = new Set([5, 10, 3, 8, 1]);   // Fa, Si♭, Mi♭, La♭, Re♭ mayores
+  function nombreEnTonalidad(pc, rootPc, intervals){
+    const mayor = intervals.includes(4) ? rootPc : (rootPc + 3) % 12;
+    return (TONOS_BEMOL.has(mayor) ? BEMOLES_UNI : SOSTENIDOS_UNI)[((pc % 12) + 12) % 12];
+  }
+  const NOMBRES_LATINOS = ['Do', 'Do♯', 'Re', 'Mi♭', 'Mi', 'Fa', 'Fa♯', 'Sol', 'La♭', 'La', 'Si♭', 'Si'];
+
+  // Ficha de cada escala: carácter en una frase y estilos donde suena. Lo que no está aquí se describe solo con su fórmula.
+  const FICHAS_ESCALAS = {
+    pent_mayor: { texto: 'Cinco notas sin semitonos: suena abierta y luminosa. La de los solos alegres del country y del rock clásico.', estilos: ['Country', 'Rock', 'Pop'] },
+    pent_menor: { texto: 'La escala más usada para improvisar en rock y blues: cinco notas que casi nunca suenan mal sobre un acorde menor.', estilos: ['Blues', 'Rock', 'Metal'] },
+    blues: { texto: 'La pentatónica menor con una nota de paso (la ♭5, la «blue note») que le da el sabor quejumbroso del blues.', estilos: ['Blues', 'Rock', 'Jazz'] },
+    flamenco: { texto: 'Frigio mayor: el semitono entre 1 y ♭2 y la 3.ª mayor dan el color andaluz de la cadencia flamenca.', estilos: ['Flamenco', 'Metal', 'Oriental'] },
+    jonico: { texto: 'La escala mayor de toda la vida: estable y resuelta. Es la referencia de la que salen los demás modos.', estilos: ['Pop', 'Folk', 'Clásica'] },
+    dorico: { texto: 'Menor pero con la 6.ª mayor: menos triste y con más groove que la menor natural.', estilos: ['Funk', 'Jazz', 'Rock'] },
+    frigio: { texto: 'Menor con ♭2: oscura y tensa desde la primera nota.', estilos: ['Metal', 'Flamenco'] },
+    lidio: { texto: 'Mayor con ♯4: flota, suena soñadora y cinematográfica.', estilos: ['Cine', 'Jazz', 'Rock progresivo'] },
+    mixolidio: { texto: 'Mayor con ♭7: alegre pero con un punto rockero y de blues.', estilos: ['Rock', 'Blues', 'Folk'] },
+    eolico: { texto: 'La menor natural: melancólica y seria. La relativa menor de la escala mayor.', estilos: ['Rock', 'Pop', 'Metal'] },
+    locrio: { texto: 'Con ♭2 y ♭5: inestable a propósito. Se usa más como color que como tonalidad.', estilos: ['Metal', 'Jazz'] },
+    menor_armonica: { texto: 'La menor natural con la 7.ª mayor: el salto entre ♭6 y 7 le da un aire clásico y exótico.', estilos: ['Clásica', 'Neoclásico', 'Oriental'] },
+    menor_melodica: { texto: 'Menor con 6.ª y 7.ª mayores: la base de muchas sonoridades del jazz moderno.', estilos: ['Jazz', 'Fusión'] },
+  };
+
   return Object.freeze({
+    gradoEnEscala, funcionEnEscala, nombreEnTonalidad, NOMBRES_LATINOS, FICHAS_ESCALAS,
     pitchClassIndex,
     NOTES,
     DISPLAY,
