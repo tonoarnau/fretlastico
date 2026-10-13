@@ -8,6 +8,19 @@ https://tonoarnau.github.io/fretlastico/
 - **Aprende** (`aprende/`): un camino guiado con unidades cortas que te escuchan tocar por el micrófono, progreso
   guardado en el navegador, repasos espaciados y sonidos reales. Prototipo: camino de guitarra con cuatro unidades.
 
+## Taller: estructura
+
+| Archivo | Qué hace |
+| --- | --- |
+| `index.html` | La página: cabecera, grupos de secciones y el marcado de cada sección |
+| `css/taller.css` | Estilos (incluida la adaptación al móvil) |
+| `js/teoria-taller.js` | Teoría y datos sin estado ni DOM: escalas, acordes, CAGED, tríadas, progresiones, estilos y ritmos (`window.FretTeoria`) |
+| `js/taller.js` | La app: estado, secciones, audio (síntesis y muestras reales), caja de ritmos, loopers, ajustes recordados |
+| `tests/taller.html` | Tests de la teoría en las 12 tonalidades (abrir en el navegador) |
+
+Enlaces directos: `index.html#acordes?tonica=9&acorde=minor` (también `escala=…` e `instrumento=guitarra|bajo`).
+La sección y los ajustes se recuerdan en el navegador (`localStorage`, clave `fretlastico.taller.v1`).
+
 ## Aprende: estructura
 
 | Archivo | Qué hace |
@@ -25,7 +38,8 @@ Sin dependencias ni compilación: son módulos JavaScript nativos. Para probarlo
 
 ```sh
 python3 -m http.server 8000
-# http://localhost:8000/aprende/  ·  tests: http://localhost:8000/aprende/tests/
+# Taller: http://localhost:8000/  ·  Aprende: http://localhost:8000/aprende/
+# tests: http://localhost:8000/tests/taller.html y http://localhost:8000/aprende/tests/
 ```
 
 El micrófono solo funciona en `https://` o en `localhost`.

@@ -332,6 +332,7 @@ const PASOS = {
       h('figure', { class: 'figura acorde' }, diagramaAcorde({ ...a, zurdo: zurdo() }),
         h('figcaption', {}, h('b', {}, a.nombre), ' · notas: ', chips)),
       h('button', { class: 'boton secundario', onclick: () => S.rasgueo(INST(), T.notasDeForma(a.trastes)) }, '🔊 Cómo suena'),
+      h('a', { class: 'enlace', href: `../index.html#acordes?tonica=${a.notas[0]}&acorde=${a.cifrado.endsWith('m') ? 'minor' : 'major'}` }, 'Más formas de este acorde en el Taller →'),
       marcador, estado,
       panelMicro(escuchar, () => {
         estado.textContent = 'Sin micro: rasguea despacio cuerda a cuerda y escucha que ninguna zumbe ni suene apagada.';
