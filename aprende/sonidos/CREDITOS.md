@@ -7,7 +7,7 @@ No se han modificado; las notas intermedias se obtienen en el navegador cambiand
 
 | Carpeta | Origen de las grabaciones |
 | --- | --- |
-| `guitar-acoustic/` | University of Iowa Electronic Music Studios |
+| `guitar-acoustic/` | University of Iowa Electronic Music Studios (lo usa Aprende) |
 | `guitar-electric/` | Karoryfer Samples |
 | `bass-electric/` | Karoryfer Samples |
 | `piano/` | Versilian Studios, VSCO 2 Community Edition |

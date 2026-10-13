@@ -4312,22 +4312,33 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   // Una nota de cada tres semitonos por instrumento; las intermedias, cambiando la velocidad (como mucho ±2 semitonos).
   // Mientras se descargan, fuera de ese rango o con el ajuste «Sintético», suena la síntesis de siempre.
   const MUESTRAS_TALLER = {
-    guitarra: ['guitar-acoustic', ['E2', 'G2', 'As2', 'Cs3', 'E3', 'G3', 'As3', 'Cs4', 'E4', 'G4', 'As4', 'Cs5'], 1.0],
+    guitarra: ['guitar-electric', ['Cs2', 'E2', 'Fs2', 'A2', 'C3', 'Ds3', 'Fs3', 'A3', 'C4', 'Ds4', 'Fs4', 'A4', 'C5', 'Ds5', 'Fs5', 'A5', 'C6'], 1.0],
     bajo: ['bass-electric', ['E1', 'G1', 'As1', 'Cs2', 'E2', 'G2', 'As2', 'Cs3', 'E3', 'G3', 'As3', 'Cs4'], 1.0],
     piano: ['piano', ['C2', 'Ds2', 'Fs2', 'A2', 'C3', 'Ds3', 'Fs3', 'A3', 'C4', 'Ds4', 'Fs4', 'A4', 'C5', 'Ds5', 'Fs5', 'A5', 'C6'], 0.5],
   };
   const bancosMuestras = {};   // instrumento → Map(midi → AudioBuffer) | 'cargando' | null (falló)
+  const descargas = {};        // instrumento → Promise<[[midi, ArrayBuffer]]>: se descargan al abrir la página
+  function descargarMuestras(inst){
+    if (!descargas[inst] && location.protocol !== 'file:') {
+      const [carpeta, notas] = MUESTRAS_TALLER[inst];
+      descargas[inst] = Promise.all(notas.map(async n => {
+        const r = await fetch(`aprende/sonidos/${carpeta}/${n}.mp3`);
+        if (!r.ok) throw new Error(r.status);
+        return [midiDeMuestra(n), await r.arrayBuffer()];
+      }));
+      descargas[inst].catch(() => {});
+    }
+    return descargas[inst];
+  }
   const midiDeMuestra = n => ({ C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 })[n[0]] + (n[1] === 's' ? 1 : 0) + 12 * (Number(n.slice(n[1] === 's' ? 2 : 1)) + 1);
   function bancoMuestras(inst){
     if (bancosMuestras[inst] === undefined && location.protocol === 'file:') bancosMuestras[inst] = null;   // abierto desde el disco: el navegador no deja leerlas
     if (bancosMuestras[inst] === undefined) {
       bancosMuestras[inst] = 'cargando';
-      const [carpeta, notas] = MUESTRAS_TALLER[inst], ctx = getAudioCtx();
-      Promise.all(notas.map(async n => {
-        const r = await fetch(`aprende/sonidos/${carpeta}/${n}.mp3`);
-        if (!r.ok) throw new Error(r.status);
-        return [midiDeMuestra(n), await ctx.decodeAudioData(await r.arrayBuffer())];
-      })).then(pares => { bancosMuestras[inst] = new Map(pares); })
+      const ctx = getAudioCtx();
+      descargarMuestras(inst)
+        .then(crudos => Promise.all(crudos.map(async ([m, ab]) => [m, await ctx.decodeAudioData(ab.slice(0))])))
+        .then(pares => { bancosMuestras[inst] = new Map(pares); })
         .catch(() => { bancosMuestras[inst] = null; });   // sin red o desde file://: se queda la síntesis
     }
     return bancosMuestras[inst] instanceof Map ? bancosMuestras[inst] : null;
@@ -6397,6 +6408,9 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
   document.querySelectorAll('#sonidoGroup button').forEach(b => b.addEventListener('click', () => { state.sonidoReal = b.dataset.sonido === 'real'; render(); }));
   const precargar = () => { if (state.sonidoReal) { bancoMuestras(state.instrument); if (state.tab === 'piano') bancoMuestras('piano'); } };
   document.addEventListener('pointerdown', precargar, { capture: true });
+  if (state.sonidoReal) { descargarMuestras(state.instrument); descargarMuestras(state.instrument === 'bajo' ? 'guitarra' : 'bajo'); }
+  let audioListo = false;
+  document.addEventListener('pointerdown', () => { audioListo = true; }, { capture: true, once: true });
 
   // Caja de ritmos: hoja deslizable con botón flotante, disponible en cualquier sección
   const abrirRitmos = abrir => { $('#ritmoHoja').hidden = !abrir; $('#ritmoFab').setAttribute('aria-expanded', String(abrir)); };
@@ -6425,6 +6439,7 @@ Consejo: si un día solo tienes 5 minutos, haz solo el primer bloque. Practicar 
     $('#manoValor').textContent = state.lefty ? 'Zurdo' : 'Diestro';
     document.querySelectorAll('#sonidoGroup button').forEach(b => b.classList.toggle('active', (b.dataset.sonido === 'real') === state.sonidoReal));
     guardarAjustes();
+    if (audioListo) precargar();   // al pasar a Bajo o a Piano, sus muestras se decodifican ya, no en la primera nota
     const vista = state.tab + state.lefty + state.instrument, shell = document.querySelector('.board-shell');
     if (vista !== ultimaVista && shell && shell.scrollWidth > shell.clientWidth) shell.scrollLeft = state.lefty ? shell.scrollWidth : 0;
     ultimaVista = vista;
